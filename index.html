@@ -50,6 +50,7 @@ h1 span{color:var(--neon)}
 .card .go{margin-top:auto;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
 .card.main{border-color:var(--neon);background:linear-gradient(135deg,rgba(255,46,99,.22),rgba(20,18,30,.88) 60%)}
 .card.main .go{color:var(--neon)}
+a.card{color:inherit;text-decoration:none}a.card:hover{border-color:var(--neon)}a.card .go{color:var(--neon)}
 .card.main:hover{background:linear-gradient(135deg,rgba(255,46,99,.34),rgba(20,18,30,.9) 60%)}
 .card[aria-disabled="true"]{cursor:default}
 .card[aria-disabled="true"] .go{color:var(--muted)}
@@ -128,18 +129,18 @@ img.ph{width:100%;object-fit:cover;display:block}
         <p>Une rue de Neo-Tokyo, six affiches, un ticket à arracher. Faites défiler pour avancer.</p>
         <span class="go">Entrer dans la rue →</span>
       </button>
-      <div class="card" aria-disabled="true" id="card-pdf10">
+      <a class="card" id="card-pdf10" href="cv/CV_Guillaume_Belle-Croix_10p.pdf" target="_blank" rel="noopener">
         <span class="tag">PDF · 10 pages</span>
         <b>CV complet</b>
-        <p>Le parcours détaillé, projet par projet.</p>
-        <span class="go">Bientôt disponible</span>
-      </div>
-      <div class="card" aria-disabled="true" id="card-pdf1">
+        <p>Matchday · All Access : ma journée dans les coulisses d'une finale, de 08:00 à 23:30.</p>
+        <span class="go">Ouvrir le PDF →</span>
+      </a>
+      <a class="card" id="card-pdf1" href="cv/CV_Guillaume_Belle-Croix_1page.pdf" target="_blank" rel="noopener">
         <span class="tag">PDF · 1 page</span>
         <b>CV express</b>
         <p>L'essentiel sur une seule page.</p>
-        <span class="go">Bientôt disponible</span>
-      </div>
+        <span class="go">Ouvrir le PDF →</span>
+      </a>
     </div>
   </div>
 </section>
