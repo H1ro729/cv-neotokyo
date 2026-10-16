@@ -86,6 +86,10 @@ h1 span{color:var(--neon)}
 .facts li::before{content:"";flex:none;width:10px;height:10px;background:var(--c1);transform:translateY(-1px)}
 .todo{border:1px dashed #5a536d;padding:18px 20px;color:var(--muted);font-size:15px;background:rgba(255,255,255,.02)}
 .todo strong{display:block;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);margin-bottom:6px}
+.txt{border-left:2px solid var(--c1);padding:4px 0 4px 18px;font-size:16px;line-height:1.6}
+.txt strong{display:block;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);margin-bottom:8px}
+.txt p{margin:0;max-width:62ch}
+img.ph{width:100%;object-fit:cover;display:block}
 .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .ph{aspect-ratio:4/3;max-width:100%;border:1px dashed #5a536d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);
   font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 10px,transparent 10px 20px)}
@@ -172,22 +176,22 @@ let MODE = 'd';
 const P = [
   {n:1, deb:665, fin:671, c1:"#ffc420", eyebrow:"01 · Qui suis-je ?", title:"Guillaume Belle-Croix",
    facts:["21 ans · Bordeaux","Esport · Digital · Événementiel","Étudiant INSEEC Bachelor"],
-   todo:[["Présentation","Ton parcours en quelques lignes : d'où tu viens, ce qui t'anime."],["Ce qui me définit","Tes qualités, tes passions, ce qu'un employeur doit retenir."]]},
+   txt:[["Présentation","21 ans, Bordelais, deux ans dans la Gendarmerie nationale et une passion de toujours pour le jeu vidéo. Aujourd'hui je reprends mes études à l'INSEEC avec un cap clair : <b>travailler dans l'esport, dans l'ombre des structures</b>, là où se construisent les événements, les partenariats et les communautés."],["Ce qui me définit","La rigueur et le sang-froid du terrain, l'envie de créer (ce CV en 3D, mon site de pronostics, mes jeux Roblox) et une vraie connaissance de la scène, côté joueur comme côté public. Fiable, ponctuel, à l'aise en équipe."]], ph:[]},
   {n:2, deb:743, fin:749, c1:"#26c8e8", eyebrow:"02 · Formation", title:"INSEEC Bachelor",
    facts:["Marketing & communication digitale","Campus de Bordeaux","Rentrée 2026"],
-   todo:[["Le programme","Ce que tu y apprends, les matières et projets marquants."],["Pourquoi ce choix","Le lien entre cette formation et ton projet esport."]]},
+   txt:[["Le programme","Stratégie de marque et marketing digital, réseaux sociaux et création de contenu, gestion de projet en équipe, présentations orales : tout ce qui fait tourner une marque aujourd'hui."],["Pourquoi ce choix","L'esport vit sur le digital : communautés, streams, réseaux sociaux, partenariats de marques. Je veux savoir piloter ces leviers pour une structure ou un événement."]], ph:[]},
   {n:3, deb:821, fin:827, c1:"#ce182c", eyebrow:"03 · Expérience", title:"Gendarme Adjoint Volontaire",
    facts:["2024 — 2026 · 2 ans","Rigueur · sang-froid · équipe","Terrain & gestion du public"],
-   todo:[["Missions","Tes missions principales et ton quotidien."],["Ce que j'en retire","Les compétences transférables dans l'esport et l'événementiel."]]},
+   txt:[["Missions","Sécurité publique et patrouilles, accueil et gestion du public, interventions en équipe de jour comme de nuit, dans le respect strict des procédures."],["Ce que j'en retire","Gérer une foule et ses flux, anticiper les risques, rester calme quand la situation se tend, être fiable et à l'heure : exactement ce que demande le jour J d'un événement."]], ph:[]},
   {n:4, deb:899, fin:905, c1:"#f0326e", eyebrow:"04 · Esport", title:"Vainqueur EWC 2026 Paris",
    facts:["Tournoi communautaire Valorant","Finale en 1v1 gagnée 10 – 4","Esports World Cup · Paris"],
-   todo:[["Le tournoi","Le déroulé, les adversaires, la finale."],["Mon esport","Les événements suivis, ta place dans la scène."]]},
+   txt:[["Le tournoi","Tournoi communautaire Valorant organisé pendant l'Esports World Cup à Paris. J'ai remporté la finale en 1v1, <b>10 à 4</b>, le 12 juillet 2026."],["Mon esport","Je suis la scène de près : Valorant Worlds 2025, EWC 2026, environ un grand événement par an, et supporter de <b>Gentle Mates</b>. Je connais l'ambiance d'une salle et ce qui fait vibrer une communauté."]], ph:[]},
   {n:5, deb:977, fin:983, c1:"#7c4dff", eyebrow:"05 · Projets", title:"Clutch Pronos",
    facts:["Mon site de pronostics esport","7 jeux · classement · cartes à collectionner",'<a class="link" href="https://clutch-esport.com" target="_blank" rel="noopener">clutch-esport.com</a>'],
-   todo:[["Le projet","L'idée, comment tu l'as construit, les chiffres."],["Autres projets","Ce CV en 3D, et ce que tu veux ajouter."]]},
+   txt:[["Le projet","Un site de pronostics esport gratuits avec des crédits virtuels : 7 jeux couverts, un classement des joueurs et des cartes de pros à collectionner. J'ai porté l'idée, le concept, l'identité visuelle, la conception avec l'IA et la mise en ligne."],["Autres projets","Ce CV immersif, une rue de Tokyo construite dans Blender ; deux jeux sur Roblox ; un serveur Discord dédié aux projets réalisés avec l'IA ; et un projet de marque de vêtements."]], ph:[]},
   {n:6, deb:1055, fin:1061, c1:"#32dc8c", eyebrow:"06 · Ce que je cherche", title:"Stage & Alternance",
    facts:["Partenariats & management esport","Événementiel · gestion de projet","Aussi CDD ou job étudiant · Bordeaux"],
-   todo:[["Mes compétences","Gestion de projet, communication digitale, outils, langues."],["Mes disponibilités","Rythme d'alternance, dates, mobilité."]]},
+   txt:[["Mes compétences","Marketing et communication digitale, réseaux sociaux, storytelling et direction artistique. Gestion de projet de l'idée au lancement. Outils : Blender, outils d'IA, Roblox Studio, mise en ligne d'un site."],["Mes disponibilités","Basé à Bordeaux, permis B. Ouvert au stage, à l'alternance, au CDD ou au job étudiant, dans les partenariats, le management esport ou l'événementiel."]], ph:[]},
 ];
 
 /* ---------- accueil ---------- */
@@ -296,11 +300,11 @@ let started = false;
 const col = document.getElementById("col"), page = document.getElementById("page");
 function pageHTML(p){
   const facts = p.facts.map(f => "<li>" + f + "</li>").join("");
-  const todos = p.todo.map(t => '<div class="todo"><strong>' + t[0] + "</strong>À compléter : " + t[1] + "</div>").join("");
-  const photos = [1,2,3,4].map(k => '<div class="ph"><b>' + k + "</b>Photo à ajouter</div>").join("");
+  const todos = p.txt.map(t => '<div class="txt"><strong>' + t[0] + "</strong><p>" + t[1] + "</p></div>").join("");
+  const photos = p.ph.length ? '<div class="sec-title">Photos</div><div class="photos">' + p.ph.map(u => '<img class="ph" loading="lazy" alt="" src="' + u + '">').join("") + "</div>" : "";
   return '<div class="poster" style="background-image:url(img/a' + p.n + '_debut.webp)" role="img" aria-label="Affiche ' + p.n + '"></div>' +
     '<div class="body" style="--c1:' + p.c1 + '"><div class="p-head"><span class="eyebrow">' + p.eyebrow + "</span><h2>" + p.title + '</h2></div><ul class="facts">' + facts + "</ul>" +
-    todos + '<div class="sec-title">Photos</div><div class="photos">' + photos + "</div></div>" +
+    todos + photos + "</div>" +
     '<div class="poster" style="background-image:url(img/a' + p.n + '_fin.webp)" role="img" aria-label="Fin du chapitre ' + p.n + '"></div>';
 }
 
