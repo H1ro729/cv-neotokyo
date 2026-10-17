@@ -190,7 +190,7 @@ let MODE = 'd';
 const P = [
   {n:1, deb:665, fin:671, c1:"#ffc420", eyebrow:"01 · Qui suis-je ?", title:"Guillaume Belle-Croix",
    facts:["21 ans · Bordeaux","Esport · Digital · Événementiel","Étudiant INSEEC Bachelor"],
-   txt:[["Présentation","Je m'appelle Guillaume Belle-Croix et j'ai 21 ans. J'ai effectué deux ans dans la Gendarmerie nationale et j'ai toujours été passionné de jeu vidéo. Aujourd'hui, je reprends mes études à l'INSEEC avec un cap clair : <b>travailler dans l'esport, dans l'ombre des structures</b>, là où se construisent les événements, les partenariats, les rosters et les communautés."],["Ce qui me définit","La rigueur et le sang-froid du terrain, l'envie de créer et d'apprendre (ce CV en 3D, mon site de pronostics, mes réalisations sur Blender, mes jeux Roblox…) et une connaissance sincère de la scène, côté joueur comme côté public. Fiable, ponctuel, à l'aise en équipe."],["Voyager","J'aime voyager et j'essaie de partir au moins une fois par an. Ma destination préférée : <b>le Japon</b>, pour sa culture, ses infrastructures, son histoire et sa communauté."]], ph:[["img/p1/japon.webp","Japon","a"],["img/p1/arena.webp","Valorant Champions · Paris","b"],["img/p1/uniforme.webp","Deux ans d'uniforme","c"],["img/p1/lunettes.webp","","d"]]},
+   txt:[["Présentation","Je m'appelle Guillaume Belle-Croix et j'ai 21 ans. J'ai effectué deux ans dans la Gendarmerie nationale et j'ai toujours été passionné de jeu vidéo. Aujourd'hui, je reprends mes études à l'INSEEC avec un cap clair : <b>travailler dans l'esport, dans l'ombre des structures</b>, là où se construisent les événements, les partenariats, les rosters et les communautés."],["Ce qui me définit","La rigueur et le sang-froid du terrain, l'envie de créer et d'apprendre (ce CV en 3D, mon site de pronostics, mes réalisations sur Blender, mes jeux Roblox…) et une connaissance sincère de la scène, côté joueur comme côté public. Fiable, ponctuel, à l'aise en équipe."],["Voyager","J'aime voyager et j'essaie de partir au moins une fois par an. Ma destination préférée : <b>le Japon</b>, pour sa culture, ses infrastructures, son histoire et sa communauté."]], ph:[["img/p1/japon.webp","Japon","a"],["img/p1/arena.webp","Valorant Champions · Paris","b"],["img/p1/uniforme.webp?v=2","Deux ans d'uniforme","c"],["img/p1/lunettes.webp","","d"]]},
   {n:2, deb:743, fin:749, c1:"#26c8e8", eyebrow:"02 · Formation", title:"INSEEC Bachelor",
    facts:["Marketing & communication digitale","Campus de Bordeaux","Rentrée 2026"],
    txt:[["Le programme","Stratégie de marque et marketing digital, réseaux sociaux et création de contenu, gestion de projet en équipe, présentations orales : tout ce qui fait tourner une marque aujourd'hui."],["Pourquoi ce choix","L'esport vit sur le digital : communautés, streams, réseaux sociaux, partenariats de marques. Je veux savoir piloter ces leviers pour une structure ou un événement."]], ph:[]},
@@ -215,7 +215,7 @@ document.getElementById("back").addEventListener("click", () => { exp.hidden = t
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl', h:'dh'}, m:{l:'ml', h:'mh'}};
-const VER = '?v=9';
+const VER = '?v=10';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0}; }
