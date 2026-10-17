@@ -331,8 +331,8 @@ function build(){
   const add = (o, len) => { o.s = s; o.len = len; s += len; segs.push(o); };
   P.forEach(p => {
     add({t:"v", f0:a, f1:p.deb}, (p.deb - a) * PXF);
-    const fade = VH * 0.35;
-    add({t:"p", p, fade, scroll:colH[p.n] - geom.ph}, fade * 2 + colH[p.n] - geom.ph);
+    const fade = VH * 0.6, sc = Math.max(0, colH[p.n] - geom.ph);
+    add({t:"p", p, fade, scroll:sc}, fade * 2 + sc * SLOW);
     a = p.fin;
   });
   add({t:"v", f0:a, f1:1204}, (1204 - a) * PXF);
@@ -345,6 +345,10 @@ function build(){
   const c = document.createElement("button"); c.type = "button"; c.textContent = "Contact"; c.onclick = () => window.scrollTo({top:total, behavior:"auto"}); nav.appendChild(c);
 }
 let shownPage = null;
+/* défilement des affiches : ralenti (SLOW) et lissé comme la vidéo */
+const SLOW = 2.6; let colT = 0, colY = null, lastPg = null, colAnim = false;
+function colTick(){ const d = colT - colY; if (Math.abs(d) < 0.3){ colY = colT; col.style.transform = "translateY(" + colY + "px)"; colAnim = false; return; } colY += d * 0.14; col.style.transform = "translateY(" + colY + "px)"; requestAnimationFrame(colTick); }
+function kickCol(){ if (!colAnim){ colAnim = true; requestAnimationFrame(colTick); } }
 function showPage(p){ if (shownPage === p) return; shownPage = p; if (!p){ col.innerHTML = ""; return; } col.innerHTML = pageHTML(p); col.style.width = geom.w + "px"; col.style.left = geom.x + "px"; }
 function onScroll(){
   if (!started) return;
@@ -356,10 +360,11 @@ function onScroll(){
   else if (sg.t === "p"){
     const p = sg.p, d = y - sg.s; showPage(p);
     let off;
+    const sl = sg.scroll * SLOW;
     if (d < sg.fade){ pageOp = d / sg.fade; off = 0; cur = fi(p.deb); }
-    else if (d < sg.fade + sg.scroll){ pageOp = 1; off = d - sg.fade; cur = fi(p.deb); }
-    else { pageOp = 1 - (d - sg.fade - sg.scroll) / sg.fade; off = sg.scroll; cur = fi(p.fin); }
-    col.style.transform = "translateY(" + (geom.y - off) + "px)";
+    else if (d < sg.fade + sl){ pageOp = 1; off = (d - sg.fade) / SLOW; cur = fi(p.deb); }
+    else { pageOp = 1 - (d - sg.fade - sl) / sg.fade; off = sg.scroll; cur = fi(p.fin); }
+    colT = geom.y - off; if (colY === null || shownPage !== lastPg){ colY = colT; lastPg = shownPage; } kickCol();
     page.querySelector(".veil").style.opacity = Math.min(1, Math.min(d, sg.len - d) / sg.fade);
   } else { cur = NF - 1; contactOp = Math.min(1, t * 2); showPage(null); }
   page.style.opacity = pageOp; page.style.pointerEvents = pageOp > 0.9 ? "auto" : "none";
