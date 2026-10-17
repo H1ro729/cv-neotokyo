@@ -93,6 +93,17 @@ a.card{color:inherit;text-decoration:none}a.card:hover{border-color:var(--neon)}
 .txt strong{display:block;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);margin-bottom:8px}
 .txt p{margin:0;max-width:62ch}
 img.ph{width:100%;object-fit:cover;display:block}
+.collage{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:clamp(34px,4.2vw,58px);gap:14px;padding:10px 4px 18px}
+.pf{margin:0;position:relative;background:#f1ece2;padding:8px 8px 26px;box-shadow:0 10px 26px rgba(0,0,0,.55);overflow:visible}
+.pf img{width:100%;height:100%;object-fit:cover;display:block}
+.pf figcaption{position:absolute;left:10px;right:10px;bottom:5px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#2a2533;line-height:1.15}
+@media (max-width:600px){.pf{padding:6px 6px 30px}.pf figcaption{font-size:9px;letter-spacing:.04em}}
+.pf::before{content:"";position:absolute;top:-9px;left:50%;width:62px;height:18px;transform:translateX(-50%) rotate(-3deg);background:rgba(233,227,207,.75);box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.pf.a{grid-column:1/6;grid-row:1/9;transform:rotate(-2.4deg)}
+.pf.b{grid-column:6/13;grid-row:2/8;transform:rotate(1.6deg)}
+.pf.c{grid-column:7/11;grid-row:8/15;transform:rotate(-1.2deg);z-index:1}
+.pf.d{grid-column:2/7;grid-row:9/15;transform:rotate(2.8deg)}
+.pf.b::before{left:24%}.pf.d::before{left:70%;transform:translateX(-50%) rotate(4deg)}
 .photos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .ph{aspect-ratio:4/3;max-width:100%;border:1px dashed #5a536d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);
   font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 10px,transparent 10px 20px)}
@@ -179,7 +190,7 @@ let MODE = 'd';
 const P = [
   {n:1, deb:665, fin:671, c1:"#ffc420", eyebrow:"01 · Qui suis-je ?", title:"Guillaume Belle-Croix",
    facts:["21 ans · Bordeaux","Esport · Digital · Événementiel","Étudiant INSEEC Bachelor"],
-   txt:[["Présentation","21 ans, Bordelais, deux ans dans la Gendarmerie nationale et une passion de toujours pour le jeu vidéo. Aujourd'hui je reprends mes études à l'INSEEC avec un cap clair : <b>travailler dans l'esport, dans l'ombre des structures</b>, là où se construisent les événements, les partenariats et les communautés."],["Ce qui me définit","La rigueur et le sang-froid du terrain, l'envie de créer (ce CV en 3D, mon site de pronostics, mes jeux Roblox) et une vraie connaissance de la scène, côté joueur comme côté public. Fiable, ponctuel, à l'aise en équipe."]], ph:[]},
+   txt:[["Présentation","Je m'appelle Guillaume Belle-Croix et j'ai 21 ans. J'ai effectué deux ans dans la Gendarmerie nationale et j'ai toujours été passionné de jeu vidéo. Aujourd'hui, je reprends mes études à l'INSEEC avec un cap clair : <b>travailler dans l'esport, dans l'ombre des structures</b>, là où se construisent les événements, les partenariats, les rosters et les communautés."],["Ce qui me définit","La rigueur et le sang-froid du terrain, l'envie de créer et d'apprendre (ce CV en 3D, mon site de pronostics, mes réalisations sur Blender, mes jeux Roblox…) et une connaissance sincère de la scène, côté joueur comme côté public. Fiable, ponctuel, à l'aise en équipe."],["Voyager","J'aime voyager et j'essaie de partir au moins une fois par an. Ma destination préférée : <b>le Japon</b>, pour sa culture, ses infrastructures, son histoire et sa communauté."]], ph:[["img/p1/japon.webp","Japon","a"],["img/p1/arena.webp","Valorant Champions · Paris","b"],["img/p1/uniforme.webp","Deux ans d'uniforme","c"],["img/p1/lunettes.webp","","d"]]},
   {n:2, deb:743, fin:749, c1:"#26c8e8", eyebrow:"02 · Formation", title:"INSEEC Bachelor",
    facts:["Marketing & communication digitale","Campus de Bordeaux","Rentrée 2026"],
    txt:[["Le programme","Stratégie de marque et marketing digital, réseaux sociaux et création de contenu, gestion de projet en équipe, présentations orales : tout ce qui fait tourner une marque aujourd'hui."],["Pourquoi ce choix","L'esport vit sur le digital : communautés, streams, réseaux sociaux, partenariats de marques. Je veux savoir piloter ces leviers pour une structure ou un événement."]], ph:[]},
@@ -204,7 +215,7 @@ document.getElementById("back").addEventListener("click", () => { exp.hidden = t
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl', h:'dh'}, m:{l:'ml', h:'mh'}};
-const VER = '?v=8';
+const VER = '?v=9';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0}; }
@@ -304,7 +315,7 @@ const col = document.getElementById("col"), page = document.getElementById("page
 function pageHTML(p){
   const facts = p.facts.map(f => "<li>" + f + "</li>").join("");
   const todos = p.txt.map(t => '<div class="txt"><strong>' + t[0] + "</strong><p>" + t[1] + "</p></div>").join("");
-  const photos = p.ph.length ? '<div class="sec-title">Photos</div><div class="photos">' + p.ph.map(u => '<img class="ph" loading="lazy" alt="" src="' + u + '">').join("") + "</div>" : "";
+  const photos = p.ph.length ? '<div class="sec-title">Photos</div><div class="collage">' + p.ph.map(([u, c, k]) => '<figure class="pf ' + k + '"><img loading="lazy" alt="' + c + '" src="' + u + '">' + (c ? "<figcaption>" + c + "</figcaption>" : "") + "</figure>").join("") + "</div>" : "";
   return '<div class="poster" style="background-image:url(img/a' + p.n + '_debut.webp)" role="img" aria-label="Affiche ' + p.n + '"></div>' +
     '<div class="body" style="--c1:' + p.c1 + '"><div class="p-head"><span class="eyebrow">' + p.eyebrow + "</span><h2>" + p.title + '</h2></div><ul class="facts">' + facts + "</ul>" +
     todos + photos + "</div>" +
