@@ -220,7 +220,7 @@ const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0}; }
 const BLOB_MAX_H = 150;            // images HD gardées compressées en mémoire
-const BMP_MAX = 10;                // images décodées gardées prêtes
+const BMP_MAX = 16;                // images décodées gardées prêtes
 const bmp = new Map(), dec = new Set();
 let lastBm = null;
 function st(){ return S[MODE] || (S[MODE] = mk()); }
@@ -276,6 +276,8 @@ function frameFor(i){
   const s = st(), kH = MODE + 'h' + i, kL = MODE + 'l' + i;
   if (bmp.has(kH)){ const b = bmp.get(kH); bmp.delete(kH); bmp.set(kH, b); return b; }
   const hb = s.h.get(i); if (hb) decode(kH, hb);
+  /* une image HD voisine (±3) vaut mieux qu'un aperçu flou agrandi */
+  for (let r = 1; r <= 3; r++) for (const j of [i - r, i + r]) if (bmp.has(MODE + 'h' + j)) return bmp.get(MODE + 'h' + j);
   if (bmp.has(kL)) return bmp.get(kL);
   const lb = s.l[i]; if (lb) decode(kL, lb);
   return null;
