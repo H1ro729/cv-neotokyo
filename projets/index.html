@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mes projets · Guillaume Belle-Croix</title>
+<meta name="description" content="Les projets réalisés par Guillaume Belle-Croix : Clutch Pronos, INSEEC Airlines, CV immersif.">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+:root{--night:#0b0a12;--ink:#f3efe6;--muted:#a49fb3;--line:#2a2638;--neon:#ff2e63;--sign:#ffc420;
+  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;--body:"IBM Plex Sans","Segoe UI",Roboto,sans-serif;--mono:"JetBrains Mono",ui-monospace,Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--night);color:var(--ink)}
+body{font-family:var(--body);font-size:16px;line-height:1.55;min-height:100vh;
+  padding:max(20px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1180px;margin:0 auto;display:grid;gap:28px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.btn{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);text-decoration:none;padding:10px 14px;border:1px solid var(--line);background:rgba(20,18,30,.82)}
+.btn:hover{border-color:var(--neon)}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sign)}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(52px,9vw,120px);line-height:.88;text-transform:uppercase;margin:0}
+h1 span{color:var(--neon)}
+.lede{max-width:60ch;color:var(--muted);margin:0;font-size:17px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.proj{display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);background:rgba(20,18,30,.82);color:var(--ink);text-decoration:none;overflow:hidden}
+a.proj:hover{border-color:var(--neon)}
+.proj .img{aspect-ratio:16/9;background:#14121e center/cover no-repeat;position:relative}
+.proj .img .soon{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--display);font-weight:900;font-size:42px;letter-spacing:.04em;text-transform:uppercase;color:#3a3450}
+.proj .txt{display:flex;flex-direction:column;gap:8px;padding:18px 18px 16px;flex:1}
+.proj .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.proj b{font-family:var(--display);font-weight:800;font-size:32px;line-height:1;text-transform:uppercase}
+.proj p{margin:0;color:var(--muted);font-size:14.5px}
+.proj .go{margin-top:auto;padding-top:6px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--neon)}
+.proj[aria-disabled="true"] .go{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="btn" href="../">← Accueil</a>
+    <span class="kicker">Guillaume Belle-Croix · Projets</span>
+  </div>
+  <h1>Mes <span>projets</span></h1>
+  <p class="lede">Ce que j'ai imaginé, conçu et mis en ligne : un site d'esport, des films en 3D réalisés sur Blender et ce CV immersif.</p>
+  <div class="grid">
+    <a class="proj" href="https://clutch-esport.com" target="_blank" rel="noopener">
+      <div class="img" style="background-image:url(../img/a5_debut.webp)"></div>
+      <div class="txt">
+        <span class="tag">Site web · Esport</span>
+        <b>Clutch Pronos</b>
+        <p>Mon site de pronostics esport gratuits : 7 jeux, un classement des joueurs et des cartes de pros à collectionner.</p>
+        <span class="go">Visiter clutch-esport.com ↗</span>
+      </div>
+    </a>
+    <a class="proj" href="airlines/">
+      <div class="img" style="background-image:url(airlines/cover.webp)"></div>
+      <div class="txt">
+        <span class="tag">Blender · Film au scroll</span>
+        <b>INSEEC Airlines</b>
+        <p>Vol IB2026 : le film de présentation en 3D de la soirée étudiante INSEEC Airlines, réalisé sur Blender en équipe. À parcourir au scroll.</p>
+        <span class="go">Embarquer →</span>
+      </div>
+    </a>
+    <a class="proj" href="../">
+      <div class="img" style="background-image:url(../img/dh/000.webp?v=9)"></div>
+      <div class="txt">
+        <span class="tag">Blender · Site au scroll</span>
+        <b>CV immersif</b>
+        <p>Une rue de Neo-Tokyo construite sur Blender, six affiches et un ticket à arracher : ce site.</p>
+        <span class="go">Entrer dans la rue →</span>
+      </div>
+    </a>
+  </div>
+</div>
+</body>
+</html>
