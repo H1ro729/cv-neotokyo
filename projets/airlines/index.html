@@ -76,7 +76,7 @@ body.lock{overflow:hidden}
 </div>
 <div id="track"></div>
 <script>
-const N = 1024, PX = 42, FPS = 12, HOLD = 700; // 1 image sur 2 du film (12 i/s), px de scroll par image, px de scroll d'arrêt sur chaque document
+const N = 1024, PX = 75, FPS = 12, HOLD = 900; // 1 image sur 2 du film (12 i/s), px de scroll par image, px de scroll d'arrêt sur chaque document
 const D = "docs/";
 const STOPS = [
   ["Ton billet d'embarquement", 12.0, ["billet.webp", "billet_verso.webp"]],
@@ -168,7 +168,7 @@ cv.addEventListener("click", () => { if (ici >= 0) ouvrir(); });
 // précharge les documents pendant le film
 addEventListener("load", () => setTimeout(() => STOPS.forEach(st => st[2] && st[2].forEach(f => { const i = new Image(); i.src = D + f; })), 4000));
 function tick(){
-  const d = target - pos; pos = Math.abs(d) < 0.01 ? target : pos + d * 0.1;
+  const d = target - pos; pos = Math.abs(d) < 0.01 ? target : pos + d * 0.08;
   draw(); pump();
   bar.style.width = (pos / (N - 1) * 100) + "%";
   intro.style.opacity = Math.max(0, 1 - scrollY / (VH * 0.5));
