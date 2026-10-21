@@ -154,6 +154,16 @@
     [366, holoOn], [444, holoOff],         // carte d'identité holographique
     [1160, dechire]                        // le ticket
   ];
+  // le son n'existe que dans la rue : bouton caché et silence sur l'écran d'accueil
+  let dansRue = false;
+  function rue() {
+    const ex = document.getElementById("exp"), r = !ex || !ex.hidden;
+    if (r !== dansRue) {
+      dansRue = r; btn.style.display = r ? "" : "none";
+      if (ctx && on) { const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(r ? 1 : 0, t + (r ? 1.2 : 0.4)); }
+    }
+    requestAnimationFrame(rue);
+  }
   function suivi() {
     let lastF = null;
     const tick = () => {
@@ -180,7 +190,7 @@
     if (!ctx) return;
     if (on && ctx.state === "suspended") ctx.resume();
     const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t);
-    master.gain.linearRampToValueAtTime(on ? 1 : 0, t + (on ? 1.8 : 0.5));
+    master.gain.linearRampToValueAtTime(on && dansRue ? 1 : 0, t + (on ? 1.8 : 0.5));
   }
   btn.addEventListener("click", () => regler(!on));
   document.addEventListener("visibilitychange", () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else if (on) ctx.resume(); });
@@ -191,6 +201,7 @@
     ["pointerdown", "keydown", "touchend"].forEach(t => addEventListener(t, go, true));
   }
   label();
-  const poser = () => document.body.appendChild(btn);
+  btn.style.display = "none";
+  const poser = () => { document.body.appendChild(btn); rue(); };
   if (document.body) poser(); else addEventListener("DOMContentLoaded", poser);
 })();

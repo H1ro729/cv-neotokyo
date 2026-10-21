@@ -477,10 +477,10 @@ window.addEventListener("resize", () => { if (started) resize(); });
   }
   function neuve(partout){
     const z = Math.random();                       // profondeur : les gouttes proches sont plus longues, rapides et visibles
-    return {x:Math.random() * (W + 200) - 100, y:partout ? Math.random() * H : -40 - Math.random() * 200,
+    return {x:Math.random() * (W + 260) - 260, y:partout ? Math.random() * H : -40 - Math.random() * 200,
       l:10 + z * 26, v:900 + z * 1300, a:0.06 + z * 0.16, w:(0.6 + z * 0.8)};
   }
-  const VENT = -0.12;                              // légère inclinaison, comme dans le rendu
+  const VENT = 0.16;                               // de haut-gauche vers bas-droite, comme dans le rendu
   function anime(t){
     requestAnimationFrame(anime);
     const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
@@ -490,7 +490,7 @@ window.addEventListener("resize", () => { if (started) resize(); });
     px.setTransform(R, 0, 0, R, 0, 0); px.clearRect(0, 0, W, H); px.lineCap = "round";
     for (const g of gouttes){
       g.y += g.v * dt; g.x += g.v * VENT * dt;
-      if (g.y - g.l > H || g.x < -60) Object.assign(g, neuve(false));
+      if (g.y - g.l > H || g.x > W + 60) Object.assign(g, neuve(false));
       px.strokeStyle = "rgba(205,220,255," + g.a + ")"; px.lineWidth = g.w;
       px.beginPath(); px.moveTo(g.x, g.y); px.lineTo(g.x - g.l * VENT, g.y - g.l); px.stroke();
     }
@@ -510,6 +510,6 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 
 </script>
 
-<script src="son.js?v=4" defer></script>
+<script src="son.js?v=5" defer></script>
 </body>
 </html>
