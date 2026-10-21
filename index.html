@@ -4,10 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="CV immersif de Guillaume Belle-Croix : une rue de Neo-Tokyo sous la pluie, à parcourir au scroll. Esport, digital, événementiel.">
-<meta property="og:title" content="Guillaume Belle-Croix · CV Neo-Tokyo">
-<meta property="og:description" content="Un CV à parcourir comme un jeu vidéo. Esport, digital, événementiel.">
-<meta property="og:image" content="https://guillaume-bellecroix.fr/img/og.jpg">
+<link rel="canonical" href="https://guillaume-bellecroix.fr/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Guillaume Belle-Croix">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Guillaume Belle-Croix · CV immersif Neo-Tokyo">
+<meta property="og:description" content="Esport, digital, événementiel : un CV à parcourir comme un jeu vidéo, dans une rue de Neo-Tokyo sous la pluie. Stage, alternance, CDD.">
 <meta property="og:url" content="https://guillaume-bellecroix.fr/">
+<meta property="og:image" content="https://guillaume-bellecroix.fr/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Guillaume Belle-Croix, CV immersif : une rue de Neo-Tokyo sous la pluie, à parcourir au scroll.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Guillaume Belle-Croix · CV immersif Neo-Tokyo">
+<meta name="twitter:description" content="Esport, digital, événementiel : un CV à parcourir comme un jeu vidéo, dans une rue de Neo-Tokyo sous la pluie. Stage, alternance, CDD.">
+<meta name="twitter:image" content="https://guillaume-bellecroix.fr/img/og.jpg">
 <meta name="theme-color" content="#0b0a12">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <title>Guillaume Belle-Croix · CV Neo-Tokyo</title>
@@ -60,6 +71,15 @@ a.card{color:inherit;text-decoration:none}a.card:hover{border-color:var(--neon)}
 .topnav a{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);text-decoration:none;
   padding:10px 14px;border:1px solid var(--neon);background:rgba(11,10,18,.72);backdrop-filter:blur(6px)}
 .topnav a:hover{background:var(--neon);color:var(--night)}
+.topnav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+#home{padding-top:max(84px,calc(env(safe-area-inset-top,0px) + 76px))}
+.topnav a.sec{border-color:var(--line)}
+.topnav a.sec:hover{border-color:var(--neon)}
+.acts{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
+.acts a{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--ink);padding:9px 12px;border:1px solid var(--line)}
+.acts a:hover{border-color:var(--neon)}
+.acts a.dl{color:var(--night);background:var(--sign);border-color:var(--sign);font-weight:500}
+.acts a.dl:hover{filter:brightness(1.1)}
 
 /* ---------- expérience ---------- */
 #exp[hidden]{display:none}
@@ -134,7 +154,7 @@ img.ph{width:100%;object-fit:cover;display:block}
 
 <section id="home">
   <div class="bg" aria-hidden="true"></div>
-  <nav class="topnav" aria-label="Navigation"><a href="projets/">Mes projets →</a></nav>
+  <nav class="topnav" aria-label="Navigation"><a class="sec" href="contact/">Contact</a><a href="projets/">Mes projets →</a></nav>
   <div class="wrap">
     <div class="kicker"><span>CV · Bordeaux · 2026</span><span class="jp">履歴書</span></div>
     <h1>Guillaume<br><span>Belle-Croix</span></h1>
@@ -146,18 +166,18 @@ img.ph{width:100%;object-fit:cover;display:block}
         <p>Une rue de Neo-Tokyo, six affiches, un ticket à arracher. Faites défiler pour avancer.</p>
         <span class="go">Entrer dans la rue →</span>
       </button>
-      <a class="card" id="card-pdf10" href="cv/CV_Guillaume_Belle-Croix_10p.pdf" target="_blank" rel="noopener">
+      <div class="card" id="card-pdf10">
         <span class="tag">PDF · 10 pages</span>
         <b>CV complet</b>
         <p>Matchday · All Access : ma journée dans les coulisses d'une finale, de 08:00 à 23:30.</p>
-        <span class="go">Ouvrir le PDF →</span>
-      </a>
-      <a class="card" id="card-pdf1" href="cv/CV_Guillaume_Belle-Croix_1page.pdf" target="_blank" rel="noopener">
+        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_10p.pdf" target="_blank" rel="noopener">Ouvrir ↗</a><a class="dl" href="cv/CV_Guillaume_Belle-Croix_10p.pdf" download="CV_Guillaume_Belle-Croix_complet.pdf">Télécharger ↓</a></span>
+      </div>
+      <div class="card" id="card-pdf1">
         <span class="tag">PDF · 1 page</span>
         <b>CV express</b>
         <p>L'essentiel sur une seule page.</p>
-        <span class="go">Ouvrir le PDF →</span>
-      </a>
+        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf" target="_blank" rel="noopener">Ouvrir ↗</a><a class="dl" href="cv/CV_Guillaume_Belle-Croix_1page.pdf" download="CV_Guillaume_Belle-Croix_1page.pdf">Télécharger ↓</a></span>
+      </div>
     </div>
   </div>
 </section>
@@ -217,7 +237,7 @@ const P = [
 /* ---------- accueil ---------- */
 const home = document.getElementById("home"), exp = document.getElementById("exp");
 document.getElementById("go-immersif").addEventListener("click", start);
-document.getElementById("back").addEventListener("click", () => { exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
+document.getElementById("back").addEventListener("click", () => { window.NTF = null; window.NTP = 0; exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl', h:'dh'}, m:{l:'ml', h:'mh'}};
@@ -313,6 +333,7 @@ function exact(i){
 function draw(){
   if (!started) return;
   const f = Math.max(0, Math.min(NF - 1, shown)), i0 = Math.floor(f), t = f - i0;
+  window.NTF = 2 * f + 1;                       // image Blender affichée (pour l'ambiance sonore)
   const i = t < 0.5 ? i0 : Math.min(NF - 1, i0 + 1);
   let bm = frameFor(i);
   for (const j of [i + 1, i + 2, i - 1]) if (j >= 0 && j < NF){ const s = st(), hb = s.h.get(j); if (hb) decode(MODE + 'h' + j, hb); }
@@ -403,6 +424,7 @@ function onScroll(){
     colT = geom.y - off; if (colY === null || shownPage !== lastPg){ colY = colT; lastPg = shownPage; } kickCol();
     page.querySelector(".veil").style.opacity = Math.min(1, Math.min(d, sg.len - d) / sg.fade);
   } else { cur = NF - 1; contactOp = Math.min(1, t * 2); showPage(null); }
+  window.NTP = pageOp;
   page.style.opacity = pageOp; page.style.pointerEvents = pageOp > 0.9 ? "auto" : "none";
   const ct = document.getElementById("contact"); ct.style.opacity = contactOp; ct.style.pointerEvents = contactOp > 0.5 ? "auto" : "none";
   document.getElementById("bar").style.width = (100 * y / total) + "%";
@@ -454,5 +476,6 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 
 </script>
 
+<script src="son.js?v=3" defer></script>
 </body>
 </html>
