@@ -97,6 +97,7 @@ a.card{color:inherit;text-decoration:none}a.card:hover{border-color:var(--neon)}
 #chapters{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 #chapters button{font-family:var(--mono);font-size:11px;letter-spacing:.08em;background:rgba(11,10,18,.7);color:var(--muted);border:1px solid var(--line);padding:8px 10px;cursor:pointer}
 #chapters button.on{color:var(--night);background:var(--sign);border-color:var(--sign)}
+@media (max-width:900px){#chapters button span{display:none}}
 #bar{position:fixed;z-index:5;left:0;top:env(safe-area-inset-top,0px);height:3px;width:0;background:var(--neon)}
 #hint{position:fixed;z-index:4;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--ink);background:rgba(11,10,18,.6);padding:8px 14px;border:1px solid var(--line);transition:opacity .4s}
@@ -169,10 +170,10 @@ img.ph{width:100%;object-fit:cover;display:block}
         <span class="go">Entrer dans la rue →</span>
       </button>
       <div class="card" id="card-pdf10">
-        <span class="tag">PDF · 10 pages</span>
-        <b>CV complet</b>
-        <p>Matchday · All Access : ma journée dans les coulisses d'une finale, de 08:00 à 23:30.</p>
-        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_10p.pdf" target="_blank" rel="noopener">Ouvrir ↗</a><a class="dl" href="cv/CV_Guillaume_Belle-Croix_10p.pdf" download="CV_Guillaume_Belle-Croix_complet.pdf">Télécharger ↓</a></span>
+        <span class="tag">PDF · 7 pages</span>
+        <b>Dossier projet</b>
+        <p>Mon parcours présenté comme un dossier remis à la direction, pièce par pièce.</p>
+        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf" target="_blank" rel="noopener">Ouvrir ↗</a><a class="dl" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf" download="CV_Guillaume_Belle-Croix_dossier.pdf">Télécharger ↓</a></span>
       </div>
       <div class="card" id="card-pdf1">
         <span class="tag">PDF · 1 page</span>
@@ -398,7 +399,8 @@ function build(){
   total = s;
   document.getElementById("track").style.height = (total + VH) + "px";
   const nav = document.getElementById("chapters"); nav.innerHTML = "";
-  P.forEach(p => { const b = document.createElement("button"); b.type = "button"; b.textContent = "0" + p.n; b.setAttribute("aria-label", "Aller à l'affiche " + p.n);
+  const NOMS = ["Synthèse", "Formation", "Expérience", "Esport", "Réalisations", "Recommandation"];
+  P.forEach(p => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = "0" + p.n + "<span> · " + NOMS[p.n - 1] + "</span>"; b.setAttribute("aria-label", "Aller à l'affiche " + p.n);
     b.onclick = () => { const sg = segs.find(x => x.p === p); window.scrollTo({top:sg.s + sg.fade * 0.999, behavior:"auto"}); }; nav.appendChild(b); });
   const c = document.createElement("button"); c.type = "button"; c.textContent = "Contact"; c.onclick = () => window.scrollTo({top:total, behavior:"auto"}); nav.appendChild(c);
 }
