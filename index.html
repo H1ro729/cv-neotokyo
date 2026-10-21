@@ -43,7 +43,7 @@ a{color:inherit}
 /* ---------- accueil ---------- */
 #home{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:48px 40px}
-#home .bg{position:absolute;inset:0;background:var(--night) url("img/dh/000.webp?v=9") center/cover no-repeat;filter:saturate(1.1)}
+#home .bg{position:absolute;inset:0;background:var(--night) url("img/dh/000.webp?v=10") center/cover no-repeat;filter:saturate(1.1)}
 #home .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,10,18,.15) 0%,rgba(11,10,18,.55) 45%,var(--night) 92%)}
 #home .wrap{position:relative;max-width:1180px;width:100%;margin:0 auto;display:grid;gap:28px}
 .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sign);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
@@ -243,7 +243,7 @@ document.getElementById("back").addEventListener("click", () => { window.NTF = n
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl', h:'dh'}, m:{l:'ml', h:'mh'}};
-const VER = '?v=11';
+const VER = '?v=12';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0}; }
