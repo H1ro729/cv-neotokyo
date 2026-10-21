@@ -5,7 +5,7 @@
 // Coupée par défaut ; le choix du visiteur est retenu.
 (() => {
   const KEY = "neotokyo-son";
-  let ctx = null, master = null, on = false;
+  let ctx = null, master = null, on = false, dansRue = false;
   const btn = document.createElement("button");
   btn.type = "button"; btn.id = "son";
   btn.setAttribute("aria-pressed", "false");
@@ -17,7 +17,7 @@
   #son:hover{border-color:#ff2e63}#son svg{width:16px;height:16px}#son .w{display:none}#son[aria-pressed="true"] .w{display:inline}#son[aria-pressed="true"] .x{display:none}
   #son[aria-pressed="true"]{border-color:#38e1ff;color:#38e1ff}@media (max-width:480px){#son span{display:none}#son{padding:8px 9px}}`;
   document.head.appendChild(st);
-  const label = () => { btn.setAttribute("aria-pressed", String(on)); btn.title = on ? "Couper le son" : "Activer l'ambiance sonore"; btn.querySelector("span").textContent = on ? "Son" : "Son coupé"; };
+  const label = () => { btn.setAttribute("aria-pressed", String(on)); btn.title = (on ? "Couper le son" : "Activer l'ambiance sonore") + (dansRue ? "" : " (on l'entend dans le CV immersif)"); btn.querySelector("span").textContent = on ? "Son" : "Son coupé"; };
 
   let blanc = null;
   function bruit(sec) {
@@ -154,12 +154,11 @@
     [366, holoOn], [444, holoOff],         // carte d'identité holographique
     [1160, dechire]                        // le ticket
   ];
-  // le son n'existe que dans la rue : bouton caché et silence sur l'écran d'accueil
-  let dansRue = false;
+  // le son ne joue que dans la rue : sur l'accueil, le bouton règle seulement le choix
   function rue() {
     const ex = document.getElementById("exp"), r = !ex || !ex.hidden;
     if (r !== dansRue) {
-      dansRue = r; btn.style.display = r ? "" : "none";
+      dansRue = r; label();
       if (ctx && on) { const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(r ? 1 : 0, t + (r ? 1.2 : 0.4)); }
     }
     requestAnimationFrame(rue);
@@ -201,7 +200,6 @@
     ["pointerdown", "keydown", "touchend"].forEach(t => addEventListener(t, go, true));
   }
   label();
-  btn.style.display = "none";
   const poser = () => { document.body.appendChild(btn); rue(); };
   if (document.body) poser(); else addEventListener("DOMContentLoaded", poser);
 })();
