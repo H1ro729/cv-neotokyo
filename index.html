@@ -87,6 +87,7 @@ a.card{color:inherit;text-decoration:none}a.card:hover{border-color:var(--neon)}
 #cv{width:100%;height:100%;display:block}
 #idle{position:absolute;left:0;top:0;opacity:0;transition:opacity .45s ease;pointer-events:none;object-fit:cover;background:transparent}
 #idle.on{opacity:1}
+#pluie{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transition:opacity .5s}
 #track{position:relative;z-index:0}
 #hud{position:fixed;z-index:5;left:0;right:0;bottom:0;display:flex;gap:14px;align-items:center;justify-content:space-between;
   padding:0 max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
@@ -183,7 +184,7 @@ img.ph{width:100%;object-fit:cover;display:block}
 </section>
 
 <section id="exp" hidden>
-  <div id="stage"><canvas id="cv"></canvas><video id="idle" muted loop playsinline preload="none" aria-hidden="true"></video></div>
+  <div id="stage"><canvas id="cv"></canvas><video id="idle" muted loop playsinline preload="none" aria-hidden="true"></video><canvas id="pluie" aria-hidden="true"></canvas></div>
   <div id="bar"></div>
   <div id="load">Chargement 0 %</div>
   <div id="hint">Faites défiler ↓</div>
@@ -463,6 +464,39 @@ function start(){
 window.addEventListener("scroll", () => requestAnimationFrame(onScroll), {passive:true});
 window.addEventListener("resize", () => { if (started) resize(); });
 
+
+/* ---------- pluie animée par-dessus l'image : la rue reste vivante même quand on ne scrolle plus ---------- */
+(() => {
+  const pc = document.getElementById("pluie"), px = pc.getContext("2d");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { pc.style.display = "none"; return; }
+  let W = 0, H = 0, R = 1, gouttes = [], last = 0;
+  function taille(){
+    R = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; pc.width = W * R; pc.height = H * R;
+    const n = Math.round(Math.min(320, W * H / 4200));
+    gouttes = Array.from({length:n}, () => neuve(true));
+  }
+  function neuve(partout){
+    const z = Math.random();                       // profondeur : les gouttes proches sont plus longues, rapides et visibles
+    return {x:Math.random() * (W + 200) - 100, y:partout ? Math.random() * H : -40 - Math.random() * 200,
+      l:10 + z * 26, v:900 + z * 1300, a:0.06 + z * 0.16, w:(0.6 + z * 0.8)};
+  }
+  const VENT = -0.12;                              // légère inclinaison, comme dans le rendu
+  function anime(t){
+    requestAnimationFrame(anime);
+    const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
+    if (exp.hidden || document.hidden) return;
+    const op = (1 - (window.NTP || 0)) * (idle.classList.contains("on") ? 0 : 1);
+    pc.style.opacity = op; if (op < 0.02) return;
+    px.setTransform(R, 0, 0, R, 0, 0); px.clearRect(0, 0, W, H); px.lineCap = "round";
+    for (const g of gouttes){
+      g.y += g.v * dt; g.x += g.v * VENT * dt;
+      if (g.y - g.l > H || g.x < -60) Object.assign(g, neuve(false));
+      px.strokeStyle = "rgba(205,220,255," + g.a + ")"; px.lineWidth = g.w;
+      px.beginPath(); px.moveTo(g.x, g.y); px.lineTo(g.x - g.l * VENT, g.y - g.l); px.stroke();
+    }
+  }
+  addEventListener("resize", taille); taille(); requestAnimationFrame(anime);
+})();
 /* copier */
 document.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => {
   const el = document.getElementById(b.dataset.copy), txt = el.textContent;
@@ -476,6 +510,6 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 
 </script>
 
-<script src="son.js?v=3" defer></script>
+<script src="son.js?v=4" defer></script>
 </body>
 </html>

@@ -1,9 +1,11 @@
-// Ambiance sonore Neo-Tokyo, générée dans le navigateur (aucun fichier audio) :
-// pluie proche + pluie lointaine, gouttes sur les auvents, rumeur de la ville, bourdonnement des néons, voitures au loin.
+// Ambiance sonore Neo-Tokyo, générée dans le navigateur (aucun fichier audio).
+// En continu : la pluie, et de temps en temps un néon qui grésille.
+// Calés sur la vidéo (déclenchés quand on passe le moment en scrollant) : les voitures au début,
+// l'activation et la désactivation de la carte holographique, le drone, le ticket qu'on arrache.
 // Coupée par défaut ; le choix du visiteur est retenu.
 (() => {
   const KEY = "neotokyo-son";
-  let ctx = null, master = null, on = false, timers = [];
+  let ctx = null, master = null, on = false;
   const btn = document.createElement("button");
   btn.type = "button"; btn.id = "son";
   btn.setAttribute("aria-pressed", "false");
@@ -17,178 +19,160 @@
   document.head.appendChild(st);
   const label = () => { btn.setAttribute("aria-pressed", String(on)); btn.title = on ? "Couper le son" : "Activer l'ambiance sonore"; btn.querySelector("span").textContent = on ? "Son" : "Son coupé"; };
 
-  function bruit(sec, type) {
+  let blanc = null;
+  function bruit(sec) {
     const n = Math.floor(ctx.sampleRate * sec), b = ctx.createBuffer(2, n, ctx.sampleRate);
-    for (let c = 0; c < 2; c++) {
-      const d = b.getChannelData(c); let last = 0;
-      for (let i = 0; i < n; i++) {
-        const w = Math.random() * 2 - 1;
-        if (type === "brun") { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w;
-      }
-    }
+    for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
     return b;
   }
-  function boucle(buf, dest, filtres, gain) {
-    const s = ctx.createBufferSource(); s.buffer = buf; s.loop = true;
-    let n = s; for (const f of filtres) { n.connect(f); n = f; }
-    const g = ctx.createGain(); g.gain.value = gain; n.connect(g); g.connect(dest); s.start(); return g;
-  }
   const filtre = (type, f, q) => { const x = ctx.createBiquadFilter(); x.type = type; x.frequency.value = f; if (q) x.Q.value = q; return x; };
+  const panneur = v => { if (!ctx.createStereoPanner) { const g = ctx.createGain(); g.connect(master); return {in:g, pan:null}; } const p = ctx.createStereoPanner(); p.pan.value = v; p.connect(master); return {in:p, pan:p.pan}; };
+  function boucle(dest, filtres, gain) {
+    const s = ctx.createBufferSource(); s.buffer = blanc; s.loop = true;
+    let n = s; for (const f of filtres) { n.connect(f); n = f; }
+    const g = ctx.createGain(); g.gain.value = gain; n.connect(g); g.connect(dest); s.start(0, Math.random() * 3); return g;
+  }
+
+  /* ---------- la pluie : nappe douce et régulière + gouttes, qui ne s'arrête jamais ---------- */
+  function pluie() {
+    const nappe = ctx.createGain(); nappe.gain.value = 1; nappe.connect(master);
+    boucle(nappe, [filtre("highpass", 250), filtre("lowpass", 2600), filtre("peaking", 900, 0.7)], 0.16);   // le rideau de pluie
+    boucle(nappe, [filtre("highpass", 3500), filtre("lowpass", 9000)], 0.025);                              // le grésillement fin
+    boucle(nappe, [filtre("lowpass", 160)], 0.05);                                                           // le corps (eau qui ruisselle)
+    const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.05; lg.gain.value = 0.12; lfo.connect(lg); lg.connect(nappe.gain); lfo.start();
+    const goutte = () => {
+      if (on) {
+        const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = blanc;
+        const f = filtre("bandpass", 900 + Math.random() * 3200, 3 + Math.random() * 4), g = ctx.createGain(), p = panneur(Math.random() * 1.8 - 0.9);
+        const a = 0.015 + Math.random() * Math.random() * 0.06;
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.03 + Math.random() * 0.06);
+        s.connect(f); f.connect(g); g.connect(p.in); s.start(t, Math.random() * 3, 0.12);
+      }
+      setTimeout(goutte, 10 + Math.random() * 45);
+    };
+    goutte();
+  }
+
+  /* ---------- néons qui grésillent de temps en temps ---------- */
+  function neons() {
+    const gresille = () => {
+      if (on) {
+        const t0 = ctx.currentTime, p = panneur(Math.random() * 1.6 - 0.8), g = ctx.createGain(); g.gain.value = 0; g.connect(p.in);
+        const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.value = 100; const bp = filtre("bandpass", 1500, 1.5); o.connect(bp); bp.connect(g);
+        let t = t0; const n = 2 + Math.floor(Math.random() * 5);
+        for (let i = 0; i < n; i++) { const d = 0.03 + Math.random() * 0.09; g.gain.setValueAtTime(0.012 + Math.random() * 0.02, t); g.gain.setValueAtTime(0, t + d); t += d + 0.02 + Math.random() * 0.08; }
+        for (let i = 0; i < n * 2; i++) {
+          const tc = t0 + Math.random() * (t - t0), s = ctx.createBufferSource(); s.buffer = blanc; const f = filtre("highpass", 2500), gc = ctx.createGain();
+          gc.gain.setValueAtTime(0.04, tc); gc.gain.exponentialRampToValueAtTime(0.0001, tc + 0.008); s.connect(f); f.connect(gc); gc.connect(p.in); s.start(tc, Math.random() * 3, 0.02);
+        }
+        o.start(t0); o.stop(t + 0.05);
+      }
+      setTimeout(gresille, 7000 + Math.random() * 12000);
+    };
+    setTimeout(gresille, 4000);
+  }
+
+  /* ---------- sons ponctuels ---------- */
+  function bip(f0, f1, t, d, a, type, pv) {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type || "sine";
+    o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a, t + Math.min(0.02, d / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(panneur(pv || 0).in); o.start(t); o.stop(t + d + 0.05);
+  }
+  function souffle(t, d, fa, fb, a, q, pv) {
+    const s = ctx.createBufferSource(); s.buffer = blanc; const f = filtre("bandpass", fa, q || 1.2), g = ctx.createGain();
+    f.frequency.setValueAtTime(fa, t); f.frequency.exponentialRampToValueAtTime(fb, t + d);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a, t + d * 0.35); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    s.connect(f); f.connect(g); g.connect(panneur(pv || 0).in); s.start(t, Math.random() * 2, d + 0.1);
+  }
+  // voiture qui passe sur la route mouillée : chuintement des pneus + moteur, effet Doppler
+  function voiture(dir, fort, d) {
+    const t = ctx.currentTime, p = panneur(-dir), g = ctx.createGain(); g.connect(p.in);
+    if (p.pan) { p.pan.setValueAtTime(-0.95 * dir, t); p.pan.linearRampToValueAtTime(0.95 * dir, t + d); }
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.5 * fort, t + d * 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    const s = ctx.createBufferSource(); s.buffer = blanc; s.loop = true; const f = filtre("bandpass", 700, 0.7), sg = ctx.createGain(); sg.gain.value = 0.55;
+    f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(1600, t + d * 0.45); f.frequency.exponentialRampToValueAtTime(450, t + d);
+    s.connect(f); f.connect(sg); sg.connect(g); s.start(t); s.stop(t + d + 0.1);
+    const o = ctx.createOscillator(); o.type = "sawtooth"; const lp = filtre("lowpass", 500), og = ctx.createGain(); og.gain.value = 0.18;
+    o.frequency.setValueAtTime(95, t); o.frequency.setValueAtTime(95, t + d * 0.42); o.frequency.exponentialRampToValueAtTime(70, t + d * 0.6);
+    o.connect(lp); lp.connect(og); og.connect(g); o.start(t); o.stop(t + d + 0.1);
+  }
+  // la voiture volante : turbine qui siffle en plus
+  function voitureVolante() {
+    const d = 3.2, t = ctx.currentTime; voiture(-1, 1.1, d);
+    const p = panneur(0.9), g = ctx.createGain(); g.connect(p.in);
+    if (p.pan) { p.pan.setValueAtTime(0.9, t); p.pan.linearRampToValueAtTime(-0.9, t + d); }
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.06, t + d * 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    [[880, 1], [1320, 0.5], [180, 1.5]].forEach(([f, a]) => { const o = ctx.createOscillator(); o.type = f < 500 ? "triangle" : "sine"; const og = ctx.createGain(); og.gain.value = a;
+      o.frequency.setValueAtTime(f * 1.06, t); o.frequency.setValueAtTime(f * 1.06, t + d * 0.4); o.frequency.exponentialRampToValueAtTime(f * 0.92, t + d * 0.62); o.connect(og); og.connect(g); o.start(t); o.stop(t + d + 0.1); });
+  }
+  // le drone qui passe au-dessus : rotors qui sifflent
+  function drone() {
+    const d = 3.6, t = ctx.currentTime, p = panneur(0.9), g = ctx.createGain(); g.connect(p.in);
+    if (p.pan) { p.pan.setValueAtTime(0.9, t); p.pan.linearRampToValueAtTime(-0.9, t + d); }
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.14, t + d * 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    const am = ctx.createGain(); am.gain.value = 0.5; const bp = filtre("bandpass", 1400, 1.4); am.connect(bp); bp.connect(g);
+    const rot = ctx.createOscillator(), rg = ctx.createGain(); rot.frequency.value = 88; rg.gain.value = 0.4; rot.connect(rg); rg.connect(am.gain); rot.start(t); rot.stop(t + d + 0.1);
+    [[232, 0.5], [247, 0.4], [466, 0.2]].forEach(([f, a]) => { const o = ctx.createOscillator(); o.type = "sawtooth"; const og = ctx.createGain(); og.gain.value = a;
+      o.frequency.setValueAtTime(f * 1.07, t); o.frequency.setValueAtTime(f * 1.07, t + d * 0.38); o.frequency.exponentialRampToValueAtTime(f * 0.93, t + d * 0.62); o.connect(og); og.connect(am); o.start(t); o.stop(t + d + 0.1); });
+    souffle(t, d, 3000, 3000, 0.04, 0.6);
+  }
+  // activation de la carte d'identité holographique
+  function holoOn() {
+    const t = ctx.currentTime;
+    bip(260, 1600, t, 0.55, 0.12, "sine"); bip(130, 800, t, 0.55, 0.05, "triangle");
+    [1318, 1760, 2637, 3520].forEach((f, i) => bip(f, f * 1.002, t + 0.42 + i * 0.075, 0.22, 0.05, "sine", (i - 1.5) * 0.25));
+    souffle(t + 0.35, 0.7, 3000, 9000, 0.05, 2.5);
+    bip(880, 880, t + 0.8, 0.5, 0.03, "sine");
+  }
+  // désactivation : la carte se replie
+  function holoOff() {
+    const t = ctx.currentTime;
+    [3520, 2637, 1760].forEach((f, i) => bip(f, f * 0.998, t + i * 0.06, 0.15, 0.035, "sine", (1 - i) * 0.25));
+    bip(1500, 160, t + 0.12, 0.45, 0.09, "sine"); souffle(t + 0.1, 0.35, 7000, 1500, 0.035, 2);
+  }
+  // le ticket qu'on arrache : craquement du papier
+  function dechire() {
+    const t0 = ctx.currentTime, d = 0.42;
+    for (let k = 0; k < 46; k++) {
+      const t = t0 + d * Math.pow(k / 46, 0.8) + Math.random() * 0.01, s = ctx.createBufferSource(); s.buffer = blanc;
+      const f = filtre("bandpass", 1500 + Math.random() * 4500, 3), g = ctx.createGain(), a = 0.06 + 0.12 * Math.sin(Math.PI * k / 46);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.012 + Math.random() * 0.02);
+      s.connect(f); f.connect(g); g.connect(panneur(0.2).in); s.start(t, Math.random() * 3, 0.05);
+    }
+    souffle(t0, d + 0.1, 900, 3500, 0.06, 0.8, 0.2);
+  }
+
+  /* moments de la vidéo (images Blender, 1..1203) : déclenchés en avançant */
+  const EVTS = [
+    [12, () => voiture(-1, 0.9, 2.4)],    // voiture de droite à gauche
+    [82, () => voiture(1, 0.9, 2.0)],     // voiture rapide de gauche à droite
+    [130, () => voiture(-1, 1.0, 2.6)],   // berline sombre de droite à gauche
+    [184, () => voiture(1, 0.8, 2.4)],    // voiture claire, au premier plan
+    [204, voitureVolante],                 // la voiture volante
+    [278, drone],                          // le drone passe au-dessus
+    [366, holoOn], [444, holoOff],         // carte d'identité holographique
+    [1160, dechire]                        // le ticket
+  ];
+  function suivi() {
+    let lastF = null;
+    const tick = () => {
+      requestAnimationFrame(tick);
+      const F = typeof window.NTF === "number" ? window.NTF : null;
+      if (F !== null && lastF !== null && on && F > lastF && F - lastF < 60)
+        for (const [T, fn] of EVTS) if (lastF < T && F >= T) fn();
+      lastF = F;
+    };
+    requestAnimationFrame(tick);
+  }
 
   function construire() {
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     master = ctx.createGain(); master.gain.value = 0;
     const comp = ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
-    const blanc = bruit(4, "blanc"), brun = bruit(6, "brun");
-    // pluie proche : souffle aigu, légèrement modulé
-    const pluie = boucle(blanc, master, [filtre("highpass", 900), filtre("lowpass", 7000)], 0.07);
-    const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.07; lg.gain.value = 0.02; lfo.connect(lg); lg.connect(pluie.gain); lfo.start();
-    // pluie lointaine / rumeur de la ville
-    boucle(blanc, master, [filtre("lowpass", 700)], 0.05);
-    boucle(brun, master, [filtre("lowpass", 180)], 0.22);
-    // bourdonnement électrique des néons (100 Hz + harmoniques), très discret, qui grésille
-    const neon = ctx.createGain(); neon.gain.value = 0.0; neon.connect(master);
-    [100, 200, 300, 500].forEach((f, i) => { const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.value = f; const g = ctx.createGain(); g.gain.value = 0.004 / (i + 1); o.connect(g); g.connect(neon); o.start(); });
-    const bz = filtre("bandpass", 1200, 1.2); neon.disconnect(); neon.connect(bz); bz.connect(master); neon.gain.value = 1;
-    timers.push(setInterval(() => { if (!on) return; const t = ctx.currentTime; neon.gain.setValueAtTime(1, t); if (Math.random() < 0.25) { neon.gain.setValueAtTime(0.15, t + 0.02); neon.gain.setValueAtTime(1, t + 0.06 + Math.random() * 0.08); } }, 900));
-    // gouttes sur les auvents et les poubelles : petits « tic » répartis en stéréo
-    const goutte = () => {
-      if (on) {
-        const t = ctx.currentTime, s = ctx.createBufferSource(); s.buffer = blanc;
-        const f = filtre("bandpass", 1800 + Math.random() * 3500, 6), g = ctx.createGain(), p = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.05 + Math.random() * 0.08, t + 0.003); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04 + Math.random() * 0.05);
-        s.connect(f); f.connect(g); if (p) { p.pan.value = Math.random() * 1.6 - 0.8; g.connect(p); p.connect(master); } else g.connect(master);
-        s.start(t, Math.random() * 3, 0.12);
-      }
-      timers.push(setTimeout(goutte, 25 + Math.random() * 140));
-    };
-    goutte();
-    // voiture qui passe au loin sur le bitume mouillé, de temps en temps
-    const voiture = () => {
-      if (on) {
-        const t = ctx.currentTime, d = 4 + Math.random() * 3, s = ctx.createBufferSource(); s.buffer = blanc; s.loop = true;
-        const f = filtre("bandpass", 500, 0.8), g = ctx.createGain(), p = ctx.createStereoPanner ? ctx.createStereoPanner() : null, dir = Math.random() < 0.5 ? -1 : 1;
-        f.frequency.setValueAtTime(350, t); f.frequency.linearRampToValueAtTime(900, t + d / 2); f.frequency.linearRampToValueAtTime(300, t + d);
-        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.09, t + d / 2); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-        s.connect(f); f.connect(g);
-        if (p) { p.pan.setValueAtTime(-0.9 * dir, t); p.pan.linearRampToValueAtTime(0.9 * dir, t + d); g.connect(p); p.connect(master); } else g.connect(master);
-        s.start(t); s.stop(t + d + 0.1);
-      }
-      timers.push(setTimeout(voiture, 9000 + Math.random() * 16000));
-    };
-    timers.push(setTimeout(voiture, 5000));
-    scene(blanc, brun);
+    blanc = bruit(4);
+    pluie(); neons(); suivi();
   }
-
-  /* ---------- sons de la scène, calés sur l'image Blender affichée (window.NTF, 1..1203) ---------- */
-  function scene(blanc, brun) {
-    const pan = (node, v) => { if (!ctx.createStereoPanner) return node; const p = ctx.createStereoPanner(); p.pan.value = v; node.connect(p); return p; };
-    const vers = (n, g) => { n.connect(g); return g; };
-    const lisse = (param, v, tc) => param.setTargetAtTime(v, ctx.currentTime, tc || 0.08);
-    const cloche = (F, c, w) => Math.exp(-(((F - c) / w) ** 2));
-    const lerpK = (F, K) => { if (F <= K[0][0]) return K[0][1]; for (let i = 1; i < K.length; i++) if (F <= K[i][0]) { const [a, va] = K[i - 1], [b, vb] = K[i]; return va + (vb - va) * (F - a) / (b - a); } return K[K.length - 1][1]; };
-
-    // voiture volante : turbine + souffle, de droite à gauche (image 120 → 320, au plus près vers 200)
-    const vG = ctx.createGain(); vG.gain.value = 0; const vP = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    const vS = ctx.createBufferSource(); vS.buffer = blanc; vS.loop = true; const vF = filtre("bandpass", 600, 0.9); vS.connect(vF); vF.connect(vG); vS.start();
-    const vO = [ctx.createOscillator(), ctx.createOscillator()]; vO[0].type = "sawtooth"; vO[1].type = "sine";
-    const vOf = filtre("lowpass", 900); vO.forEach((o, i) => { o.frequency.value = i ? 220 : 74; const g = ctx.createGain(); g.gain.value = i ? 0.25 : 0.35; o.connect(g); g.connect(vOf); o.start(); }); vOf.connect(vG);
-    if (vP) { vG.connect(vP); vP.connect(master); } else vG.connect(master);
-    // drone de reconnaissance : rotors qui sifflent, passe derrière le perso (232 → 352)
-    const dG = ctx.createGain(); dG.gain.value = 0; const dP = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
-    const dBP = filtre("bandpass", 1400, 1.5), dAM = ctx.createGain(); dAM.gain.value = 0.5;
-    const dO = [ctx.createOscillator(), ctx.createOscillator(), ctx.createOscillator()];
-    dO.forEach((o, i) => { o.type = "sawtooth"; o.frequency.value = [232, 247, 466][i]; const g = ctx.createGain(); g.gain.value = [0.5, 0.4, 0.2][i]; o.connect(g); g.connect(dAM); o.start(); });
-    const rot = ctx.createOscillator(), rotG = ctx.createGain(); rot.frequency.value = 88; rotG.gain.value = 0.35; rot.connect(rotG); rotG.connect(dAM.gain); rot.start();
-    const dN = ctx.createBufferSource(); dN.buffer = blanc; dN.loop = true; const dNf = filtre("highpass", 3000), dNg = ctx.createGain(); dNg.gain.value = 0.25; dN.connect(dNf); dNf.connect(dNg); dNg.connect(dG); dN.start();
-    dAM.connect(dBP); dBP.connect(dG); if (dP) { dG.connect(dP); dP.connect(master); } else dG.connect(master);
-    // hologramme : bourdonnement cristallin pendant que la carte flotte (≈ 380 → 445)
-    const hG = ctx.createGain(); hG.gain.value = 0; hG.connect(master);
-    [[220, 0.5], [330, 0.35], [660, 0.12], [1320, 0.05]].forEach(([f, a]) => { const o = ctx.createOscillator(); o.frequency.value = f; const g = ctx.createGain(); g.gain.value = a; o.connect(g); g.connect(hG); o.start(); });
-    const trem = ctx.createOscillator(), tremG = ctx.createGain(); trem.frequency.value = 6; tremG.gain.value = 0.25; trem.connect(tremG); tremG.connect(hG.gain); trem.start();
-    const hN = ctx.createBufferSource(); hN.buffer = blanc; hN.loop = true; const hNf = filtre("bandpass", 6000, 3), hNg = ctx.createGain(); hNg.gain.value = 0.25; hN.connect(hNf); hNf.connect(hNg); hNg.connect(hG); hN.start();
-
-    // ---- sons ponctuels ----
-    function bip(f0, f1, t, d, a, type, p) {
-      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type || "sine";
-      o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + d);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a, t + Math.min(0.02, d / 4)); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-      o.connect(g); pan(g, p || 0).connect(master); o.start(t); o.stop(t + d + 0.05);
-    }
-    function souffle(t, d, fa, fb, a, q, p) {
-      const s = ctx.createBufferSource(); s.buffer = blanc; const f = filtre("bandpass", fa, q || 1.2), g = ctx.createGain();
-      f.frequency.setValueAtTime(fa, t); f.frequency.exponentialRampToValueAtTime(fb, t + d);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a, t + d * 0.35); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-      s.connect(f); f.connect(g); pan(g, p || 0).connect(master); s.start(t, Math.random() * 2, d + 0.1);
-    }
-    // feu piéton japonais : « piyo-piyo » (deux gazouillis)
-    const piyo = () => { const t = ctx.currentTime; bip(2900, 2100, t, 0.09, 0.05, "sine", -0.55); bip(2900, 2100, t + 0.17, 0.09, 0.045, "sine", -0.55); };
-    // pas sur le bitume mouillé
-    let pied = 1;
-    const pas = () => { const t = ctx.currentTime; pied = -pied; bip(95, 50, t, 0.12, 0.25, "sine", 0.12 * pied); souffle(t + 0.01, 0.16, 1400, 2600, 0.09, 1.4, 0.15 * pied); };
-    // activation de la carte d'identité holographique
-    const holoOn = () => {
-      const t = ctx.currentTime;
-      bip(260, 1600, t, 0.55, 0.12, "sine"); bip(130, 800, t, 0.55, 0.05, "triangle");
-      [1318, 1760, 2637, 3520].forEach((f, i) => bip(f, f * 1.002, t + 0.42 + i * 0.075, 0.22, 0.05, "sine", (i - 1.5) * 0.25));
-      souffle(t + 0.35, 0.7, 3000, 9000, 0.05, 2.5);
-      bip(880, 880, t + 0.8, 0.5, 0.03, "sine");
-    };
-    const holoOff = () => { const t = ctx.currentTime; bip(1400, 180, t, 0.4, 0.07, "sine"); souffle(t, 0.3, 6000, 1500, 0.03, 2); };
-    // le chat noir
-    const miaou = () => {
-      const t = ctx.currentTime, d = 0.75, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sawtooth";
-      o.frequency.setValueAtTime(520, t); o.frequency.linearRampToValueAtTime(820, t + 0.22); o.frequency.linearRampToValueAtTime(760, t + 0.45); o.frequency.exponentialRampToValueAtTime(430, t + d);
-      const f1 = filtre("bandpass", 900, 4), f2 = filtre("bandpass", 2400, 6), m = ctx.createGain();
-      f1.frequency.setValueAtTime(700, t); f1.frequency.linearRampToValueAtTime(1300, t + 0.3); f1.frequency.linearRampToValueAtTime(800, t + d);
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.05, t + 0.08); g.gain.setValueAtTime(0.05, t + 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
-      o.connect(f1); o.connect(f2); f1.connect(m); f2.connect(m); m.connect(g); pan(g, 0.35).connect(master); o.start(t); o.stop(t + d + 0.05);
-    };
-    // le ticket qu'on arrache : petits craquements de papier
-    const dechire = () => {
-      const t0 = ctx.currentTime, d = 0.42;
-      for (let k = 0; k < 46; k++) {
-        const t = t0 + d * Math.pow(k / 46, 0.8) + Math.random() * 0.01, s = ctx.createBufferSource(); s.buffer = blanc;
-        const f = filtre("bandpass", 1500 + Math.random() * 4500, 3), g = ctx.createGain(), a = 0.05 + 0.1 * Math.sin(Math.PI * k / 46);
-        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(a, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.012 + Math.random() * 0.02);
-        s.connect(f); f.connect(g); pan(g, 0.2).connect(master); s.start(t, Math.random() * 3, 0.05);
-      }
-      souffle(t0, d + 0.1, 900, 3500, 0.05, 0.8, 0.2);
-    };
-    // une affiche s'ouvre : froissement doux
-    const affiche = () => { const t = ctx.currentTime; souffle(t, 0.45, 500, 2400, 0.06, 0.7); bip(660, 660, t + 0.12, 0.35, 0.015, "sine"); };
-
-    const MARCHE = [[242, 346], [466, 1100]], PAS = 16;
-    const EVTS = [[368, holoOn], [446, holoOff], [318, miaou], [1162, dechire]];
-    let lastF = null, lastPas = null, lastPiyo = 0, lastP = 0;
-    const boucle = () => {
-      requestAnimationFrame(boucle);
-      if (!on) return;
-      const F = typeof window.NTF === "number" ? window.NTF : null;
-      const now = ctx.currentTime;
-      if (F === null) { lisse(vG.gain, 0); lisse(dG.gain, 0); lisse(hG.gain, 0); lastF = null; return; }
-      // continus
-      lisse(vG.gain, 0.32 * cloche(F, 200, 70));
-      const vx = lerpK(F, [[120, 0.95], [320, -0.95]]); if (vP) lisse(vP.pan, vx);
-      lisse(vF.frequency, 380 + 900 * cloche(F, 200, 45)); vO[0].frequency.setTargetAtTime(74 * (1 + 0.08 * Math.tanh((200 - F) / 25)), now, 0.1);
-      lisse(dG.gain, 0.16 * Math.max(cloche(F, 300, 40), 0.25 * cloche(F, 250, 20)) * (F > 228 && F < 360 ? 1 : 0));
-      if (dP) lisse(dP.pan, Math.max(-1, Math.min(1, lerpK(F, [[232, 2.7], [258, 4.5], [272, 4.6], [288, 2.6], [312, -0.6], [352, -2.1]]) / 4)));
-      dO.forEach((o, i) => o.frequency.setTargetAtTime([232, 247, 466][i] * (1 + 0.06 * Math.tanh((300 - F) / 18)), now, 0.08));
-      lisse(hG.gain, F > 372 && F < 448 ? 0.035 * Math.min(1, (F - 372) / 10, (448 - F) / 8) : 0);
-      // ponctuels (seulement en avançant pas à pas, pas lors d'un saut de chapitre)
-      if (lastF !== null && Math.abs(F - lastF) < 60) {
-        if (F > lastF) for (const [T, fn] of EVTS) if (lastF < T && F >= T) fn();
-        const ip = Math.floor(F / PAS);
-        if (lastPas !== null && ip !== lastPas && MARCHE.some(([a, b]) => F >= a && F <= b)) pas();
-        lastPas = ip;
-      } else lastPas = Math.floor(F / PAS);
-      lastF = F;
-      if (F >= 236 && F <= 350 && now - lastPiyo > 0.95) { piyo(); lastPiyo = now; }
-      const P = window.NTP || 0; if (P > 0.5 && lastP <= 0.5) affiche(); lastP = P;
-    };
-    requestAnimationFrame(boucle);
-  }
-
   function regler(v) {
     on = v; label();
     try { localStorage.setItem(KEY, on ? "1" : "0"); } catch (e) {}
@@ -196,12 +180,11 @@
     if (!ctx) return;
     if (on && ctx.state === "suspended") ctx.resume();
     const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t);
-    master.gain.linearRampToValueAtTime(on ? 0.9 : 0, t + (on ? 1.8 : 0.5));
+    master.gain.linearRampToValueAtTime(on ? 1 : 0, t + (on ? 1.8 : 0.5));
   }
   btn.addEventListener("click", () => regler(!on));
   document.addEventListener("visibilitychange", () => { if (!ctx) return; if (document.hidden) ctx.suspend(); else if (on) ctx.resume(); });
 
-  // si le visiteur avait activé le son, on le relance à sa première interaction (les navigateurs l'exigent)
   let voulu = false; try { voulu = localStorage.getItem(KEY) === "1"; } catch (e) {}
   if (voulu) {
     const go = e => { if (e && e.target && e.target.closest && e.target.closest("#son")) return; ["pointerdown", "keydown", "touchend"].forEach(t => removeEventListener(t, go, true)); if (!on) regler(true); };
