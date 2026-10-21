@@ -28,6 +28,32 @@ canvas{width:100%;height:100%;display:block}
 #intro h1{font-family:var(--display);font-weight:900;font-size:clamp(46px,8vw,104px);line-height:.9;text-transform:uppercase;margin:6px 0 8px}
 #intro p{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0}
 #load{font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--muted)}
+#stops{position:fixed;z-index:4;left:0;right:0;top:calc(env(safe-area-inset-top,0px));height:14px;pointer-events:none}
+#stops button{position:absolute;top:-3px;width:11px;height:11px;margin-left:-5px;border-radius:50%;border:2px solid var(--orange);background:var(--night);padding:0;cursor:pointer;pointer-events:auto}
+#stops button.passe{background:var(--orange)}
+#arret{position:fixed;z-index:3;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
+  display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;width:min(560px,calc(100% - 32px))}
+#arret.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#arret .n{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:rgba(11,10,18,.7);padding:6px 10px}
+#arret .n b{color:var(--orange);font-weight:500}
+#voir{display:inline-flex;align-items:center;gap:10px;font:700 15px var(--mono);letter-spacing:.04em;color:#fff;background:var(--orange);border:0;border-radius:999px;padding:12px 20px 12px 16px;cursor:pointer;
+  box-shadow:0 10px 30px rgba(0,0,0,.45);animation:pulse 2.2s ease-in-out infinite}
+#voir svg{width:18px;height:18px}
+@keyframes pulse{0%,100%{box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 0 rgba(255,122,77,.55)}50%{box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 12px rgba(255,122,77,0)}}
+#doc{position:fixed;inset:0;z-index:20;display:grid;grid-template-rows:auto 1fr auto;background:rgba(6,6,12,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+#doc[hidden]{display:none}
+#doc header,#doc footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 10px}
+#doc footer{padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px));justify-content:center;font-family:var(--mono);font-size:11px;color:var(--muted);flex-wrap:wrap;gap:8px}
+#doc .nom{font-family:var(--display);font-weight:900;font-size:clamp(22px,3.2vw,38px);text-transform:uppercase;line-height:1}
+#doc .nom small{display:block;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;color:var(--orange);margin-bottom:6px}
+#doc .act{display:flex;gap:8px}
+#doc .act button{font:500 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink);background:rgba(20,18,30,.9);border:1px solid var(--line);padding:9px 12px;cursor:pointer}
+#doc .act button.plein{background:var(--orange);border-color:var(--orange);color:#fff}
+#cadre{min-height:0;overflow:auto;display:grid;place-items:center;padding:0 16px}
+#docImg{max-width:100%;max-height:calc(100dvh - 160px);object-fit:contain;border-radius:6px;box-shadow:0 30px 80px rgba(0,0,0,.6);cursor:zoom-in}
+#docImg.zoom{max-width:none;max-height:none;width:min(2000px,220%);cursor:zoom-out}
+body.lock{overflow:hidden}
+@media (prefers-reduced-motion:reduce){#voir{animation:none}#arret{transition:none}}
 </style>
 </head>
 <body>
@@ -37,18 +63,49 @@ canvas{width:100%;height:100%;display:block}
 <div id="intro">
   <div class="k">Projet de cours · Blender · Vol IB2026</div>
   <h1>INSEEC Airlines</h1>
-  <p>Faites défiler pour embarquer ↓</p>
+  <p>Faites défiler pour embarquer ↓ · le film s'arrête sur chaque document</p>
+</div>
+<div id="stops"></div>
+<div id="arret"><span class="n"><b id="aN"></b> · <span id="aT"></span></span>
+  <button id="voir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>Voir le document</button></div>
+<div id="doc" hidden role="dialog" aria-modal="true" aria-labelledby="docNom">
+  <header><div class="nom" id="docNom"><small>Document de bord</small><span></span></div>
+    <div class="act"><button id="docRet" hidden>Retourner</button><button class="plein" id="docFer">Fermer</button></div></header>
+  <div id="cadre"><img id="docImg" alt=""></div>
+  <footer><span>Clic sur le document : zoomer</span><span>·</span><span>Échap : fermer</span></footer>
 </div>
 <div id="track"></div>
 <script>
-const N = 1024, PX = 42;                    // images (1 sur 2 du film à 24 i/s), pixels de scroll par image
+const N = 1024, PX = 42, FPS = 12, HOLD = 700; // 1 image sur 2 du film (12 i/s), px de scroll par image, px de scroll d'arrêt sur chaque document
+const D = "docs/";
+const STOPS = [
+  ["Ton billet d'embarquement", 12.0, ["billet.webp", "billet_verso.webp"]],
+  ["Annonce du commandant", 19.667, ["commandant.webp"]],
+  ["Bienvenue à bord", 22.458, ["bienvenue.webp"]],
+  ["Consignes de sécurité", 25.083, ["securite.webp"]],
+  ["L'équipage", 27.875, ["equipage.webp"]],
+  ["Choisis ta classe", 30.958, ["classes.webp"]],
+  ["Le menu de bord", 36.375, ["menu.webp"]],
+  ["Quatre escales", 40.458, ["escales.webp"]],
+  ["Plan de vol", 43.083, ["plan.webp"]],
+  ["Le passeport", 55.458, ["passeport.webp"]],
+  ["Le magazine de bord", 58.583, ["magazine.webp"]],
+  ["Le budget", 62.167, ["budget.webp"]],
+  ["Fais décoller le vol", 65.375, ["fonds.webp"], 67.292],
+  ["Fin du voyage", 83.167, null]
+];
+// courbe scroll -> image : le film avance, puis reste figé HOLD px sur chaque arrêt
+const K = [[0, 0]]; let ky = 0, ki = 0;
+STOPS.forEach(st => { const i = st[1] * FPS; ky += (i - ki) * PX; K.push([ky, i]); st.y0 = ky; ky += HOLD; K.push([ky, i]); st.y1 = ky; ki = st[3] ? st[3] * FPS : i; if (st[3]) K.push([ky + 0.01, ki]); });
+ky += (N - 1 - ki) * PX; K.push([ky, N - 1]); const TOTAL = ky;
+function idxAt(y){ y = Math.max(0, Math.min(TOTAL, y)); for (let k = 1; k < K.length; k++) if (y <= K[k][0]) { const [a, ia] = K[k - 1], [b, ib] = K[k]; return b > a ? ia + (ib - ia) * (y - a) / (b - a) : ib; } return N - 1; }
 const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
 const imgs = new Array(N), ok = new Uint8Array(N);
 let DPR = 1, VW = 0, VH = 0, pos = 0, cur = -1, nLoaded = 0;
 const track = document.getElementById("track"), intro = document.getElementById("intro"), bar = document.getElementById("bar"), load = document.getElementById("load");
 function size(){
   DPR = Math.min(window.devicePixelRatio || 1, 2); VW = innerWidth; VH = innerHeight;
-  cv.width = VW * DPR; cv.height = VH * DPR; track.style.height = (N * PX + VH) + "px"; cur = -1; draw();
+  cv.width = VW * DPR; cv.height = VH * DPR; track.style.height = (TOTAL + VH) + "px"; cur = -1; draw();
 }
 function url(i){ return "f/" + String(i).padStart(4, "0") + ".webp"; }
 // chargement : d'abord une image sur 16 (aperçu de tout le film), puis 1 sur 4, puis toutes, en priorité autour de la position
@@ -83,7 +140,33 @@ function draw(){
   if (a === i0 && i0 + 1 < N && ok[i0 + 1] && t > 0.01){ ctx.globalAlpha = t; ctx.drawImage(imgs[i0 + 1], x * DPR, y * DPR, w * DPR, h * DPR); ctx.globalAlpha = 1; }
 }
 let target = 0;
-function onScroll(){ target = Math.min(N - 1, Math.max(0, scrollY / PX)); }
+function onScroll(){ target = idxAt(scrollY); majArret(); }
+const arret = document.getElementById("arret"), voir = document.getElementById("voir"), doc = document.getElementById("doc"), docImg = document.getElementById("docImg"), docRet = document.getElementById("docRet");
+const stopsEl = document.getElementById("stops");
+STOPS.forEach((st, j) => { const b = document.createElement("button"); b.title = st[0]; b.setAttribute("aria-label", "Aller à : " + st[0]); b.style.left = (st[1] * FPS / (N - 1) * 100) + "%";
+  b.onclick = () => { scrollTo(0, (st.y0 + st.y1) / 2); target = idxAt(scrollY); pos = target; }; stopsEl.appendChild(b); st.b = b; });
+let ici = -1;
+function majArret(){
+  ici = STOPS.findIndex(st => scrollY >= st.y0 - 60 && scrollY <= st.y1 + 60);
+  STOPS.forEach(st => st.b.classList.toggle("passe", scrollY >= st.y0 - 60));
+  if (ici < 0) { arret.classList.remove("on"); return; }
+  const st = STOPS[ici];
+  document.getElementById("aN").textContent = "Arrêt " + (ici + 1) + " / " + STOPS.length;
+  document.getElementById("aT").textContent = st[0];
+  voir.hidden = !st[2]; arret.classList.add("on");
+}
+let face = 0;
+function ouvrir(){ const st = STOPS[ici]; if (!st || !st[2]) return; face = 0; docImg.classList.remove("zoom"); docImg.src = D + st[2][0]; docImg.alt = st[0];
+  doc.querySelector(".nom span").textContent = st[0]; docRet.hidden = st[2].length < 2; doc.hidden = false; document.body.classList.add("lock"); document.getElementById("docFer").focus(); }
+function fermer(){ doc.hidden = true; document.body.classList.remove("lock"); }
+voir.onclick = ouvrir; document.getElementById("docFer").onclick = fermer;
+docRet.onclick = () => { const l = STOPS[ici][2]; face = (face + 1) % l.length; docImg.src = D + l[face]; };
+docImg.onclick = () => docImg.classList.toggle("zoom");
+document.getElementById("cadre").onclick = e => { if (e.target.id === "cadre") fermer(); };
+addEventListener("keydown", e => { if (!doc.hidden && e.key === "Escape") fermer(); else if (doc.hidden && (e.key === "d" || e.key === "D") && ici >= 0) ouvrir(); });
+cv.addEventListener("click", () => { if (ici >= 0) ouvrir(); });
+// précharge les documents pendant le film
+addEventListener("load", () => setTimeout(() => STOPS.forEach(st => st[2] && st[2].forEach(f => { const i = new Image(); i.src = D + f; })), 4000));
 function tick(){
   const d = target - pos; pos = Math.abs(d) < 0.01 ? target : pos + d * 0.1;
   draw(); pump();
