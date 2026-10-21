@@ -28,12 +28,13 @@
 #intro .film{width:min(360px,80vw);height:6px;background:#2a2638;position:relative;overflow:hidden}
 #intro .film i{position:absolute;left:0;top:0;bottom:0;width:0;background:#ff2e63}
 /* son */
-#intro .gros{width:118px;height:118px;border-radius:50%;border:2px solid #2a2638;background:rgba(20,18,30,.9);color:#f3efe6;display:grid;place-items:center;cursor:pointer;
-  transition:border-color .3s,color .3s,box-shadow .3s}
-#intro .gros svg{width:54px;height:54px}
+#intro .gros{display:inline-flex;align-items:center;gap:16px;font:500 26px "JetBrains Mono",ui-monospace,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;
+  color:#f3efe6;background:rgba(11,10,18,.7);border:2px solid #2a2638;padding:18px 26px;cursor:pointer;white-space:nowrap;transition:border-color .3s,color .3s,box-shadow .3s}
+#intro .gros svg{width:38px;height:38px}
 #intro .gros .w{display:none}#intro .gros.actif .w{display:inline}#intro .gros.actif .x{display:none}
-#intro .gros.actif{border-color:#38e1ff;color:#38e1ff;box-shadow:0 0 30px rgba(56,225,255,.35)}
-#intro .vole{position:fixed;z-index:41;transition:all .9s cubic-bezier(.6,.05,.25,1)}
+#intro .gros.actif{border-color:#38e1ff;color:#38e1ff;box-shadow:0 0 30px rgba(56,225,255,.3)}
+#intro .vole{position:fixed;z-index:41;box-sizing:border-box;transition:all .65s cubic-bezier(.6,.05,.25,1)}
+#intro .vole svg{transition:all .65s cubic-bezier(.6,.05,.25,1)}
 #intro .passer{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(18px + env(safe-area-inset-bottom,0px));font:500 11px "JetBrains Mono",monospace;letter-spacing:.12em;
   text-transform:uppercase;color:#a49fb3;background:none;border:1px solid #2a2638;padding:9px 12px;cursor:pointer;z-index:2;transition:opacity .4s}
 #intro .passer:hover{color:#f3efe6;border-color:#ff2e63}
@@ -47,7 +48,7 @@
 @media (prefers-reduced-motion:reduce){#intro *{animation-duration:0s!important;transition:none!important}}`;
   document.head.appendChild(css);
 
-  const ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/><path class="x" d="m22 9-6 6M16 9l6 6"/></svg>';
+  const ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/><path class="x" d="m22 9-6 6M16 9l6 6"/></svg>';
   const attendre = ms => new Promise(r => setTimeout(r, ms));
 
   window.lancerIntro = function (fini) {
@@ -58,14 +59,15 @@
       : '<div class="souris"><div class="roue"></div><div class="fl bas"></div><div class="fl haut"></div></div>';
     el.innerHTML = `
       <div class="sc s1">${geste}<div class="film"><i></i></div><div class="cap"></div></div>
-      <div class="sc s2"><button type="button" class="gros" aria-label="Activer ou couper le son">${ICON}</button><div class="cap"></div><div class="sous">Vous pourrez changer à tout moment, en haut à gauche</div></div>
+      <div class="sc s2"><button type="button" class="gros" aria-label="Activer ou couper le son">${ICON}<span>Son coupé</span></button><div class="cap"></div><div class="sous">Vous pourrez changer à tout moment, en haut à gauche</div></div>
       <button type="button" class="passer">Passer →</button>`;
     document.body.appendChild(el);
     const html = document.documentElement, ovAvant = html.style.overflow; html.style.overflow = "hidden";
     if (son) son.style.visibility = "hidden";
     const s1 = el.querySelector(".s1"), s2 = el.querySelector(".s2"), cap = s1.querySelector(".cap"), film = s1.querySelector(".film i");
     const gros = el.querySelector(".gros"), cap2 = s2.querySelector(".cap");
-    const majGros = () => { const a = son && son.getAttribute("aria-pressed") === "true"; gros.classList.toggle("actif", a); cap2.innerHTML = a ? "Son <b>activé</b> · touchez l'icône pour le couper" : "Son <b>coupé</b> · touchez l'icône pour l'activer"; };
+    const etat = a => { gros.classList.toggle("actif", a); gros.querySelector("span").textContent = a ? "Son" : "Son coupé"; };
+    const majGros = () => { const a = son && son.getAttribute("aria-pressed") === "true"; etat(a); cap2.innerHTML = a ? "Son <b>activé</b> · touchez l'icône pour le couper" : "Son <b>coupé</b> · touchez l'icône pour l'activer"; };
     gros.addEventListener("click", () => { if (son) son.click(); majGros(); });
     let fin = false, annule = false;
     const roue = el.querySelector(".roue, .doigt"), flB = el.querySelector(".fl.bas"), flH = el.querySelector(".fl.haut");
@@ -82,8 +84,9 @@
         el.appendChild(v); gros.style.visibility = "hidden";
         s2.querySelectorAll(".cap,.sous").forEach(x => x.style.opacity = 0);
         el.classList.add("fin");
-        requestAnimationFrame(() => requestAnimationFrame(() => Object.assign(v.style, {left:b.left + "px", top:b.top + "px", width:b.width + "px", height:b.height + "px", borderRadius:"0"})));
-        await attendre(950);
+        requestAnimationFrame(() => requestAnimationFrame(() => { Object.assign(v.style, {left:b.left + "px", top:b.top + "px", width:b.width + "px", height:b.height + "px", fontSize:"11px", padding:"8px 11px", gap:"8px", borderWidth:"1px", boxShadow:"none"});
+          const sv = v.querySelector("svg"); sv.style.width = sv.style.height = "16px"; }));
+        await attendre(700);
         son.style.visibility = ""; v.remove();
       } else { el.classList.add("fin"); await attendre(900); }
       el.remove(); html.style.overflow = ovAvant;
@@ -98,26 +101,26 @@
       await attendre(350); if (fin) return;
       s1.classList.add("on");
       // avancer
-      cap.innerHTML = tactile ? "Glissez vers le haut pour <b>avancer</b>" : "Faites défiler vers le bas pour <b>avancer</b>";
-      roue.style.animation = (tactile ? "doigtHaut" : "roueBas") + " .9s ease-in-out 3";
-      if (flB) flB.style.animation = "flBas .9s ease-in-out 3";
+      cap.innerHTML = tactile ? "Glissez vers le haut pour <b>avancer</b>" : "Faites défiler vers le haut pour <b>avancer</b>";
+      roue.style.animation = (tactile ? "doigtHaut" : "roueHaut") + " .9s ease-in-out 3";
+      if (flH) flH.style.animation = "flHaut .9s ease-in-out 3";
       filmVers(70, 2700);
       await attendre(2800); if (fin) return;
       // reculer
-      roue.style.animation = "none"; if (flB) flB.style.animation = "none"; void roue.offsetWidth;
-      cap.innerHTML = tactile ? "Glissez vers le bas pour <b>revenir en arrière</b>" : "Remontez pour <b>revenir en arrière</b>";
-      roue.style.animation = (tactile ? "doigtBas" : "roueHaut") + " .9s ease-in-out 2";
-      if (flH) flH.style.animation = "flHaut .9s ease-in-out 2";
+      roue.style.animation = "none"; if (flH) flH.style.animation = "none"; void roue.offsetWidth;
+      cap.innerHTML = tactile ? "Glissez vers le bas pour <b>revenir en arrière</b>" : "Faites défiler vers le bas pour <b>revenir en arrière</b>";
+      roue.style.animation = (tactile ? "doigtBas" : "roueBas") + " .9s ease-in-out 2";
+      if (flB) flB.style.animation = "flBas .9s ease-in-out 2";
       filmVers(30, 1800);
       await attendre(2000); if (fin) return;
       // le son
-      s1.classList.remove("on"); await attendre(300); if (fin) return;
+      s1.classList.remove("on"); await attendre(200); if (fin) return;
       majGros(); s2.classList.add("on");
-      await attendre(900); if (fin) return;
+      await attendre(450); if (fin) return;
       // petite démonstration : l'icône bascule coupé → activé → coupé, sans toucher au vrai réglage
       const vrai = gros.classList.contains("actif");
-      gros.classList.toggle("actif", !vrai); await attendre(650); if (fin) return;
-      gros.classList.toggle("actif", vrai); await attendre(2600); if (fin) return;
+      etat(!vrai); await attendre(500); if (fin) return;
+      etat(vrai); await attendre(1500); if (fin) return;
       terminer();
     })();
   };
