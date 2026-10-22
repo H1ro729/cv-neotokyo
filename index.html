@@ -243,46 +243,54 @@ document.getElementById("back").addEventListener("click", () => { window.NTF = n
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl', h:'dh'}, m:{l:'ml', h:'mh'}};
-const VER = '?v=13';
+const VER = '?v=14';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
-function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0}; }
+function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
 const BLOB_MAX_H = 150;            // images HD gardées compressées en mémoire
 const BMP_MAX = 16;                // images décodées gardées prêtes
 const bmp = new Map(), dec = new Set();
 let lastBm = null;
 function st(){ return S[MODE] || (S[MODE] = mk()); }
 function have(s, lvl, i){ return lvl === 'l' ? s.l[i] !== undefined : s.h.has(i); }
-/* file d'attente par paquets : tous les aperçus d'abord (autour du point courant), puis la HD autour de la position */
+/* file d'attente par paquets, par priorité :
+   1. l'aperçu de l'image courante ; 2. la HD juste autour (surtout devant, dans le sens du défilement) ;
+   3. les aperçus de proche en proche ; 4. une fenêtre HD plus large */
+let SENS = 1;
 function nextJob(s){
-  const c = Math.round(cur);
-  for (const lvl of ['l', 'h']){
-    const per = IDX[DIR[MODE][lvl]].per, lim = lvl === 'l' ? NF : 96;
-    for (let r = 0; r < lim; r++){
-      for (const i of (lvl === 'l' ? [c + r, c - r] : [c + r, c - Math.floor(r / 3)])){
-        if (i < 0 || i >= NF || have(s, lvl, i)) continue;
-        const p = Math.floor(i / per), key = lvl + p;
-        if (!s.busy.has(key)) return [lvl, p, key];
-      }
-    }
-  }
+  const c = Math.round(cur), seen = new Set();
+  const tryJob = (lvl, i) => {
+    if (i < 0 || i >= NF || have(s, lvl, i)) return null;
+    const per = IDX[DIR[MODE][lvl]].per, p = Math.floor(i / per), key = lvl + p;
+    if (s.busy.has(key) || seen.has(key)) return null;
+    seen.add(key); return [lvl, p, key];
+  };
+  let j = tryJob('l', c); if (j) return j;
+  /* les aperçus des ~3 paquets devant passent avant toute HD : on peut toujours défiler sans tomber sur du vide */
+  for (let r = 1; r < 60; r++){ j = tryJob('l', c + SENS * r); if (j) return j; }
+  if (Math.abs(cur - shown) > 6 || !started) j = null; else
+  for (let k = 0; k <= 14; k++){ j = tryJob('h', c + SENS * k) || (k <= 3 ? tryJob('h', c - SENS * k) : null); if (j) return j; }
+  for (let r = 1; r < NF; r++){ j = tryJob('l', c + SENS * r) || (r % 2 ? tryJob('l', c - SENS * r) : null); if (j) return j; }
+  for (let r = 15; r < 96; r++){ j = tryJob('h', c + SENS * r) || (r < 30 ? tryJob('h', c - SENS * r) : null); if (j) return j; }
   return null;
 }
 function pump(){
   if (!IDX) return;
-  const mode = MODE, s = st();
+  const mode = MODE, s = st(), c = Math.round(cur);
+  for (const [k, j] of s.ctl) if (j.lvl === 'h'){ const m = (j.p + 0.5) * j.per; if (Math.abs(m - c) > 110) j.ac.abort(); }
   while (s.act < 4){
     const job = nextJob(s); if (!job) return;
     const [lvl, p, key] = job, set = DIR[mode][lvl], info = IDX[set];
     s.act++; s.busy.add(key);
-    fetch('pk/' + set + '_' + String(p).padStart(3, '0') + '.bin' + VER).then(r => { if (!r.ok) throw 0; return r.blob(); }).then(pack => {
+    const ac = new AbortController(); s.ctl.set(key, {ac, lvl, p, per:info.per});
+    fetch('pk/' + set + '_' + String(p).padStart(3, '0') + '.bin' + VER, {signal:ac.signal}).then(r => { if (!r.ok) throw 0; return r.blob(); }).then(pack => {
       info.packs[p].forEach(([o, n], k) => {
         const i = p * info.per + k, bl = pack.slice(o, o + n, 'image/webp');
         if (lvl === 'l'){ if (s.l[i] === undefined){ s.l[i] = bl; s.lN++; } } else s.h.set(i, bl);
       });
       if (lvl === 'l') updLoad(); else trimH(s);
       draw();
-    }).catch(() => {}).finally(() => { s.act--; s.busy.delete(key); pump(); });
+    }).catch(() => {}).finally(() => { s.act--; s.busy.delete(key); s.ctl.delete(key); pump(); });
   }
 }
 function trimH(s){
@@ -311,14 +319,16 @@ function frameFor(i){
   return null;
 }
 const loadEl = document.getElementById("load");
-function updLoad(){ const s = st(); const p = Math.round(100 * s.lN / NF); loadEl.textContent = p < 100 ? "Chargement " + p + " %" : ""; }
+let attente = false;
+function updLoad(){ const s = st(); const p = Math.round(100 * s.lN / NF); loadEl.textContent = p < 100 ? "Chargement " + p + " %" : (attente ? "Chargement…" : ""); }
 function loadAll(){ st(); pump(); }
 
 /* ---------- canvas ---------- */
 const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
 let VW = 0, VH = 0, DPR = 1, cur = 0, shown = 0, animating = false;
-function tick(){ const d = cur - shown; if (Math.abs(d) < 0.01){ shown = cur; draw(); animating = false; return; } shown += d * 0.14; draw(); requestAnimationFrame(tick); }
-function kick(){ if (!animating){ animating = true; requestAnimationFrame(tick); } pump(); }
+let net = true;               // à l'arrêt : image entière, nette (pas de fondu entre deux images)
+function tick(){ const d = cur - shown; if (Math.abs(d) < 0.01){ shown = cur; net = true; draw(); animating = false; pump(); return; } net = false; shown += d * 0.14; draw(); requestAnimationFrame(tick); }
+function kick(){ const d = cur - shown; if (Math.abs(d) > 0.01) SENS = d > 0 ? 1 : -1; if (!animating){ animating = true; requestAnimationFrame(tick); } pump(); }
 function cover(){
   if (MODE === 'm'){ const s = VW / 1000; const w = VW, h = 1080 * s; return {s, w, h, x:0, y:Math.max(0, (VH - h) * 0.42)}; }
   const s = Math.max(VW / 1920, VH / 1080); const w = 1920 * s, h = 1080 * s; return {s, w, h, x:(VW - w) / 2, y:(VH - h) / 2}; }
@@ -334,7 +344,7 @@ function exact(i){
 }
 function draw(){
   if (!started) return;
-  const f = Math.max(0, Math.min(NF - 1, shown)), i0 = Math.floor(f), t = f - i0;
+  const f = Math.max(0, Math.min(NF - 1, net ? Math.round(shown) : shown)), i0 = Math.floor(f), t = f - i0;
   window.NTF = 2 * f + 1;                       // image Blender affichée (pour l'ambiance sonore)
   const i = t < 0.5 ? i0 : Math.min(NF - 1, i0 + 1);
   let bm = frameFor(i);
@@ -342,6 +352,18 @@ function draw(){
   if (!bm){
     for (let r = 1; r < 40 && !bm; r++){ for (const j of [i - r, i + r]) if (!bm && j >= 0 && j < NF && bmp.has(MODE + 'h' + j)) bm = bmp.get(MODE + 'h' + j); }
   }
+  /* rien de prêt à cet endroit (défilement très rapide juste après l'arrivée) : l'aperçu chargé le plus proche,
+     plutôt que de rester figé sur une image d'un tout autre endroit de la rue */
+  if (!bm){
+    const s = st();
+    for (let r = 1; r < NF; r++){
+      const j = [i - r, i + r].find(x => x >= 0 && x < NF && (bmp.has(MODE + 'l' + x) || s.l[x]));
+      if (j === undefined) continue;
+      if (bmp.has(MODE + 'l' + j)) bm = bmp.get(MODE + 'l' + j); else decode(MODE + 'l' + j, s.l[j]);
+      break;
+    }
+  }
+  attente = !st().l[i] && !st().h.has(i); if (st().lN >= NF) loadEl.textContent = attente ? "Chargement…" : "";
   if (!bm) bm = lastBm;
   if (!bm) return;
   lastBm = bm;
