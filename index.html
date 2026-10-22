@@ -461,6 +461,17 @@ function draw(){
   } else ctx.drawImage(bm, 0, 0, bm.naturalWidth || bm.width, bm.naturalHeight || bm.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
 }
 let started = false;
+const DBG = {seek:0, bloc:0, err:'', fps:0};
+if (/[?&]debug=1/.test(location.search)){
+  const el = document.createElement('div');
+  el.style.cssText = 'position:fixed;z-index:99;right:8px;top:60px;font:12px/1.4 monospace;background:rgba(0,0,0,.75);color:#0f0;padding:8px 10px;pointer-events:none;white-space:pre';
+  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(el));
+  let n = 0, t = performance.now();
+  const boucle = () => { n++; const now = performance.now(); if (now - t > 1000){ DBG.fps = n; n = 0; t = now; } requestAnimationFrame(boucle); };
+  requestAnimationFrame(boucle);
+  addEventListener('error', e => { DBG.err = e.message; });
+  setInterval(() => { el.textContent = 'mode ' + (typeof USE_VID !== 'undefined' && USE_VID ? 'video' : 'images') + ' ' + MODE + '\nfps ' + DBG.fps + '\nscrollY ' + Math.round(scrollY) + ' / ' + document.documentElement.scrollHeight + '\nimage ' + (window.NTF || 0) + '\ncur ' + (typeof cur !== 'undefined' ? cur.toFixed(1) : '') + '\nseek ' + DBG.seek + ' bloc ' + DBG.bloc + '\noverflow ' + (document.documentElement.style.overflow || '-') + '\nerr ' + DBG.err; }, 250);
+}
 
 /* ---------- Safari : la rue est lue comme une vidéo qu'on fait avancer image par image ----------
    (le navigateur gère seul la mémoire et le décodage : plus de gel au bout de quelques défilements) */
@@ -497,11 +508,15 @@ if (USE_VID){
     })();
     return v;
   };
+  /* Safari oublie parfois de signaler la fin d'un déplacement dans la vidéo : sans garde-fou, l'image resterait figée */
   const viser = v => {
-    if (!v.ready || v.busy) return;
+    if (!v.ready) return;
+    if (v.busy){ if (performance.now() - v.tB > 300){ v.busy = false; v.at = -1; DBG.bloc++; } else return; }
     if (v.want === v.at){ placer(v); return; }
-    v.busy = true; v.tgt = v.want; v.el.currentTime = (v.want + 0.5) / 30;
+    v.busy = true; v.tB = performance.now(); v.tgt = v.want; DBG.seek++;
+    try { v.el.currentTime = (v.want + 0.5) / 30; } catch (e) { v.busy = false; DBG.err = String(e); }
   };
+  setInterval(() => { const v = VV[MODE]; if (v && started) viser(v); }, 120);
   /* la vidéo est affichée telle quelle (pas de dessin dans le canvas) : c'est Safari qui l'affiche, sans effort */
   const placer = v => {
     const c = cover(), st_ = v.el.style;
