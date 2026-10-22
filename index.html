@@ -474,11 +474,13 @@ if (USE_VID){
     if (VV[MODE]) return VV[MODE];
     const v = VV[MODE] = {el:document.createElement('video'), prog:0, ready:false, want:0, at:-1, busy:false, tgt:0};
     v.el.muted = true; v.el.playsInline = true; v.el.setAttribute('playsinline', ''); v.el.preload = 'auto';
+    Object.assign(v.el.style, {position:'absolute', left:0, top:0, visibility:'hidden', pointerEvents:'none', background:'#0b0a12'});
+    const stg = document.getElementById('stage'); stg.style.overflow = 'hidden'; stg.insertBefore(v.el, document.getElementById('idle')); cv.style.visibility = 'hidden';
     // la vidéo ne passe pas : on revient au lecteur d'images
     v.el.addEventListener('error', () => { if (!/img=1/.test(location.search)) location.replace(location.pathname + '?img=1'); });
     v.el.addEventListener('seeked', () => { v.at = v.tgt; v.busy = false; peindre(v); viser(v); });
     v.el.addEventListener('loadeddata', () => {
-      const fin = () => { v.ready = true; v.busy = false; v.at = -1; viser(v); };
+      const fin = () => { v.ready = true; v.busy = false; v.at = -1; placer(v); viser(v); };
       const p = v.el.play(); if (p && p.then) p.then(() => { v.el.pause(); fin(); }, fin); else fin();
     });
     (async () => {
@@ -497,34 +499,16 @@ if (USE_VID){
   };
   const viser = v => {
     if (!v.ready || v.busy) return;
-    if (v.want === v.at){ if (plein && !anim){ anim = true; requestAnimationFrame(composer); } return; }
+    if (v.want === v.at){ placer(v); return; }
     v.busy = true; v.tgt = v.want; v.el.currentTime = (v.want + 0.5) / 30;
   };
-  /* fondu entre l'image affichée et la nouvelle : le défilement paraît continu au lieu de sauter d'image en image */
-  const ca = document.createElement('canvas'), cb = document.createElement('canvas'), xa = ca.getContext('2d'), xb = cb.getContext('2d');
-  let fondu = 1, t0f = 0, anim = false, plein = false;
-  const DUREE = 110;
-  const composer = () => {
-    if (!started) { anim = false; return; }
-    const c = cover(), w = cb.width, h = cb.height;
-    fondu = Math.min(1, (performance.now() - t0f) / DUREE);
-    ctx.fillStyle = "#0b0a12"; ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-    if (plein && fondu < 1){ ctx.globalAlpha = 1; ctx.drawImage(ca, 0, 0, w, h, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR); ctx.globalAlpha = fondu; }
-    ctx.drawImage(cb, 0, 0, w, h, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR); ctx.globalAlpha = 1;
-    if (fondu < 1) requestAnimationFrame(composer); else anim = false;
+  /* la vidéo est affichée telle quelle (pas de dessin dans le canvas) : c'est Safari qui l'affiche, sans effort */
+  const placer = v => {
+    const c = cover(), st_ = v.el.style;
+    st_.left = c.x + "px"; st_.top = c.y + "px"; st_.width = c.w + "px"; st_.height = c.h + "px";
+    for (const k in VV) VV[k].el.style.visibility = (VV[k] === v && v.ready) ? "visible" : "hidden";
   };
-  const peindre = v => {
-    if (!started || !v.ready || v !== VV[MODE]) return;
-    const w = v.el.videoWidth, h = v.el.videoHeight; if (!w) return;
-    if (cb.width !== w || cb.height !== h){ ca.width = cb.width = w; ca.height = cb.height = h; plein = false; }
-    // l'image en cours de fondu devient l'ancienne
-    if (plein){ xa.globalAlpha = 1; xa.drawImage(cb, 0, 0); }
-    xb.drawImage(v.el, 0, 0, w, h);
-    t0f = performance.now(); fondu = 0;
-    if (!plein){ plein = true; fondu = 1; }
-    if (!anim){ anim = true; requestAnimationFrame(composer); }
-  };
+  const peindre = v => { if (v === VV[MODE]) placer(v); };
   loadAll = () => { vget(); };
   pump = () => {};
   updLoad = () => {};
@@ -651,7 +635,7 @@ window.addEventListener("resize", () => { if (started) resize(); });
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) { pc.style.display = "none"; return; }
   let W = 0, H = 0, R = 1, gouttes = [], last = 0;
   function taille(){
-    R = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; pc.width = W * R; pc.height = H * R;
+    R = Math.min(USE_VID ? 1 : 2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; pc.width = W * R; pc.height = H * R;
     const n = Math.round(Math.min(320, W * H / 4200));
     gouttes = Array.from({length:n}, () => neuve(true));
   }
