@@ -228,10 +228,10 @@ img.ph{width:100%;object-fit:cover;display:block}
     <h2>Continuer</h2>
     <div class="tiles">
       <button class="tile" type="button" id="tile-cv" style="background-image:url(img/t_cv.webp?v=2)"><span class="bdg">3D</span><span class="t"><b>CV immersif</b></span></button>
-      <div class="tile pdf" style="background-image:url(img/t_dossier.webp?v=4);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" aria-label="Voir le dossier"></a>
+      <div class="tile pdf" style="background-image:url(img/t_dossier.webp?v=5);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" aria-label="Voir le dossier"></a>
         <span class="t"><b>Dossier</b><small>PDF · 7 pages</small></span>
         <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf" aria-label="Télécharger le dossier">↓</a></span></div>
-      <div class="tile pdf" style="background-image:url(img/t_fiche.webp?v=3);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" aria-label="Voir le CV 1 page"></a>
+      <div class="tile pdf" style="background-image:url(img/t_fiche.webp?v=4);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" aria-label="Voir le CV 1 page"></a>
         <span class="t"><b>CV</b><small>PDF · 1 page</small></span>
         <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf" aria-label="Télécharger le CV">↓</a></span></div>
       <a class="tile plain" href="projets/"><span class="arr" aria-hidden="true">→</span><span class="t"><b>Mes projets</b><small>Clutch Esport · INSEEC Airlines</small></span></a>
@@ -497,15 +497,33 @@ if (USE_VID){
   };
   const viser = v => {
     if (!v.ready || v.busy) return;
-    if (v.want === v.at){ peindre(v); return; }
+    if (v.want === v.at){ if (plein && !anim){ anim = true; requestAnimationFrame(composer); } return; }
     v.busy = true; v.tgt = v.want; v.el.currentTime = (v.want + 0.5) / 30;
+  };
+  /* fondu entre l'image affichée et la nouvelle : le défilement paraît continu au lieu de sauter d'image en image */
+  const ca = document.createElement('canvas'), cb = document.createElement('canvas'), xa = ca.getContext('2d'), xb = cb.getContext('2d');
+  let fondu = 1, t0f = 0, anim = false, plein = false;
+  const DUREE = 110;
+  const composer = () => {
+    if (!started) { anim = false; return; }
+    const c = cover(), w = cb.width, h = cb.height;
+    fondu = Math.min(1, (performance.now() - t0f) / DUREE);
+    ctx.fillStyle = "#0b0a12"; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+    if (plein && fondu < 1){ ctx.globalAlpha = 1; ctx.drawImage(ca, 0, 0, w, h, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR); ctx.globalAlpha = fondu; }
+    ctx.drawImage(cb, 0, 0, w, h, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR); ctx.globalAlpha = 1;
+    if (fondu < 1) requestAnimationFrame(composer); else anim = false;
   };
   const peindre = v => {
     if (!started || !v.ready || v !== VV[MODE]) return;
-    const c = cover(), w = v.el.videoWidth, h = v.el.videoHeight; if (!w) return;
-    ctx.fillStyle = "#0b0a12"; ctx.fillRect(0, 0, cv.width, cv.height);
-    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-    ctx.drawImage(v.el, 0, 0, w, h, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
+    const w = v.el.videoWidth, h = v.el.videoHeight; if (!w) return;
+    if (cb.width !== w || cb.height !== h){ ca.width = cb.width = w; ca.height = cb.height = h; plein = false; }
+    // l'image en cours de fondu devient l'ancienne
+    if (plein){ xa.globalAlpha = 1; xa.drawImage(cb, 0, 0); }
+    xb.drawImage(v.el, 0, 0, w, h);
+    t0f = performance.now(); fondu = 0;
+    if (!plein){ plein = true; fondu = 1; }
+    if (!anim){ anim = true; requestAnimationFrame(composer); }
   };
   loadAll = () => { vget(); };
   pump = () => {};
