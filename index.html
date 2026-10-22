@@ -306,7 +306,7 @@ const home = document.getElementById("home"), exp = document.getElementById("exp
   }));
   addEventListener("pageshow", e => { if (e.persisted) { document.getElementById("home").classList.remove("sortie"); pose(cur()); } });
 })();
-["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { start(); if (window.lancerIntro) window.lancerIntro(); }));
+["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { if (window.stat) window.stat("rue/entree", "Entrée dans le CV immersif"); start(); if (window.lancerIntro) window.lancerIntro(); }));
 document.getElementById("back").addEventListener("click", () => { window.NTF = null; window.NTP = 0; exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
@@ -513,7 +513,7 @@ let shownPage = null;
 const SLOW = 2.6; let colT = 0, colY = null, lastPg = null, colAnim = false;
 function colTick(){ const d = colT - colY; if (Math.abs(d) < 0.3){ colY = colT; col.style.transform = "translateY(" + colY + "px)"; colAnim = false; return; } colY += d * 0.14; col.style.transform = "translateY(" + colY + "px)"; requestAnimationFrame(colTick); }
 function kickCol(){ if (!colAnim){ colAnim = true; requestAnimationFrame(colTick); } }
-function showPage(p){ if (shownPage === p) return; shownPage = p; if (!p){ col.innerHTML = ""; return; } col.innerHTML = pageHTML(p); col.style.width = geom.w + "px"; col.style.left = geom.x + "px"; }
+function showPage(p){ if (shownPage === p) return; shownPage = p; if (!p){ col.innerHTML = ""; return; } col.innerHTML = pageHTML(p); if (window.stat) window.stat("rue/affiche-" + p.n, "Rue : affiche " + p.n); col.style.width = geom.w + "px"; col.style.left = geom.x + "px"; }
 function onScroll(){
   if (!started) return;
   const y = window.scrollY;
@@ -530,7 +530,7 @@ function onScroll(){
     else { pageOp = 1 - (d - sg.fade - sl) / sg.fade; off = sg.scroll; cur = fi(p.fin); }
     colT = geom.y - off; if (colY === null || shownPage !== lastPg){ colY = colT; lastPg = shownPage; } kickCol();
     page.querySelector(".veil").style.opacity = Math.min(1, Math.min(d, sg.len - d) / sg.fade);
-  } else { cur = NF - 1; contactOp = Math.min(1, t * 2); showPage(null); }
+  } else { cur = NF - 1; contactOp = Math.min(1, t * 2); showPage(null); if (window.stat) window.stat("rue/contact", "Rue : arrivé au ticket contact"); }
   window.NTP = pageOp;
   page.style.opacity = pageOp; page.style.pointerEvents = pageOp > 0.9 ? "auto" : "none";
   const ct = document.getElementById("contact"); ct.style.opacity = contactOp; ct.style.pointerEvents = contactOp > 0.5 ? "auto" : "none";
