@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610222057";
+(() => { const BUILD = "202610222102";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -584,12 +584,12 @@ if (USE_VID){
   /* Safari oublie parfois de signaler la fin d'un déplacement dans la vidéo : sans garde-fou, l'image resterait figée */
   const viser = v => {
     if (!v.ready) return;
-    if (v.busy){ if (performance.now() - v.tB > 300){ v.busy = false; v.at = -1; DBG.bloc++; } else return; }
+    if (v.busy){ if (performance.now() - v.tB > 300){ v.busy = false; v.at = -1; DBG.bloc++; noterBloc(); if (secours) return; } else return; }
     if (v.want === v.at){ placer(v); return; }
     v.busy = true; v.tB = performance.now(); v.tgt = v.want; DBG.seek++;
     try { v.el.currentTime = (v.want + 0.5) / 30; } catch (e) { v.busy = false; DBG.err = String(e); }
   };
-  setInterval(() => { const v = VV[MODE]; if (v && started) viser(v); }, 120);
+  setInterval(() => { const v = VV[MODE]; if (v && started && !secours) viser(v); }, 120);
   /* la vidéo est affichée telle quelle (pas de dessin dans le canvas) : c'est Safari qui l'affiche, sans effort */
   const placer = v => {
     const c = cover(), st_ = v.el.style;
@@ -597,7 +597,21 @@ if (USE_VID){
     for (const k in VV) VV[k].el.style.visibility = (VV[k] === v && v.ready) ? "visible" : "hidden";
   };
   const peindre = v => { if (v === VV[MODE]) placer(v); };
-  loadAll = () => { vget(); };
+  /* secours : si Safari bloque la vidéo plusieurs fois de suite, on repasse au lecteur d'images, sans recharger la page */
+  const ORIG = {loadAll, pump, updLoad, draw, pret: window.NTPRET};
+  let secours = false, blocs = [];
+  window.ntSecours = () => {
+    if (secours) return; secours = true;
+    for (const k in VV){ VV[k].el.pause(); VV[k].el.style.display = 'none'; }
+    cv.style.visibility = ''; loadAll = ORIG.loadAll; pump = ORIG.pump; updLoad = ORIG.updLoad; draw = ORIG.draw; window.NTPRET = ORIG.pret;
+    if (VV[MODE] && VV[MODE].ready && cb_dessin(VV[MODE])) {}
+    loadAll(); draw();
+  };
+  const cb_dessin = v => { try { const c = cover(); ctx.drawImage(v.el, 0, 0, v.el.videoWidth, v.el.videoHeight, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR); lastBm = null; return true; } catch (e) { return false; } };
+  const noterBloc = () => { const t = performance.now(); blocs = blocs.filter(x => t - x < 8000); blocs.push(t); if (blocs.length >= 3) window.ntSecours(); };
+  // libère la vidéo en mémoire quand on quitte la page (sinon Safari l'accumule d'une visite à l'autre)
+  addEventListener('pagehide', () => { for (const k in VV){ const u = VV[k].el.src; VV[k].el.removeAttribute('src'); VV[k].el.load(); if (u.startsWith('blob:')) URL.revokeObjectURL(u); } });
+  loadAll = () => { if (!secours) vget(); };
   pump = () => {};
   updLoad = () => {};
   window.NTPRET = () => { const v = vget(); return v.ready ? 1 : 0.97 * v.prog; };
