@@ -243,7 +243,7 @@ document.getElementById("back").addEventListener("click", () => { window.NTF = n
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl', h:'dh'}, m:{l:'ml', h:'mh'}};
-const VER = '?v=12';
+const VER = '?v=13';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0}; }
