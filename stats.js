@@ -1,7 +1,7 @@
 // Statistiques de visite (GoatCounter : sans cookies, tableau de bord privé visible seulement après connexion).
 // Pour ne pas compter ses propres visites : ouvrir une fois https://guillaume-bellecroix.fr/#toggle-goatcounter sur chaque appareil.
 (() => {
-  const CODE = "";   // code du compte GoatCounter, ex. "gbellecroix" pour https://gbellecroix.goatcounter.com
+  const CODE = "guiguizee";   // code du compte GoatCounter, ex. "gbellecroix" pour https://gbellecroix.goatcounter.com
   const vus = new Set();
   window.stat = (nom, titre) => {
     if (!CODE || vus.has(nom)) return; vus.add(nom);
