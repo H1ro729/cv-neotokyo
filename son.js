@@ -9,15 +9,22 @@
   const btn = document.createElement("button");
   btn.type = "button"; btn.id = "son";
   btn.setAttribute("aria-pressed", "false");
-  btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/><path class="x" d="m22 9-6 6M16 9l6 6"/></svg><span>Son</span>';
+  btn.innerHTML = '<span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Son</span>';
   const st = document.createElement("style");
-  st.textContent = `#son{position:fixed;z-index:30;left:max(16px,env(safe-area-inset-left,0px));top:calc(14px + env(safe-area-inset-top,0px));display:inline-flex;align-items:center;gap:8px;
-    font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#f3efe6;background:rgba(11,10,18,.7);
-    border:1px solid #2a2638;padding:8px 11px;cursor:pointer;backdrop-filter:blur(6px)}
-  #son:hover{border-color:#ff2e63}#son svg{width:16px;height:16px}#son .w{display:none}#son[aria-pressed="true"] .w{display:inline}#son[aria-pressed="true"] .x{display:none}
-  #son[aria-pressed="true"]{border-color:#38e1ff;color:#38e1ff}@media (max-width:480px){#son span{display:none}#son{padding:8px 9px}}`;
+  st.textContent = `#son{position:fixed;z-index:30;left:max(16px,env(safe-area-inset-left,0px));top:calc(16px + env(safe-area-inset-top,0px));display:inline-flex;align-items:center;gap:9px;height:36px;
+    font-family:"IBM Plex Sans","Segoe UI",Roboto,sans-serif;font-size:13px;font-weight:600;color:#f3efe6;background:rgba(255,255,255,.08);
+    border:0;border-radius:999px;padding:0 14px 0 11px;cursor:pointer;backdrop-filter:blur(8px);transition:background .2s,color .2s}
+  #son:hover{background:rgba(255,255,255,.15)}
+  #son .eq{display:inline-flex;align-items:flex-end;gap:2px;width:16px;height:14px}
+  #son .eq i{flex:1;background:currentColor;border-radius:1px;height:3px;transition:height .2s}
+  #son[aria-pressed="true"]{background:#ff2e63;color:#fff}
+  #son[aria-pressed="true"] .eq i{animation:eq .9s ease-in-out infinite alternate}
+  #son[aria-pressed="true"] .eq i:nth-child(2){animation-delay:-.3s}#son[aria-pressed="true"] .eq i:nth-child(3){animation-delay:-.6s}#son[aria-pressed="true"] .eq i:nth-child(4){animation-delay:-.15s}
+  @keyframes eq{from{height:3px}to{height:14px}}
+  @media (max-width:480px){#son span{display:none}#son{padding:0 11px}}
+  @media (prefers-reduced-motion:reduce){#son .eq i{animation:none!important;height:8px}}`;
   document.head.appendChild(st);
-  const label = () => { btn.setAttribute("aria-pressed", String(on)); btn.title = (on ? "Couper le son" : "Activer l'ambiance sonore") + (dansRue ? "" : " (on l'entend dans le CV immersif)"); btn.querySelector("span").textContent = on ? "Son" : "Son coupé"; };
+  const label = () => { btn.setAttribute("aria-pressed", String(on)); btn.title = (on ? "Couper le son" : "Activer l'ambiance sonore") + (dansRue ? "" : " (on l'entend dans le CV immersif)"); btn.querySelector("span:last-child").textContent = on ? "Son activé" : "Activer le son"; };
 
   let blanc = null;
   function bruit(sec) {

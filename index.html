@@ -49,7 +49,7 @@ a{color:inherit}
 #home .bg::after{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(11,10,18,.94) 0%,rgba(11,10,18,.78) 34%,rgba(11,10,18,.18) 72%,rgba(11,10,18,.35) 100%),
   linear-gradient(0deg,rgba(11,10,18,.95) 0%,rgba(11,10,18,0) 42%)}
-.lbar{position:relative;z-index:2;display:flex;align-items:center;gap:26px;height:68px;padding-left:150px;border-bottom:1px solid rgba(255,255,255,.07)}
+.lbar{position:relative;z-index:2;display:flex;align-items:center;gap:26px;height:68px;padding-left:180px;border-bottom:1px solid rgba(255,255,255,.07)}
 .lbar .logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .lbar .logo span{color:var(--neon)}
 .tabs{display:flex;gap:22px;align-items:stretch;height:100%}
@@ -105,9 +105,14 @@ a{color:inherit}
   border:1px solid rgba(255,255,255,.08);cursor:pointer;font:inherit;text-align:left;padding:0;transition:transform .18s ease,border-color .18s ease}
 .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,10,18,.92) 0%,rgba(11,10,18,.1) 62%)}
 .tile:hover,.tile:focus-visible{transform:translateY(-3px);border-color:rgba(255,255,255,.5)}
-.tile .t{position:absolute;z-index:1;left:14px;right:14px;bottom:12px;display:grid;gap:2px}
+.tile .t{pointer-events:none;position:absolute;z-index:1;left:14px;right:14px;bottom:12px;display:grid;gap:2px}
 .tile b{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
 .tile small{font-size:12.5px;color:#bdb7c9}
+.tile.pdf .cover{position:absolute;inset:0;z-index:1}
+.tile .acts{position:absolute;z-index:2;right:12px;bottom:12px;display:flex;gap:6px}
+.tile .acts a{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;color:var(--ink);background:rgba(255,255,255,.14);backdrop-filter:blur(6px);transition:background .15s}
+.tile .acts a:hover{background:var(--neon)}
+.tile .acts a:last-child{padding:0;width:32px;font-size:15px}
 .tile .bdg{position:absolute;z-index:1;top:10px;left:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--neon);color:#fff;padding:3px 7px;border-radius:3px}
 @media (max-width:1180px){.lmain{grid-template-columns:minmax(0,1fr)}.ach{grid-column:auto;max-width:520px}}
 @media (max-width:900px){#home .bg{background-position:58% top;background-size:auto 70vh}#home .bg::after{background:linear-gradient(180deg,rgba(11,10,18,.45) 0,rgba(11,10,18,.85) 40vh,var(--night) 70vh)}.lbar{gap:16px}.tabs{display:none}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.tile{flex:0 0 min(70vw,300px);scroll-snap-align:start}}
@@ -190,7 +195,7 @@ img.ph{width:100%;object-fit:cover;display:block}
   <div class="bg" aria-hidden="true"></div>
   <header class="lbar">
     <div class="logo">G. Belle-Croix<span>.</span></div>
-    <nav class="tabs" aria-label="Navigation"><i class="ind" aria-hidden="true"></i><a href="./" aria-current="page">Accueil</a><a href="projets/">Projets</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Dossier</a><a href="contact/">Contact</a></nav>
+    <nav class="tabs" aria-label="Navigation"><i class="ind" aria-hidden="true"></i><a href="./" aria-current="page">Accueil</a><a href="projets/">Projets</a><a href="contact/">Contact</a></nav>
     <div class="prof"><img src="img/avatar.webp" alt="" width="32" height="32"><b>Guillaume</b><span class="dot" aria-hidden="true"></span><small>Disponible</small></div>
   </header>
   <div class="lmain">
@@ -199,7 +204,6 @@ img.ph{width:100%;object-fit:cover;display:block}
       <p class="lede">Esport, événementiel, digital. Je cherche un stage ou une alternance.</p>
       <div class="cta">
         <button class="play" id="go-immersif" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>Jouer</button>
-        <a class="btn2" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf">CV PDF ↓</a>
       </div>
       <div class="meta">CV en 3D · à parcourir au scroll · son conseillé</div>
     </div>
@@ -216,9 +220,13 @@ img.ph{width:100%;object-fit:cover;display:block}
     <h2>Continuer</h2>
     <div class="tiles">
       <button class="tile" type="button" id="tile-cv" style="background-image:url(img/t_cv.webp)"><span class="bdg">3D</span><span class="t"><b>CV immersif</b></span></button>
-      <a class="tile" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" style="background-image:url(img/t_dossier.webp)"><span class="t"><b>Dossier</b><small>PDF</small></span></a>
-      <a class="tile" href="projets/" style="background-image:url(img/t_clutch.webp)"><span class="t"><b>Clutch Esport</b></span></a>
-      <a class="tile" href="projets/airlines/" style="background-image:url(img/t_airlines.webp)"><span class="t"><b>INSEEC Airlines</b></span></a>
+      <div class="tile pdf" style="background-image:url(img/t_dossier.webp)"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" aria-label="Voir le dossier"></a>
+        <span class="t"><b>Dossier</b><small>PDF · 7 pages</small></span>
+        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf" aria-label="Télécharger le dossier">↓</a></span></div>
+      <div class="tile pdf" style="background-image:url(img/t_fiche.webp);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" aria-label="Voir le CV 1 page"></a>
+        <span class="t"><b>CV</b><small>PDF · 1 page</small></span>
+        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf" aria-label="Télécharger le CV">↓</a></span></div>
+      <a class="tile" href="projets/" style="background-image:url(img/t_projets.webp)"><span class="t"><b>Mes projets</b></span></a>
     </div>
   </div>
 </section>
@@ -596,7 +604,7 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 
 </script>
 
-<script src="son.js?v=8" defer></script>
+<script src="son.js?v=9" defer></script>
 <script src="intro.js?v=2" defer></script>
 </body>
 </html>

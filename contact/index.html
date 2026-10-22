@@ -62,6 +62,28 @@ h1 span{color:var(--neon)}
 #toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;transition:.25s;font-family:var(--mono);font-size:12px;letter-spacing:.08em;background:var(--ink);color:var(--night);padding:10px 14px;pointer-events:none}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 
+
+/* style « launcher » commun à l'accueil */
+body{padding-top:0}
+.lbar{display:flex;align-items:center;gap:26px;height:68px;max-width:1180px;margin:0 auto 34px;border-bottom:1px solid rgba(255,255,255,.07)}
+.lbar .logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;text-decoration:none;color:var(--ink)}
+.lbar .logo span{color:var(--neon)}
+.tabs{position:relative;display:flex;gap:22px;align-items:stretch;height:100%}
+.tabs a{display:flex;align-items:center;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.tabs a:hover,.tabs a[aria-current]{color:var(--ink)}
+.tabs .ind{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--neon);transition:transform .32s cubic-bezier(.3,.7,.2,1),width .32s cubic-bezier(.3,.7,.2,1)}
+.prof{margin-left:auto;display:flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:999px;background:rgba(255,255,255,.06);font-size:14px;white-space:nowrap}
+.prof img{width:32px;height:32px;border-radius:50%;object-fit:cover}.prof b{font-weight:600}.prof .dot{width:8px;height:8px;border-radius:50%;background:#3ddc84}
+.lbar{max-width:860px}
+.pdf .duo{display:flex;gap:6px}.pdf .duo a{text-decoration:none}.pdf .duo a:first-child span{background:rgba(255,255,255,.1);color:var(--ink)}
+@media (max-width:620px){.lbar .logo{display:none}.prof{display:none}.lbar{margin-bottom:22px}}
+.proj,.row,.pdf{border-radius:10px;border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.04);transition:transform .18s ease,border-color .18s ease}
+a.proj:hover,.pdf:hover{transform:translateY(-3px);border-color:rgba(255,255,255,.4)}
+.proj .go,.acts a,.acts button,.pdf span{border-radius:6px}
+.proj .go{font-family:var(--body);font-weight:600;font-size:14px;letter-spacing:.02em;text-transform:none}
+.ico{border-radius:8px;border-color:rgba(255,255,255,.1)}
+.acts a,.acts button{font-family:var(--body);font-weight:600;font-size:13px;letter-spacing:.02em;text-transform:none;border-color:rgba(255,255,255,.14)}
+.pdf span{font-family:var(--body);font-weight:600;font-size:13px;letter-spacing:.02em;text-transform:none}
 @keyframes monte{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .wrap>*,.grid>*,.list>*,.pdfs>*{animation:monte .5s cubic-bezier(.2,.7,.2,1) backwards}
 .wrap>:nth-child(2){animation-delay:.06s}.wrap>:nth-child(3){animation-delay:.12s}
@@ -72,11 +94,12 @@ html.sortie .wrap{opacity:0;transform:translateY(-10px)}
 </style>
 </head>
 <body>
+<header class="lbar">
+  <a class="logo" href="../">G. Belle-Croix<span>.</span></a>
+  <nav class="tabs" aria-label="Navigation"><i class="ind" aria-hidden="true"></i><a href="../">Accueil</a><a href="../projets/">Projets</a><a href="../contact/" aria-current="page">Contact</a></nav>
+  <div class="prof"><img src="../img/avatar.webp" alt="" width="32" height="32"><b>Guillaume</b><span class="dot" aria-hidden="true"></span></div>
+</header>
 <div class="wrap">
-  <div class="top">
-    <a class="btn" href="../">← Accueil</a>
-    <span class="kicker">Guillaume Belle-Croix · Contact</span>
-  </div>
   <h1>Me <span>contacter</span></h1>
   <p class="lede">Stage, alternance ou CDD : je réponds vite.</p>
 
@@ -110,8 +133,8 @@ html.sortie .wrap{opacity:0;transform:translateY(-10px)}
 
   <div class="sec">Mon CV en PDF</div>
   <div class="pdfs">
-    <a class="pdf" href="../cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf"><div><b>Dossier projet</b><small>PDF · 7 pages</small></div><span>Télécharger ↓</span></a>
-    <a class="pdf" href="../cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf"><div><b>Fiche de synthèse</b><small>PDF · 1 page</small></div><span>Télécharger ↓</span></a>
+    <div class="pdf"><div><b>Dossier projet</b><small>PDF · 7 pages</small></div><div class="duo"><a href="../cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener"><span>Voir</span></a><a href="../cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf"><span>Télécharger ↓</span></a></div></div>
+    <div class="pdf"><div><b>CV 1 page</b><small>PDF · 1 page</small></div><div class="duo"><a href="../cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener"><span>Voir</span></a><a href="../cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf"><span>Télécharger ↓</span></a></div></div>
   </div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
@@ -131,6 +154,15 @@ document.addEventListener("click", async e => {
   try { await navigator.clipboard.writeText(b.dataset.copy); toast("Copié : " + b.dataset.copy); }
   catch (err) { toast(b.dataset.copy); }
 });
+</script>
+<script>
+(() => { const nav = document.querySelector(".tabs"), ind = nav.querySelector(".ind");
+  const pose = a => { if (a) { ind.style.width = a.offsetWidth + "px"; ind.style.transform = "translateX(" + a.offsetLeft + "px)"; } };
+  const cur = () => nav.querySelector("a[aria-current]");
+  ind.style.transition = "none"; pose(cur()); requestAnimationFrame(() => requestAnimationFrame(() => ind.style.transition = ""));
+  document.fonts && document.fonts.ready.then(() => pose(cur())); addEventListener("resize", () => pose(cur()));
+  nav.querySelectorAll("a").forEach(a => a.addEventListener("click", () => pose(a)));
+})();
 </script>
 <script>
 // sortie douce avant de changer de page
