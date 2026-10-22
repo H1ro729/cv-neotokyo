@@ -56,7 +56,18 @@ a{color:inherit}
 .tabs a{display:flex;align-items:center;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;position:relative}
 .tabs a:hover{color:var(--ink)}
 .tabs a[aria-current]{color:var(--ink)}
-.tabs a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--neon)}
+.tabs{position:relative}
+.tabs .ind{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--neon);transition:transform .32s cubic-bezier(.3,.7,.2,1),width .32s cubic-bezier(.3,.7,.2,1)}
+/* animations d'entrée et de sortie */
+@keyframes monte{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero>*,.ach,.lrow .tile,.lbar{animation:monte .55s cubic-bezier(.2,.7,.2,1) backwards}
+.hero>:nth-child(2){animation-delay:.07s}.hero>:nth-child(3){animation-delay:.14s}.hero>:nth-child(4){animation-delay:.21s}
+.ach{animation-delay:.18s}.lrow .tile:nth-child(1){animation-delay:.24s}.lrow .tile:nth-child(2){animation-delay:.3s}.lrow .tile:nth-child(3){animation-delay:.36s}.lrow .tile:nth-child(4){animation-delay:.42s}
+#home .bg{animation:fond 1.4s ease both}@keyframes fond{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
+#home .lmain,#home .lrow{transition:opacity .28s ease,transform .28s ease}
+#home.sortie .lmain,#home.sortie .lrow{opacity:0;transform:translateY(-10px)}
+.tile:active,.play:active,.btn2:active{transform:scale(.97)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .prof{margin-left:auto;display:flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:999px;background:rgba(255,255,255,.06);font-size:14px;white-space:nowrap}
 .prof img{width:32px;height:32px;border-radius:50%;object-fit:cover}
 .prof b{font-weight:600}.prof .dot{width:8px;height:8px;border-radius:50%;background:#3ddc84}
@@ -89,7 +100,7 @@ a{color:inherit}
 .prog{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}.prog i{display:block;height:100%;width:75%;background:var(--sign)}
 .lrow{position:relative;z-index:1;display:grid;gap:12px;margin-top:28px}
 .lrow h2{margin:0;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .tile{position:relative;display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#15131f center/cover no-repeat;text-decoration:none;color:var(--ink);
   border:1px solid rgba(255,255,255,.08);cursor:pointer;font:inherit;text-align:left;padding:0;transition:transform .18s ease,border-color .18s ease}
 .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,10,18,.92) 0%,rgba(11,10,18,.1) 62%)}
@@ -179,39 +190,35 @@ img.ph{width:100%;object-fit:cover;display:block}
   <div class="bg" aria-hidden="true"></div>
   <header class="lbar">
     <div class="logo">G. Belle-Croix<span>.</span></div>
-    <nav class="tabs" aria-label="Navigation"><a href="./" aria-current="page">Accueil</a><a href="projets/">Projets</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Dossier</a><a href="contact/">Contact</a></nav>
+    <nav class="tabs" aria-label="Navigation"><i class="ind" aria-hidden="true"></i><a href="./" aria-current="page">Accueil</a><a href="projets/">Projets</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Dossier</a><a href="contact/">Contact</a></nav>
     <div class="prof"><img src="img/avatar.webp" alt="" width="32" height="32"><b>Guillaume</b><span class="dot" aria-hidden="true"></span><small>Disponible</small></div>
   </header>
   <div class="lmain">
     <div class="hero">
-      <div class="kicker"><span>Candidature 2026 · Bordeaux</span></div>
       <h1>Guillaume<br><span>Belle-Croix</span></h1>
-      <p class="lede">Esport, événementiel et digital. Étudiant INSEEC Bachelor, je cherche un stage ou une alternance pour travailler côté staff : partenariats, communauté, organisation.</p>
-      <div class="chips"><span>21 ans</span><span>INSEEC Bachelor</span><span>Ex-Gendarme Adjoint Volontaire</span><span class="ok">● Stage · alternance · CDD</span></div>
+      <p class="lede">Esport, événementiel, digital. Je cherche un stage ou une alternance.</p>
       <div class="cta">
         <button class="play" id="go-immersif" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>Jouer</button>
-        <a class="btn2" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf">Dossier PDF ↓</a>
-        <a class="btn2" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf">CV 1 page ↓</a>
+        <a class="btn2" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf">CV PDF ↓</a>
       </div>
-      <div class="meta">Le CV en 3D : une rue de Neo-Tokyo à parcourir au scroll · environ 5 min · son conseillé</div>
+      <div class="meta">CV en 3D · à parcourir au scroll · son conseillé</div>
     </div>
     <aside class="ach" aria-label="Succès">
       <h2>Succès <span>3 / 4</span></h2>
-      <div class="ac"><i>EWC</i><div><b>Vainqueur EWC 2026</b><small>Tournoi communautaire Valorant · finale 10 – 4</small></div></div>
-      <div class="ac"><i class="b">2 ans</i><div><b>Sur le terrain</b><small>Gendarme Adjoint Volontaire, 2024 – 2026</small></div></div>
-      <div class="ac"><i class="c">www</i><div><b>Un site en ligne</b><small>Clutch Esport, de l'idée à la mise en ligne</small></div></div>
-      <div class="ac"><i class="d">?</i><div><b>Prochain succès</b><small>Décrocher un stage ou une alternance</small></div></div>
+      <div class="ac"><i>EWC</i><div><b>Vainqueur EWC 2026</b><small>Valorant</small></div></div>
+      <div class="ac"><i class="b">2 ans</i><div><b>Gendarme adjoint</b><small>2024 – 2026</small></div></div>
+      <div class="ac"><i class="c">www</i><div><b>Clutch Esport</b><small>Mon site, en ligne</small></div></div>
+      <div class="ac"><i class="d">?</i><div><b>Prochain succès</b><small>Ton stage ou ton alternance ?</small></div></div>
       <div class="prog" aria-hidden="true"><i></i></div>
     </aside>
   </div>
   <div class="lrow">
     <h2>Continuer</h2>
     <div class="tiles">
-      <button class="tile" type="button" id="tile-cv" style="background-image:url(img/t_cv.webp)"><span class="bdg">3D</span><span class="t"><b>CV immersif</b><small>Neo-Tokyo · au scroll</small></span></button>
-      <a class="tile" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" style="background-image:url(img/t_dossier.webp)"><span class="t"><b>Dossier projet</b><small>PDF · 7 pages</small></span></a>
-      <a class="tile" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" style="background-image:url(img/t_fiche.webp);background-position:center top"><span class="t"><b>Fiche de synthèse</b><small>PDF · 1 page</small></span></a>
-      <a class="tile" href="projets/" style="background-image:url(img/t_clutch.webp)"><span class="t"><b>Clutch Esport</b><small>Mon site de pronostics</small></span></a>
-      <a class="tile" href="projets/airlines/" style="background-image:url(img/t_airlines.webp)"><span class="t"><b>INSEEC Airlines</b><small>Film 3D · concept de soirée</small></span></a>
+      <button class="tile" type="button" id="tile-cv" style="background-image:url(img/t_cv.webp)"><span class="bdg">3D</span><span class="t"><b>CV immersif</b></span></button>
+      <a class="tile" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" style="background-image:url(img/t_dossier.webp)"><span class="t"><b>Dossier</b><small>PDF</small></span></a>
+      <a class="tile" href="projets/" style="background-image:url(img/t_clutch.webp)"><span class="t"><b>Clutch Esport</b></span></a>
+      <a class="tile" href="projets/airlines/" style="background-image:url(img/t_airlines.webp)"><span class="t"><b>INSEEC Airlines</b></span></a>
     </div>
   </div>
 </section>
@@ -269,6 +276,20 @@ const P = [
 
 /* ---------- accueil ---------- */
 const home = document.getElementById("home"), exp = document.getElementById("exp");
+// onglets : le trait glisse vers l'onglet cliqué, puis la page s'efface avant de changer
+(() => {
+  const nav = document.querySelector(".tabs"), ind = nav && nav.querySelector(".ind");
+  const pose = a => { if (ind && a) { ind.style.width = a.offsetWidth + "px"; ind.style.transform = "translateX(" + a.offsetLeft + "px)"; } };
+  const cur = () => nav && nav.querySelector("a[aria-current]");
+  if (ind) { ind.style.transition = "none"; pose(cur()); requestAnimationFrame(() => ind.style.transition = ""); addEventListener("resize", () => pose(cur())); }
+  document.querySelectorAll("#home a[href]").forEach(a => a.addEventListener("click", e => {
+    if (a.target === "_blank" || a.hasAttribute("download") || e.metaKey || e.ctrlKey || e.shiftKey) { if (nav && nav.contains(a)) pose(a); return; }
+    const u = new URL(a.href, location.href); if (u.origin !== location.origin || u.pathname === location.pathname) return;
+    e.preventDefault(); if (nav && nav.contains(a)) pose(a);
+    document.getElementById("home").classList.add("sortie"); setTimeout(() => location.href = a.href, 300);
+  }));
+  addEventListener("pageshow", e => { if (e.persisted) { document.getElementById("home").classList.remove("sortie"); pose(cur()); } });
+})();
 ["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { start(); if (window.lancerIntro) window.lancerIntro(); }));
 document.getElementById("back").addEventListener("click", () => { window.NTF = null; window.NTP = 0; exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
 
