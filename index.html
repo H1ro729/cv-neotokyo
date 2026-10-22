@@ -228,10 +228,10 @@ img.ph{width:100%;object-fit:cover;display:block}
     <h2>Continuer</h2>
     <div class="tiles">
       <button class="tile" type="button" id="tile-cv" style="background-image:url(img/t_cv.webp?v=2)"><span class="bdg">3D</span><span class="t"><b>CV immersif</b></span></button>
-      <div class="tile pdf" style="background-image:url(img/t_dossier.webp?v=3);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" aria-label="Voir le dossier"></a>
+      <div class="tile pdf" style="background-image:url(img/t_dossier.webp?v=4);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" aria-label="Voir le dossier"></a>
         <span class="t"><b>Dossier</b><small>PDF · 7 pages</small></span>
         <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf" aria-label="Télécharger le dossier">↓</a></span></div>
-      <div class="tile pdf" style="background-image:url(img/t_fiche.webp?v=2);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" aria-label="Voir le CV 1 page"></a>
+      <div class="tile pdf" style="background-image:url(img/t_fiche.webp?v=3);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" aria-label="Voir le CV 1 page"></a>
         <span class="t"><b>CV</b><small>PDF · 1 page</small></span>
         <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf" aria-label="Télécharger le CV">↓</a></span></div>
       <a class="tile plain" href="projets/"><span class="arr" aria-hidden="true">→</span><span class="t"><b>Mes projets</b><small>Clutch Esport · INSEEC Airlines</small></span></a>
@@ -311,7 +311,7 @@ document.getElementById("back").addEventListener("click", () => { window.NTF = n
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl3', h:'dh3'}, m:{l:'ml3', h:'mh3'}};
-const VER = '?v=15';
+const VER = '?v=16';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
@@ -461,6 +461,63 @@ function draw(){
   } else ctx.drawImage(bm, 0, 0, bm.naturalWidth || bm.width, bm.naturalHeight || bm.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
 }
 let started = false;
+
+/* ---------- Safari : la rue est lue comme une vidéo qu'on fait avancer image par image ----------
+   (le navigateur gère seul la mémoire et le décodage : plus de gel au bout de quelques défilements) */
+// ordinateur sous Safari (le téléphone, lui, défile bien avec les images)
+const H264 = document.createElement('video').canPlayType('video/mp4; codecs="avc1.640028"') !== '';
+const VTEST = /[?&]vid=webm/.test(location.search);   // essai sous Chromium (sans H.264)
+const USE_VID = VTEST || (H264 && (/[?&]vid=1/.test(location.search) || (VIA_IMG && !/[?&]img=1/.test(location.search) && matchMedia("(hover: hover) and (pointer: fine)").matches)));
+if (USE_VID){
+  const VS = VTEST ? {d:'pk/rue_d.webm', m:'pk/rue_m.webm'} : {d:'pk/rue_d.mp4', m:'pk/rue_m.mp4'}, VV = {};
+  const vget = () => {
+    if (VV[MODE]) return VV[MODE];
+    const v = VV[MODE] = {el:document.createElement('video'), prog:0, ready:false, want:0, at:-1, busy:false, tgt:0};
+    v.el.muted = true; v.el.playsInline = true; v.el.setAttribute('playsinline', ''); v.el.preload = 'auto';
+    // la vidéo ne passe pas : on revient au lecteur d'images
+    v.el.addEventListener('error', () => { if (!/img=1/.test(location.search)) location.replace(location.pathname + '?img=1'); });
+    v.el.addEventListener('seeked', () => { v.at = v.tgt; v.busy = false; peindre(v); viser(v); });
+    v.el.addEventListener('loadeddata', () => {
+      const fin = () => { v.ready = true; v.busy = false; v.at = -1; viser(v); };
+      const p = v.el.play(); if (p && p.then) p.then(() => { v.el.pause(); fin(); }, fin); else fin();
+    });
+    (async () => {
+      try {
+        const r = await fetch(VS[MODE] + VER); const n = +r.headers.get('content-length') || 0;
+        let blob;
+        if (r.body && r.body.getReader && n){
+          const rd = r.body.getReader(), parts = []; let got = 0;
+          for (;;){ const {done, value} = await rd.read(); if (done) break; parts.push(value); got += value.length; v.prog = got / n; }
+          blob = new Blob(parts, {type:'video/mp4'});
+        } else { blob = await r.blob(); }
+        v.prog = 1; v.el.src = URL.createObjectURL(blob); v.el.load();
+      } catch (e) { v.prog = 1; v.el.src = VS[MODE] + VER; v.el.load(); }
+    })();
+    return v;
+  };
+  const viser = v => {
+    if (!v.ready || v.busy) return;
+    if (v.want === v.at){ peindre(v); return; }
+    v.busy = true; v.tgt = v.want; v.el.currentTime = (v.want + 0.5) / 30;
+  };
+  const peindre = v => {
+    if (!started || !v.ready || v !== VV[MODE]) return;
+    const c = cover(), w = v.el.videoWidth, h = v.el.videoHeight; if (!w) return;
+    ctx.fillStyle = "#0b0a12"; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+    ctx.drawImage(v.el, 0, 0, w, h, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
+  };
+  loadAll = () => { vget(); };
+  pump = () => {};
+  updLoad = () => {};
+  window.NTPRET = () => { const v = vget(); return v.ready ? 1 : 0.97 * v.prog; };
+  draw = () => {
+    if (!started) return;
+    const v = vget(), f = Math.max(0, Math.min(NF - 1, Math.round(shown)));
+    window.NTF = f + 1; v.want = f; viser(v);
+  };
+  loadEl.textContent = "";
+}
 
 /* ---------- pages d'affiche ---------- */
 const col = document.getElementById("col"), page = document.getElementById("page");
