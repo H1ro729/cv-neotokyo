@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610222102";
+(() => { const BUILD = "202610222106";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -57,7 +57,7 @@ a{color:inherit}
 #home .bg::after{content:"";position:absolute;inset:0;background:
   linear-gradient(90deg,rgba(11,10,18,.94) 0%,rgba(11,10,18,.78) 34%,rgba(11,10,18,.18) 72%,rgba(11,10,18,.35) 100%),
   linear-gradient(0deg,rgba(11,10,18,.95) 0%,rgba(11,10,18,0) 42%)}
-.lbar{position:relative;z-index:2;display:flex;align-items:center;gap:26px;height:68px;padding-left:180px;border-bottom:1px solid rgba(255,255,255,.07)}
+.lbar{position:relative;z-index:2;display:flex;align-items:center;gap:26px;height:68px;border-bottom:1px solid rgba(255,255,255,.07)}
 .lbar .logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
 .lbar .logo span{color:var(--neon)}
 .tabs{display:flex;gap:22px;align-items:stretch;height:100%}
@@ -133,7 +133,7 @@ a{color:inherit}
 .tile .bdg{position:absolute;z-index:1;top:10px;left:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--neon);color:#fff;padding:3px 7px;border-radius:3px}
 @media (max-width:1180px){.lmain{grid-template-columns:minmax(0,1fr)}.ach{grid-column:auto;max-width:520px}}
 @media (max-width:900px){#home .bg{background-position:58% top;background-size:auto 70vh}#home .bg::after{background:linear-gradient(180deg,rgba(11,10,18,.45) 0,rgba(11,10,18,.85) 40vh,var(--night) 70vh)}.lbar{gap:16px}.tabs{display:none}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.tile{flex:0 0 min(70vw,300px);scroll-snap-align:start}}
-@media (max-width:560px){.lbar{padding-left:64px}.lbar .logo{display:none}.prof small{display:none}.play{font-size:22px;padding:13px 24px 12px}.hero .lede{font-size:16px}}
+@media (max-width:560px){.lbar .logo{display:none}.prof small{display:none}.play{font-size:22px;padding:13px 24px 12px}.hero .lede{font-size:16px}}
 
 /* ---------- expérience ---------- */
 #exp[hidden]{display:none}
@@ -322,25 +322,25 @@ let MODE = 'd';
 const P = [
   {n:1, deb:665, fin:671, c1:"#ffc420", eyebrow:"01 · Qui suis-je ?", title:"Guillaume Belle-Croix",
    facts:["21 ans · Bordeaux","Esport · Digital · Événementiel","Étudiant INSEEC Bachelor"],
-   txt:[["Présentation","Je m'appelle Guillaume Belle-Croix et j'ai 21 ans. J'ai effectué deux ans dans la Gendarmerie nationale et j'ai toujours été passionné de jeu vidéo. Aujourd'hui, je reprends mes études à l'INSEEC avec un cap clair : <b>travailler dans l'esport, dans l'ombre des structures</b>, là où se construisent les événements, les partenariats, les rosters et les communautés."],["Ce qui me définit","La rigueur et le sang-froid du terrain, l'envie de créer et d'apprendre (ce CV en 3D, mon site de pronostics, mes réalisations sur Blender, mes jeux Roblox…) et une connaissance sincère de la scène, côté joueur comme côté public. Fiable, ponctuel, à l'aise en équipe."],["Voyager","J'aime voyager et j'essaie de partir au moins une fois par an. Ma destination préférée : <b>le Japon</b>, pour sa culture, ses infrastructures, son histoire et sa communauté."]], ph:[["img/p1/japon.webp","Japon","a"],["img/p1/arena.webp","Valorant Champions · Paris","b"],["img/p1/uniforme.webp?v=2","Deux ans d'uniforme","c"],["img/p1/lunettes.webp","","d"]]},
+   txt:[["Présentation","Moi c'est Guillaume, j'ai 21 ans. J'ai passé deux ans dans la Gendarmerie nationale, et le jeu vidéo m'a toujours suivi. Aujourd'hui je reprends mes études à l'INSEEC avec une idée bien précise : <b>travailler dans l'esport, côté coulisses</b>. Les événements, les partenariats, les équipes, la communauté."],["Ce qui me ressemble","Du terrain, j'ai gardé la rigueur et le calme. J'aime créer et apprendre par moi-même : ce CV en 3D, mon site de pronos, Blender, Roblox… Et la scène esport, je la connais vraiment, en tant que joueur et en tant que spectateur. On peut compter sur moi, je suis à l'heure et j'aime travailler en équipe."],["Voyager","J'essaie de partir au moins une fois par an. Mon coup de cœur reste <b>le Japon</b> : la culture, l'histoire, la façon dont tout est pensé, et les gens."]], ph:[["img/p1/japon.webp","Japon","a"],["img/p1/arena.webp","Valorant Champions · Paris","b"],["img/p1/uniforme.webp?v=2","Deux ans d'uniforme","c"],["img/p1/lunettes.webp","","d"]]},
   {n:2, deb:743, fin:749, c1:"#26c8e8", eyebrow:"02 · Formation", title:"INSEEC Bachelor",
    facts:["Marketing & communication digitale","Campus de Bordeaux","Rentrée 2026"],
-   txt:[["Le programme","Stratégie de marque et marketing digital, réseaux sociaux et création de contenu, gestion de projet en équipe, présentations orales : tout ce qui fait tourner une marque aujourd'hui."],["Pourquoi ce choix","L'esport vit sur le digital : communautés, streams, réseaux sociaux, partenariats de marques. Je veux savoir piloter ces leviers pour une structure ou un événement."]], ph:[]},
+   txt:[["Le programme","On y voit la stratégie de marque, le marketing digital, les réseaux sociaux et la création de contenu, avec pas mal de projets en équipe et d'oraux."],["Pourquoi ce choix","Dans l'esport, presque tout passe par le digital : les communautés, les streams, les réseaux, les partenariats avec les marques. Je veux apprendre à maîtriser tout ça pour le mettre au service d'une équipe ou d'un événement."]], ph:[]},
   {n:3, deb:821, fin:827, c1:"#ce182c", eyebrow:"03 · Expérience", title:"Gendarme Adjoint Volontaire",
    facts:["2024 — 2026 · 2 ans","Rigueur · sang-froid · équipe","Terrain & gestion du public"],
-   txt:[["Missions","Sécurité publique et patrouilles, accueil et gestion du public, gestion des effectifs, interventions en équipe de jour comme de nuit, dans le respect strict des procédures."],["Ce que j'en retire","Gérer une foule et ses flux, anticiper les risques, rester calme quand la situation se tend, être fiable et à l'heure. Ces deux années m'ont surtout appris à me connaître : mes limites, ma façon de réagir sous pression, ce qui me motive. J'en suis ressorti plus mûr, plus sûr de moi et avec une idée claire de la personne que je veux devenir."]], ph:[["img/p3/patrouille.webp","Avant la patrouille","a"],["img/p3/camarades.webp?v=2","Entre camarades","b"],["img/p3/terrain.webp?v=3","Sur le terrain","c"]]},
+   txt:[["Missions","Patrouilles et sécurité publique, accueil du public, gestion des effectifs, interventions en équipe, de jour comme de nuit. Avec des procédures à respecter à la lettre."],["Ce que j'en retire","J'ai appris à gérer du monde, à anticiper et à garder mon calme quand ça se tend. Surtout, ces deux ans m'ont appris à me connaître : comment je réagis sous pression, ce qui me motive vraiment. J'en suis sorti plus mûr, et je sais mieux où je veux aller."]], ph:[["img/p3/patrouille.webp","Avant la patrouille","a"],["img/p3/camarades.webp?v=2","Entre camarades","b"],["img/p3/terrain.webp?v=3","Sur le terrain","c"]]},
   {n:4, deb:899, fin:905, c1:"#f0326e", eyebrow:"04 · Esport", title:"Vainqueur EWC 2026 Paris",
    facts:[],
-   txt:[["Le tournoi","Finale en 1v1 remportée <b>10 – 4</b> le 12 juillet 2026, lors du tournoi communautaire Valorant de l'Esports World Cup à Paris."],["Depuis tout petit","Le jeu vidéo m'accompagne depuis l'enfance. Aujourd'hui je joue beaucoup moins : ce qui me passionne, c'est <b>la scène esport</b>, les équipes, les compétitions et tout ce qui se construit autour."],["Sur place","Valorant Champions 2025, EWC 2026 : au moins un grand événement par an, et supporter des <b>équipes françaises</b>. Je connais la scène de l'intérieur, côté joueur comme côté public."]],
+   txt:[["Le tournoi","Le 12 juillet 2026, j'ai gagné la finale du tournoi communautaire Valorant de l'EWC à Paris, en 1v1, <b>10 à 4</b>."],["Depuis tout petit","Je joue aux jeux vidéo depuis que je suis petit. Aujourd'hui je joue beaucoup moins : ce qui m'intéresse vraiment, c'est <b>la scène esport</b>. Les équipes, les compétitions, et tout le travail qu'il y a derrière."],["Sur place","Valorant Champions 2025, EWC 2026… J'essaie d'aller sur au moins un gros événement par an, et je suis à fond derrière les <b>équipes françaises</b>. L'ambiance d'une salle, je connais, côté joueur comme côté public."]],
    ph:[["img/p4/champions.webp?v=2","Valorant Champions 2025 · Paris","a"],["img/p4/gentlemates.webp?v=2","Avec Gentle Mates · EWC 2026","b"],["img/p4/vitality.webp?v=2","Team Vitality sur scène · EWC 2026","c"],["img/p4/gentlemates_match.webp?v=4","Gentle Mates en match · EWC 2026","d"]]},
   {n:5, deb:977, fin:983, c1:"#7c4dff", eyebrow:"05 · Réalisations", title:"Mes projets",
    facts:[],
-   txt:[["Ce qui me fait avancer","J'aime m'investir dans un projet <b>de l'idée jusqu'au résultat</b>, et apprendre en le faisant. Chacun de ces trois projets m'a fait découvrir un nouveau métier : le web, la 3D, la communication d'un événement."],
-        ["Et toujours un projet en cours","Deux jeux sur Roblox, un serveur Discord autour de l'IA, une marque de vêtements en préparation. Quand je ne sais pas faire, <b>j'apprends</b>."]],
+   txt:[["Ce qui me motive","Ce que j'aime, c'est prendre un projet <b>de l'idée jusqu'au bout</b> et apprendre en route. Chacun de ces trois projets m'a fait découvrir quelque chose de nouveau : le web, la 3D, la communication d'un événement."],
+        ["Et toujours un projet en cours","J'ai aussi fait deux jeux sur Roblox, je gère un serveur Discord autour de l'IA et je prépare une marque de vêtements. Quand je ne sais pas faire quelque chose, <b>je l'apprends</b>."]],
    fiches:[
-    {img:"projets/clutch.webp", pos:"left top", t:"Clutch Esport", tag:"Fiche 5.1", obj:"Faire vivre une communauté autour des pronostics esport, gratuitement, avec des crédits virtuels.", real:"Concept, identité visuelle, conception du site, mise en ligne et nom de domaine. 7 jeux, un classement, des cartes de pros à collectionner.", res:"<b>Site en ligne</b>", href:"https://clutch-esport.com", go:"clutch-esport.com ↗"},
-    {img:"img/dh/000.webp?v=16", pos:"center", t:"CV immersif en 3D", tag:"Fiche 5.2", obj:"Présenter mon parcours autrement, comme une expérience qu'on vit.", real:"Une rue de Tokyo sous la pluie modélisée dans <b>Blender</b>, une vidéo en vue à la première personne, un site au scroll avec ambiance sonore.", res:"<b>Vous êtes dedans</b>", href:"", go:""},
-    {img:"projets/airlines/cover.webp", pos:"center", t:"INSEEC Airlines", tag:"Fiche 5.3 · Concept", obj:"Proposer un concept de soirée étudiante sur le thème du voyage en avion.", real:"J'ai eu l'idée et créé tout le support numérique : un film de présentation en 3D sur Blender et un lecteur interactif avec les documents de bord.", res:"<b>Support complet</b>, consultable sur mon site", href:"projets/airlines/", go:"Voir le film →"}
+    {img:"projets/clutch.webp", pos:"left top", t:"Clutch Esport", tag:"Fiche 5.1", obj:"Créer une communauté autour des pronos esport, gratuitement, avec des crédits virtuels.", real:"J'ai tout fait : le concept, l'identité visuelle, le site, la mise en ligne et le nom de domaine. 7 jeux, un classement et des cartes de pros à collectionner.", res:"<b>Site en ligne</b>", href:"https://clutch-esport.com", go:"clutch-esport.com ↗"},
+    {img:"img/dh/000.webp?v=16", pos:"center", t:"CV immersif en 3D", tag:"Fiche 5.2", obj:"Présenter mon parcours autrement, comme quelque chose qu'on vit.", real:"Une rue de Tokyo sous la pluie que j'ai modélisée sur <b>Blender</b>, filmée en vue à la première personne, et un site qu'on parcourt au scroll, avec le son.", res:"<b>Vous êtes dedans</b>", href:"", go:""},
+    {img:"projets/airlines/cover.webp", pos:"center", t:"INSEEC Airlines", tag:"Fiche 5.3 · Concept", obj:"Imaginer une soirée étudiante sur le thème du voyage en avion.", real:"L'idée vient de moi, et j'ai créé tout le support : un film de présentation en 3D sur Blender et un lecteur avec les documents de bord.", res:"<b>Tout est en ligne</b> sur mon site", href:"projets/airlines/", go:"Voir le film →"}
    ], ph:[]},
   {n:6, deb:1055, fin:1061, c1:"#32dc8c", eyebrow:"06 · Recommandation", title:"Stage & Alternance",
    facts:[], txt:[], ph:[],
@@ -354,9 +354,9 @@ const P = [
  <div class="r6c"><h4>Savoir-être <em>6.4</em></h4><div class="r6t"><span>Adaptabilité</span><span>Sang-froid</span><span>Rigueur</span><span>Fiabilité</span><span>Esprit d'équipe</span><span>Curiosité</span></div></div>
  <div class="r6c"><h4>Langues <em>6.5</em></h4><div class="r6l"><span>Français</span><i class="n5"></i><small>Natif</small><span>Anglais</span><i class="n2"></i><small>Interm.</small></div></div>
 </div>
-<p class="r6d"><b>En dehors :</b> joueur PC · création de sites web · petit sportif · animé par divers projets.</p>
+<p class="r6d"><b>En dehors :</b> je joue sur PC, je crée des sites, je fais un peu de sport et j'ai toujours un projet en route.</p>
 <div class="r6g2">
- <div class="r6reco"><h4>Recommandation</h4><p>M'intégrer à votre équipe sur un poste en <b>partenariats et management esport</b>, en <b>événementiel</b> ou en <b>marketing digital</b>, en <b>stage ou alternance</b> (aussi CDD ou job étudiant), à Bordeaux ou en mobilité.</p></div>
+ <div class="r6reco"><h4>Recommandation</h4><p>Me faire une place dans votre équipe, en <b>partenariats et management esport</b>, en <b>événementiel</b> ou en <b>marketing digital</b>. En <b>stage ou en alternance</b>, et je suis aussi ouvert à un CDD ou un job étudiant, à Bordeaux ou ailleurs.</p></div>
  <div class="r6s"><h4>Prochaines étapes <em>6.6</em></h4><ol><li><b>1</b><span>Découvrir mon parcours</span><small>fait</small></li><li><b>2</b><span>Parcourir le CV en 3D</span><small>en cours</small></li><li><b>3</b><span>Planifier un entretien</span><small>à votre convenance</small></li></ol></div>
 </div>
 <label class="r6v"><span class="r6vt">Visa de la direction</span><span class="r6vc"><input type="checkbox" data-visa> Entretien accordé <em>← à cocher 😉</em></span><button type="button" class="r6go" data-contact>Me contacter ↓</button></label>
@@ -788,7 +788,7 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 
 </script>
 
-<script src="son.js?v=10" defer></script>
+<script src="son.js?v=11" defer></script>
 <script src="intro.js?v=3" defer></script>
 <script src="stats.js?v=2" defer></script>
 </body>

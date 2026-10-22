@@ -15,7 +15,7 @@
     font-family:"IBM Plex Sans","Segoe UI",Roboto,sans-serif;font-size:13px;font-weight:600;color:#f3efe6;background:rgba(255,255,255,.08);
     border:0;border-radius:999px;padding:0 14px 0 11px;cursor:pointer;backdrop-filter:blur(8px);transition:background .2s,color .2s}
   #son:hover{background:rgba(255,255,255,.15)}
-  #home:not([hidden]) ~ #son{position:absolute}
+  .lbar #son{position:static;flex:none}
   #son .eq{display:inline-flex;align-items:flex-end;gap:2px;width:16px;height:14px}
   #son .eq i{flex:1;background:currentColor;border-radius:1px;height:3px;transition:height .2s}
   #son[aria-pressed="true"]{background:#ff2e63;color:#fff}
@@ -168,6 +168,10 @@
   // le son ne joue que dans la rue : sur l'accueil, le bouton règle seulement le choix
   function rue() {
     const ex = document.getElementById("exp"), r = !ex || !ex.hidden;
+    // sur l'accueil, le bouton prend place dans la barre du haut (aligné avec le logo et les onglets)
+    const barre = document.querySelector("#home .lbar");
+    if (barre && !r && btn.parentNode !== barre) barre.insertBefore(btn, barre.firstChild);
+    if (r && btn.parentNode !== document.body) document.body.appendChild(btn);
     if (r !== dansRue) {
       dansRue = r; label();
       if (ctx && on) { const t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t); master.gain.linearRampToValueAtTime(r ? 1 : 0, t + (r ? 1.2 : 0.4)); }
