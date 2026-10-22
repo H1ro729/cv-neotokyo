@@ -267,8 +267,8 @@ function nextJob(s){
   };
   let j = tryJob('l', c); if (j) return j;
   /* les aperçus des ~3 paquets devant passent avant toute HD : on peut toujours défiler sans tomber sur du vide */
-  for (let r = 1; r < 60; r++){ j = tryJob('l', c + SENS * r); if (j) return j; }
-  if (Math.abs(cur - shown) > 6 || !started) j = null; else
+  for (let r = 1; r < 25; r++){ j = tryJob('l', c + SENS * r); if (j) return j; }
+  if (Math.abs(cur - shown) > 45 || !started) j = null; else
   for (let k = 0; k <= 14; k++){ j = tryJob('h', c + SENS * k) || (k <= 3 ? tryJob('h', c - SENS * k) : null); if (j) return j; }
   for (let r = 1; r < NF; r++){ j = tryJob('l', c + SENS * r) || (r % 2 ? tryJob('l', c - SENS * r) : null); if (j) return j; }
   for (let r = 15; r < 96; r++){ j = tryJob('h', c + SENS * r) || (r < 30 ? tryJob('h', c - SENS * r) : null); if (j) return j; }
@@ -363,7 +363,8 @@ function draw(){
       break;
     }
   }
-  attente = !st().l[i] && !st().h.has(i); if (st().lN >= NF) loadEl.textContent = attente ? "Chargement…" : "";
+  attente = !st().l[i] && !st().h.has(i);
+  if (st().lN >= NF){ const tx = attente ? "Chargement…" : ""; if (loadEl.textContent !== tx) loadEl.textContent = tx; }
   if (!bm) bm = lastBm;
   if (!bm) return;
   lastBm = bm;
@@ -372,7 +373,7 @@ function draw(){
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
   /* fondu entre deux images consécutives : le défilement devient continu au lieu de sauter d'image en image */
   const a = exact(i0), b = i0 + 1 < NF ? exact(i0 + 1) : null;
-  if (a && b && t > 0.001 && a.width === b.width){
+  if (a && b && t > 0.001){
     ctx.globalAlpha = 1; ctx.drawImage(a, 0, 0, a.width, a.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
     ctx.globalAlpha = t; ctx.drawImage(b, 0, 0, b.width, b.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
     ctx.globalAlpha = 1; lastBm = t < 0.5 ? a : b;
