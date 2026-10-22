@@ -40,47 +40,67 @@ body{font-family:var(--body);font-size:16px;line-height:1.55}
 a{color:inherit}
 :focus-visible{outline:2px solid var(--sign);outline-offset:3px}
 
-/* ---------- accueil ---------- */
-#home{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:48px 40px}
-#home .bg{position:absolute;inset:0;background:var(--night) url("img/dh/000.webp?v=10") center/cover no-repeat;filter:saturate(1.1)}
-#home .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,10,18,.15) 0%,rgba(11,10,18,.55) 45%,var(--night) 92%)}
-#home .wrap{position:relative;max-width:1180px;width:100%;margin:0 auto;display:grid;gap:28px}
+/* ---------- accueil : écran de lancement façon jeu moderne, sobre ---------- */
 .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sign);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.kicker .jp{font-family:var(--jp);letter-spacing:.3em;color:var(--neon)}
-h1{font-family:var(--display);font-weight:900;font-size:clamp(56px,11vw,150px);line-height:.86;letter-spacing:.005em;text-transform:uppercase;margin:0;text-wrap:balance}
-h1 span{color:var(--neon)}
-.lede{max-width:56ch;color:var(--muted);margin:0;font-size:17px}
-.cards{display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:14px}
-@media (max-width:820px){.cards{grid-template-columns:1fr}}
-.card{position:relative;display:flex;flex-direction:column;gap:10px;min-width:0;padding:22px 22px 20px;border:1px solid var(--line);background:rgba(20,18,30,.82);
-  backdrop-filter:blur(6px);text-decoration:none;color:var(--ink);text-align:left;font:inherit;cursor:pointer}
-.card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.card b{font-family:var(--display);font-weight:800;font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:.01em}
-.card p{margin:0;color:var(--muted);font-size:14.5px}
-.card .go{margin-top:auto;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-.card.main{border-color:var(--neon);background:linear-gradient(135deg,rgba(255,46,99,.22),rgba(20,18,30,.88) 60%)}
-.card.main .go{color:var(--neon)}
-a.card{color:inherit;text-decoration:none}a.card:hover{border-color:var(--neon)}a.card .go{color:var(--neon)}
-.card.main:hover{background:linear-gradient(135deg,rgba(255,46,99,.34),rgba(20,18,30,.9) 60%)}
-.card[aria-disabled="true"]{cursor:default}
-.card[aria-disabled="true"] .go{color:var(--muted)}
-.card[aria-disabled="true"] b{color:#cfc9da}
-
-.topnav{position:absolute;z-index:3;top:max(16px,env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px))}
-.topnav a{display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink);text-decoration:none;
-  padding:10px 14px;border:1px solid var(--neon);background:rgba(11,10,18,.72);backdrop-filter:blur(6px)}
-.topnav a:hover{background:var(--neon);color:var(--night)}
-.topnav{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+#home{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;flex-direction:column;
+  padding:0 max(20px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
 #home[hidden]{display:none}
-#home{padding-top:max(84px,calc(env(safe-area-inset-top,0px) + 76px))}
-.topnav a.sec{border-color:var(--line)}
-.topnav a.sec:hover{border-color:var(--neon)}
-.acts{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap}
-.acts a{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;color:var(--ink);padding:9px 12px;border:1px solid var(--line)}
-.acts a:hover{border-color:var(--neon)}
-.acts a.dl{color:var(--night);background:var(--sign);border-color:var(--sign);font-weight:500}
-.acts a.dl:hover{filter:brightness(1.1)}
+#home .bg{position:absolute;inset:0;background:var(--night) url("img/dh/000.webp?v=15") 62% center/cover no-repeat}
+#home .bg::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(11,10,18,.94) 0%,rgba(11,10,18,.78) 34%,rgba(11,10,18,.18) 72%,rgba(11,10,18,.35) 100%),
+  linear-gradient(0deg,rgba(11,10,18,.95) 0%,rgba(11,10,18,0) 42%)}
+.lbar{position:relative;z-index:2;display:flex;align-items:center;gap:26px;height:68px;padding-left:150px;border-bottom:1px solid rgba(255,255,255,.07)}
+.lbar .logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.lbar .logo span{color:var(--neon)}
+.tabs{display:flex;gap:22px;align-items:stretch;height:100%}
+.tabs a{display:flex;align-items:center;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;position:relative}
+.tabs a:hover{color:var(--ink)}
+.tabs a[aria-current]{color:var(--ink)}
+.tabs a[aria-current]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--neon)}
+.prof{margin-left:auto;display:flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:999px;background:rgba(255,255,255,.06);font-size:14px;white-space:nowrap}
+.prof img{width:32px;height:32px;border-radius:50%;object-fit:cover}
+.prof b{font-weight:600}.prof .dot{width:8px;height:8px;border-radius:50%;background:#3ddc84}
+.prof small{color:var(--muted);font-size:13px}
+.lmain{position:relative;z-index:1;flex:1;display:grid;grid-template-columns:minmax(0,640px) 1fr minmax(0,330px);gap:32px;align-items:start;padding-top:clamp(36px,9vh,110px)}
+.hero{display:grid;gap:18px}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(50px,7vw,104px);line-height:.88;letter-spacing:.01em;text-transform:uppercase;margin:0}
+.hero h1 span{color:var(--neon);white-space:nowrap}
+.hero .lede{margin:0;color:#c9c4d4;font-size:18px;line-height:1.5;max-width:52ch}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips span{font-size:13px;font-weight:500;padding:5px 11px;border-radius:4px;background:rgba(255,255,255,.07);color:#dcd7e4}
+.chips .ok{background:rgba(61,220,132,.12);color:#3ddc84}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px}
+.play{display:inline-flex;align-items:center;gap:12px;font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.06em;text-transform:uppercase;
+  color:#fff;background:var(--neon);border:0;border-radius:6px;padding:14px 30px 13px;cursor:pointer}
+.play svg{width:18px;height:18px}
+.play:hover{filter:brightness(1.08)}
+.btn2{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;letter-spacing:.04em;text-decoration:none;color:var(--ink);
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:14px 18px}
+.btn2:hover{background:rgba(255,255,255,.14)}
+.meta{font-size:13px;color:var(--muted)}
+.ach{grid-column:3;background:rgba(14,13,22,.82);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:18px 20px;display:grid;gap:14px}
+.ach h2{margin:0;display:flex;justify-content:space-between;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.ach h2 span{color:var(--sign)}
+.ac{display:flex;gap:12px;align-items:center}
+.ac i{flex:none;width:42px;height:42px;border-radius:8px;display:grid;place-items:center;font-style:normal;font-family:var(--mono);font-size:11px;color:var(--night);background:var(--sign)}
+.ac i.b{background:#8fa2ff}.ac i.c{background:#3ddc84}.ac i.d{background:rgba(255,255,255,.1);color:var(--muted);border:1px dashed rgba(255,255,255,.25)}
+.ac b{display:block;font-size:15px;font-weight:600;line-height:1.2}
+.ac small{color:var(--muted);font-size:13px}
+.prog{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}.prog i{display:block;height:100%;width:75%;background:var(--sign)}
+.lrow{position:relative;z-index:1;display:grid;gap:12px;margin-top:28px}
+.lrow h2{margin:0;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px}
+.tile{position:relative;display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#15131f center/cover no-repeat;text-decoration:none;color:var(--ink);
+  border:1px solid rgba(255,255,255,.08);cursor:pointer;font:inherit;text-align:left;padding:0;transition:transform .18s ease,border-color .18s ease}
+.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,10,18,.92) 0%,rgba(11,10,18,.1) 62%)}
+.tile:hover,.tile:focus-visible{transform:translateY(-3px);border-color:rgba(255,255,255,.5)}
+.tile .t{position:absolute;z-index:1;left:14px;right:14px;bottom:12px;display:grid;gap:2px}
+.tile b{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.tile small{font-size:12.5px;color:#bdb7c9}
+.tile .bdg{position:absolute;z-index:1;top:10px;left:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--neon);color:#fff;padding:3px 7px;border-radius:3px}
+@media (max-width:1180px){.lmain{grid-template-columns:minmax(0,1fr)}.ach{grid-column:auto;max-width:520px}}
+@media (max-width:900px){#home .bg{background-position:58% top;background-size:auto 70vh}#home .bg::after{background:linear-gradient(180deg,rgba(11,10,18,.45) 0,rgba(11,10,18,.85) 40vh,var(--night) 70vh)}.lbar{gap:16px}.tabs{display:none}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.tile{flex:0 0 min(70vw,300px);scroll-snap-align:start}}
+@media (max-width:560px){.lbar{padding-left:64px}.lbar .logo{display:none}.prof small{display:none}.play{font-size:22px;padding:13px 24px 12px}.hero .lede{font-size:16px}}
 
 /* ---------- expérience ---------- */
 #exp[hidden]{display:none}
@@ -157,30 +177,41 @@ img.ph{width:100%;object-fit:cover;display:block}
 
 <section id="home">
   <div class="bg" aria-hidden="true"></div>
-  <nav class="topnav" aria-label="Navigation"><a class="sec" href="contact/">Contact</a><a href="projets/">Mes projets →</a></nav>
-  <div class="wrap">
-    <div class="kicker"><span>CV · Bordeaux · 2026</span><span class="jp">履歴書</span></div>
-    <h1>Guillaume<br><span>Belle-Croix</span></h1>
-    <p class="lede">Esport, digital, événementiel. Étudiant INSEEC Bachelor, à la recherche d'un stage ou d'une alternance.</p>
-    <div class="cards">
-      <button class="card main" id="go-immersif" type="button">
-        <span class="tag">Expérience au scroll · 3D</span>
-        <b>CV immersif</b>
-        <p>Une rue de Neo-Tokyo, six affiches, un ticket à arracher. Faites défiler pour avancer.</p>
-        <span class="go">Entrer dans la rue →</span>
-      </button>
-      <div class="card" id="card-pdf10">
-        <span class="tag">PDF · 7 pages</span>
-        <b>Dossier projet</b>
-        <p>Mon parcours présenté comme un dossier remis à la direction, pièce par pièce.</p>
-        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Ouvrir ↗</a><a class="dl" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf">Télécharger ↓</a></span>
+  <header class="lbar">
+    <div class="logo">G. Belle-Croix<span>.</span></div>
+    <nav class="tabs" aria-label="Navigation"><a href="./" aria-current="page">Accueil</a><a href="projets/">Projets</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Dossier</a><a href="contact/">Contact</a></nav>
+    <div class="prof"><img src="img/avatar.webp" alt="" width="32" height="32"><b>Guillaume</b><span class="dot" aria-hidden="true"></span><small>Disponible</small></div>
+  </header>
+  <div class="lmain">
+    <div class="hero">
+      <div class="kicker"><span>Candidature 2026 · Bordeaux</span></div>
+      <h1>Guillaume<br><span>Belle-Croix</span></h1>
+      <p class="lede">Esport, événementiel et digital. Étudiant INSEEC Bachelor, je cherche un stage ou une alternance pour travailler côté staff : partenariats, communauté, organisation.</p>
+      <div class="chips"><span>21 ans</span><span>INSEEC Bachelor</span><span>Ex-Gendarme Adjoint Volontaire</span><span class="ok">● Stage · alternance · CDD</span></div>
+      <div class="cta">
+        <button class="play" id="go-immersif" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>Jouer</button>
+        <a class="btn2" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf">Dossier PDF ↓</a>
+        <a class="btn2" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf">CV 1 page ↓</a>
       </div>
-      <div class="card" id="card-pdf1">
-        <span class="tag">PDF · 1 page</span>
-        <b>Fiche de synthèse</b>
-        <p>L'essentiel du dossier sur une seule page.</p>
-        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener">Ouvrir ↗</a><a class="dl" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf">Télécharger ↓</a></span>
-      </div>
+      <div class="meta">Le CV en 3D : une rue de Neo-Tokyo à parcourir au scroll · environ 5 min · son conseillé</div>
+    </div>
+    <aside class="ach" aria-label="Succès">
+      <h2>Succès <span>3 / 4</span></h2>
+      <div class="ac"><i>EWC</i><div><b>Vainqueur EWC 2026</b><small>Tournoi communautaire Valorant · finale 10 – 4</small></div></div>
+      <div class="ac"><i class="b">2 ans</i><div><b>Sur le terrain</b><small>Gendarme Adjoint Volontaire, 2024 – 2026</small></div></div>
+      <div class="ac"><i class="c">www</i><div><b>Un site en ligne</b><small>Clutch Esport, de l'idée à la mise en ligne</small></div></div>
+      <div class="ac"><i class="d">?</i><div><b>Prochain succès</b><small>Décrocher un stage ou une alternance</small></div></div>
+      <div class="prog" aria-hidden="true"><i></i></div>
+    </aside>
+  </div>
+  <div class="lrow">
+    <h2>Continuer</h2>
+    <div class="tiles">
+      <button class="tile" type="button" id="tile-cv" style="background-image:url(img/t_cv.webp)"><span class="bdg">3D</span><span class="t"><b>CV immersif</b><small>Neo-Tokyo · au scroll</small></span></button>
+      <a class="tile" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" style="background-image:url(img/t_dossier.webp)"><span class="t"><b>Dossier projet</b><small>PDF · 7 pages</small></span></a>
+      <a class="tile" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" style="background-image:url(img/t_fiche.webp);background-position:center top"><span class="t"><b>Fiche de synthèse</b><small>PDF · 1 page</small></span></a>
+      <a class="tile" href="projets/" style="background-image:url(img/t_clutch.webp)"><span class="t"><b>Clutch Esport</b><small>Mon site de pronostics</small></span></a>
+      <a class="tile" href="projets/airlines/" style="background-image:url(img/t_airlines.webp)"><span class="t"><b>INSEEC Airlines</b><small>Film 3D · concept de soirée</small></span></a>
     </div>
   </div>
 </section>
@@ -238,7 +269,7 @@ const P = [
 
 /* ---------- accueil ---------- */
 const home = document.getElementById("home"), exp = document.getElementById("exp");
-document.getElementById("go-immersif").addEventListener("click", () => { start(); if (window.lancerIntro) window.lancerIntro(); });
+["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { start(); if (window.lancerIntro) window.lancerIntro(); }));
 document.getElementById("back").addEventListener("click", () => { window.NTF = null; window.NTP = 0; exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
