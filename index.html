@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="fr">
 <head>
+<script>
+/* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
+(() => { const BUILD = "202610222057";
+  fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
+    if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
+  }).catch(() => {}); })();
+</script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="CV immersif de Guillaume Belle-Croix : une rue de Neo-Tokyo sous la pluie, à parcourir au scroll. Esport, digital, événementiel.">
