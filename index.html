@@ -398,6 +398,9 @@ const loadEl = document.getElementById("load");
 let attente = false;
 function updLoad(){ const s = st(); const p = Math.round(100 * s.lN / NF); loadEl.textContent = p < 100 ? "Chargement " + p + " %" : (attente ? "Chargement…" : ""); }
 function loadAll(){ st(); pump(); }
+/* avancement du chargement avant d'ouvrir la rue : tous les aperçus + la HD du début */
+const HD0 = 60;
+window.NTPRET = () => { const s = st(); let h = 0; for (let i = 0; i < HD0; i++) if (s.h.has(i)) h++; return 0.8 * Math.min(1, s.lN / NF) + 0.2 * h / HD0; };
 
 /* ---------- canvas ---------- */
 const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
@@ -613,6 +616,6 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 </script>
 
 <script src="son.js?v=10" defer></script>
-<script src="intro.js?v=2" defer></script>
+<script src="intro.js?v=3" defer></script>
 </body>
 </html>

@@ -39,6 +39,13 @@
   text-transform:uppercase;color:#a49fb3;background:none;border:1px solid #2a2638;padding:9px 12px;cursor:pointer;z-index:2;transition:opacity .4s}
 #intro .passer:hover{color:#f3efe6;border-color:#ff2e63}
 #intro.fin .passer{opacity:0}
+#intro .chg{position:absolute;left:50%;bottom:calc(64px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(420px,78vw);display:grid;gap:10px;text-align:center;transition:opacity .4s}
+#intro .chg .barre{height:4px;border-radius:2px;background:#2a2638;overflow:hidden}
+#intro .chg .barre i{display:block;height:100%;width:0;background:#ff2e63;box-shadow:0 0 12px #ff2e63;transition:width .3s ease}
+#intro .chg .txt{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a49fb3}
+#intro .chg.attente{bottom:50%;transform:translate(-50%,50%)}
+#intro .chg.attente .txt{font-size:13px;color:#f3efe6}
+#intro.fin .chg{opacity:0}
 @keyframes roueBas{0%{top:14px;opacity:0}15%{opacity:1}70%{top:48px;opacity:1}100%{top:52px;opacity:0}}
 @keyframes roueHaut{0%{top:52px;opacity:0}15%{opacity:1}70%{top:18px;opacity:1}100%{top:14px;opacity:0}}
 @keyframes flBas{0%,100%{opacity:0;transform:translate(-50%,-6px)}40%,70%{opacity:1;transform:translate(-50%,4px)}}
@@ -60,6 +67,7 @@
     el.innerHTML = `
       <div class="sc s1">${geste}<div class="film"><i></i></div><div class="cap"></div></div>
       <div class="sc s2"><button type="button" class="gros" aria-label="Activer ou couper le son">${ICON}<span>Son coupé</span></button><div class="cap"></div><div class="sous">Vous pourrez changer à tout moment, en haut à gauche</div></div>
+      <div class="chg" aria-live="polite"><div class="txt">Chargement de la rue · 0 %</div><div class="barre"><i></i></div></div>
       <button type="button" class="passer">Passer →</button>`;
     document.body.appendChild(el);
     const html = document.documentElement, ovAvant = html.style.overflow; html.style.overflow = "hidden";
@@ -72,8 +80,21 @@
     let fin = false, annule = false;
     const roue = el.querySelector(".roue, .doigt"), flB = el.querySelector(".fl.bas"), flH = el.querySelector(".fl.haut");
     const filmVers = (w, ms) => { film.style.transition = "width " + ms + "ms ease-in-out"; film.style.width = w + "%"; };
+    // chargement : la rue n'est ouverte qu'une fois les images prêtes (sinon le défilement saccade)
+    const chg = el.querySelector(".chg"), chgI = chg.querySelector("i"), chgT = chg.querySelector(".txt");
+    const pret = () => (window.NTPRET ? window.NTPRET() : 1);
+    const majChg = () => { const v = Math.min(1, pret()); chgI.style.width = (v * 100).toFixed(1) + "%"; chgT.textContent = v >= 1 ? "Rue prête" : "Chargement de la rue · " + Math.floor(v * 100) + " %"; return v; };
+    const tChg = setInterval(majChg, 200); majChg();
     async function terminer() {
       if (fin) return; fin = true;
+      if (majChg() < 1) {
+        // l'explication est finie mais tout n'est pas chargé : on attend ici avec la barre
+        s1.classList.remove("on"); s2.classList.remove("on"); chg.classList.add("attente");
+        el.querySelector(".passer").style.opacity = 0;
+        while (majChg() < 1) await attendre(200);
+        await attendre(300); chg.classList.remove("attente");
+      }
+      clearInterval(tChg);
       s1.classList.remove("on");
       // le bouton son quitte le centre et va se ranger en haut à gauche
       if (son) {
