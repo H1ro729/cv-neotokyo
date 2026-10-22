@@ -15,6 +15,7 @@
     font-family:"IBM Plex Sans","Segoe UI",Roboto,sans-serif;font-size:13px;font-weight:600;color:#f3efe6;background:rgba(255,255,255,.08);
     border:0;border-radius:999px;padding:0 14px 0 11px;cursor:pointer;backdrop-filter:blur(8px);transition:background .2s,color .2s}
   #son:hover{background:rgba(255,255,255,.15)}
+  #home:not([hidden]) ~ #son{position:absolute}
   #son .eq{display:inline-flex;align-items:flex-end;gap:2px;width:16px;height:14px}
   #son .eq i{flex:1;background:currentColor;border-radius:1px;height:3px;transition:height .2s}
   #son[aria-pressed="true"]{background:#ff2e63;color:#fff}
