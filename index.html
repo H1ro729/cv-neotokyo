@@ -248,7 +248,7 @@ const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
 const BLOB_MAX_H = 150;            // images HD gardées compressées en mémoire
-const BMP_MAX = 16;                // images décodées gardées prêtes
+const BMP_MAX = 24;                // images décodées gardées prêtes
 const bmp = new Map(), dec = new Set();
 let lastBm = null;
 function st(){ return S[MODE] || (S[MODE] = mk()); }
@@ -299,12 +299,20 @@ function trimH(s){
   const far = [...s.h.keys()].sort((a, b) => Math.abs(b - c) - Math.abs(a - c));
   while (s.h.size > BLOB_MAX_H) s.h.delete(far.shift());
 }
+/* décodage : Safari décode mieux en arrière-plan via <img>.decode() ; les autres via createImageBitmap */
+const VIA_IMG = /Apple/.test(navigator.vendor || '') || /[?&]img=1/.test(location.search);
+function decoder(blob){
+  if (!VIA_IMG) return createImageBitmap(blob);
+  const u = URL.createObjectURL(blob), im = new Image(); im._u = u; im.decoding = 'async'; im.src = u;
+  return im.decode().then(() => im, e => { URL.revokeObjectURL(u); throw e; });
+}
+function liberer(o){ if (!o || o === lastBm) return; if (o.close) o.close(); if (o._u) URL.revokeObjectURL(o._u); }
 function decode(key, blob){
   if (bmp.has(key) || dec.has(key)) return;
   dec.add(key);
-  createImageBitmap(blob).then(b => {
+  decoder(blob).then(b => {
     dec.delete(key); bmp.set(key, b);
-    while (bmp.size > BMP_MAX){ const k = bmp.keys().next().value; if (k === key) break; const o = bmp.get(k); if (o && o !== lastBm && o.close) o.close(); bmp.delete(k); }
+    while (bmp.size > BMP_MAX){ const k = bmp.keys().next().value; if (k === key) break; liberer(bmp.get(k)); bmp.delete(k); }
     draw();
   }).catch(() => dec.delete(key));
 }
@@ -348,7 +356,9 @@ function draw(){
   window.NTF = 2 * f + 1;                       // image Blender affichée (pour l'ambiance sonore)
   const i = t < 0.5 ? i0 : Math.min(NF - 1, i0 + 1);
   let bm = frameFor(i);
-  for (const j of [i + 1, i + 2, i - 1]) if (j >= 0 && j < NF){ const s = st(), hb = s.h.get(j); if (hb) decode(MODE + 'h' + j, hb); }
+  { const s = st();
+    for (const k of [1, 2, 3, 4, 5, 6, -1]){ const j = i + SENS * k; if (j < 0 || j >= NF) continue;
+      const hb = s.h.get(j); if (hb) decode(MODE + 'h' + j, hb); else if (s.l[j]) decode(MODE + 'l' + j, s.l[j]); } }
   if (!bm){
     for (let r = 1; r < 40 && !bm; r++){ for (const j of [i - r, i + r]) if (!bm && j >= 0 && j < NF && bmp.has(MODE + 'h' + j)) bm = bmp.get(MODE + 'h' + j); }
   }
@@ -374,10 +384,10 @@ function draw(){
   /* fondu entre deux images consécutives : le défilement devient continu au lieu de sauter d'image en image */
   const a = exact(i0), b = i0 + 1 < NF ? exact(i0 + 1) : null;
   if (a && b && t > 0.001){
-    ctx.globalAlpha = 1; ctx.drawImage(a, 0, 0, a.width, a.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
-    ctx.globalAlpha = t; ctx.drawImage(b, 0, 0, b.width, b.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
+    ctx.globalAlpha = 1; ctx.drawImage(a, 0, 0, a.naturalWidth || a.width, a.naturalHeight || a.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
+    ctx.globalAlpha = t; ctx.drawImage(b, 0, 0, b.naturalWidth || b.width, b.naturalHeight || b.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
     ctx.globalAlpha = 1; lastBm = t < 0.5 ? a : b;
-  } else ctx.drawImage(bm, 0, 0, bm.width, bm.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
+  } else ctx.drawImage(bm, 0, 0, bm.naturalWidth || bm.width, bm.naturalHeight || bm.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
 }
 let started = false;
 
