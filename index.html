@@ -166,6 +166,34 @@ a{color:inherit}
 .txt strong{display:block;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);margin-bottom:8px}
 .txt p{margin:0;max-width:62ch}
 .fiches{display:grid;gap:16px}
+/* affiche 06 : recommandation façon dossier */
+.r6{display:grid;gap:16px}
+.r6g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.r6g3{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:16px}
+.r6c,.r6s{padding:16px 18px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035)}
+.r6 h4{margin:0 0 12px;font-size:17px;font-weight:600;display:flex;gap:8px;align-items:baseline}
+.r6 h4 em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em}
+.r6c ul{list-style:none;margin:0;padding:0;display:grid;gap:7px;font-size:14.5px}
+.r6c li{display:flex;gap:10px;align-items:baseline}.r6c li::before{content:"";flex:none;width:7px;height:7px;background:var(--c1)}
+.r6t{display:flex;flex-wrap:wrap;gap:6px}
+.r6t span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 8px;border-radius:4px;background:rgba(255,255,255,.07)}
+.r6l{display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center;font-size:14.5px}
+.r6l i{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--c1) var(--v),rgba(255,255,255,.12) var(--v))}
+.r6l i.n5{--v:100%}.r6l i.n2{--v:42%}
+.r6l small{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.r6d{margin:0;font-size:14px;color:var(--muted)}.r6d b{color:var(--ink)}
+.r6reco{padding:20px 22px;border-radius:10px;background:var(--c1);color:#062a1a}
+.r6reco h4{color:#062a1a}.r6reco p{margin:0;font-size:15px;line-height:1.6}
+.r6s ol{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.r6s li{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;font-size:14.5px}
+.r6s li b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:rgba(255,255,255,.1)}
+.r6s li:first-child b{background:var(--c1);color:#062a1a}
+.r6s li small{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
+.r6v{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center;padding:16px 20px;border:1.5px dashed rgba(255,255,255,.25);border-radius:10px;cursor:pointer}
+.r6vt{grid-column:1/-1;font-weight:600;font-size:17px}
+.r6vc{display:flex;gap:10px;align-items:center;font-size:15px}.r6vc em{font-family:"Caveat","Segoe Print",cursive;font-style:normal;color:var(--c1);font-size:16px}
+.r6vc input{width:20px;height:20px;accent-color:var(--c1)}
+.r6go{font:inherit;font-weight:600;font-size:14px;border:0;border-radius:6px;padding:10px 16px;background:var(--c1);color:#062a1a;cursor:pointer}
+@media (max-width:760px){.r6g2,.r6g3{grid-template-columns:1fr}.r6v{grid-template-columns:1fr}}
 .fiche{display:grid;grid-template-columns:minmax(0,38%) 1fr;gap:22px;align-items:start;padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035);color:inherit;text-decoration:none;transition:border-color .18s,transform .18s}
 a.fiche:hover{border-color:var(--c1);transform:translateY(-2px)}
 .fph{display:block;background:#f1ece2;padding:7px 7px 18px;box-shadow:0 8px 20px rgba(0,0,0,.5);transform:rotate(-1.5deg)}
@@ -306,9 +334,25 @@ const P = [
     {img:"img/dh/000.webp?v=16", pos:"center", t:"CV immersif en 3D", tag:"Fiche 5.2", obj:"Présenter mon parcours autrement, comme une expérience qu'on vit.", real:"Une rue de Tokyo sous la pluie modélisée dans <b>Blender</b>, une vidéo en vue à la première personne, un site au scroll avec ambiance sonore.", res:"<b>Vous êtes dedans</b>", href:"", go:""},
     {img:"projets/airlines/cover.webp", pos:"center", t:"INSEEC Airlines", tag:"Fiche 5.3 · Concept", obj:"Proposer un concept de soirée étudiante sur le thème du voyage en avion.", real:"J'ai eu l'idée et créé tout le support numérique : un film de présentation en 3D sur Blender et un lecteur interactif avec les documents de bord.", res:"<b>Support complet</b>, consultable sur mon site", href:"projets/airlines/", go:"Voir le film →"}
    ], ph:[]},
-  {n:6, deb:1055, fin:1061, c1:"#32dc8c", eyebrow:"06 · Ce que je cherche", title:"Stage & Alternance",
-   facts:["Partenariats & management esport","Événementiel · gestion de projet","Aussi CDD ou job étudiant · Bordeaux"],
-   txt:[["Mes compétences","Marketing et communication digitale, réseaux sociaux, storytelling et direction artistique. Gestion de projet de l'idée au lancement. Outils : Blender, création et mise en ligne de sites."],["Mes disponibilités","Basé à Bordeaux, permis B. Ouvert au stage, à l'alternance, au CDD ou au job étudiant, dans les partenariats, le management esport ou l'événementiel."]], ph:[]},
+  {n:6, deb:1055, fin:1061, c1:"#32dc8c", eyebrow:"06 · Recommandation", title:"Stage & Alternance",
+   facts:[], txt:[], ph:[],
+   html:`<div class="r6">
+<div class="r6g2">
+ <div class="r6c"><h4>Marketing &amp; communication <em>6.1</em></h4><ul><li>Marketing et communication digitale</li><li>Réseaux sociaux, création de contenu</li><li>Storytelling, direction artistique</li><li>Prise de parole</li></ul></div>
+ <div class="r6c"><h4>Projet &amp; événement <em>6.2</em></h4><ul><li>De l'idée au lancement</li><li>Accueil et gestion du public</li><li>Travail en équipe, gestion des effectifs</li><li>Gestion des imprévus et du stress</li></ul></div>
+</div>
+<div class="r6g3">
+ <div class="r6c"><h4>Outils <em>6.3</em></h4><div class="r6t"><span>Blender</span><span>Création de sites</span><span>Discord</span></div></div>
+ <div class="r6c"><h4>Savoir-être <em>6.4</em></h4><div class="r6t"><span>Adaptabilité</span><span>Sang-froid</span><span>Rigueur</span><span>Fiabilité</span><span>Esprit d'équipe</span><span>Curiosité</span></div></div>
+ <div class="r6c"><h4>Langues <em>6.5</em></h4><div class="r6l"><span>Français</span><i class="n5"></i><small>Natif</small><span>Anglais</span><i class="n2"></i><small>Interm.</small></div></div>
+</div>
+<p class="r6d"><b>En dehors :</b> joueur PC · création de sites web · petit sportif · animé par divers projets.</p>
+<div class="r6g2">
+ <div class="r6reco"><h4>Recommandation</h4><p>M'intégrer à votre équipe sur un poste en <b>partenariats et management esport</b>, en <b>événementiel</b> ou en <b>marketing digital</b>, en <b>stage ou alternance</b> (aussi CDD ou job étudiant), à Bordeaux ou en mobilité.</p></div>
+ <div class="r6s"><h4>Prochaines étapes <em>6.6</em></h4><ol><li><b>1</b><span>Découvrir mon parcours</span><small>fait</small></li><li><b>2</b><span>Parcourir le CV en 3D</span><small>en cours</small></li><li><b>3</b><span>Planifier un entretien</span><small>à votre convenance</small></li></ol></div>
+</div>
+<label class="r6v"><span class="r6vt">Visa de la direction</span><span class="r6vc"><input type="checkbox" data-visa> Entretien accordé <em>← à cocher 😉</em></span><button type="button" class="r6go" data-contact>Me contacter ↓</button></label>
+</div>`},
 ];
 
 /* ---------- accueil ---------- */
@@ -569,7 +613,7 @@ function pageHTML(p){
       '<span class="frw"><i>Objectif</i><span>' + f.obj + '</span></span><span class="frw"><i>Réalisé</i><span>' + f.real + '</span></span><span class="frw"><i>Résultat</i><span>' + f.res + '</span></span>' +
       (f.go ? '<span class="fgo">' + f.go + '</span>' : '') + '</span></' + (f.href ? 'a' : 'div') + '>';
   }).join("") + '</div>' : "";
-  const todos = p.txt.length ? unTxt(p.txt[0]) + fiches + p.txt.slice(1).map(unTxt).join("") : fiches;
+  const todos = (p.txt.length ? unTxt(p.txt[0]) + fiches + p.txt.slice(1).map(unTxt).join("") : fiches) + (p.html || "");
   const photos = p.ph.length ? '<div class="sec-title">Photos</div><div class="collage">' + p.ph.map(([u, c, k]) => '<figure class="pf ' + k + '"><img loading="lazy" alt="' + c + '" src="' + u + '">' + (c ? "<figcaption>" + c + "</figcaption>" : "") + "</figure>").join("") + "</div>" : "";
   return '<div class="poster" style="background-image:url(img/a' + p.n + '_debut.webp)" role="img" aria-label="Affiche ' + p.n + '"></div>' +
     '<div class="body" style="--c1:' + p.c1 + '"><div class="p-head"><span class="eyebrow">' + p.eyebrow + "</span><h2>" + p.title + '</h2></div>' + (facts ? '<ul class="facts">' + facts + "</ul>" : "") +
@@ -612,6 +656,10 @@ function build(){
   const c = document.createElement("button"); c.type = "button"; c.textContent = "Contact"; c.onclick = () => window.scrollTo({top:total, behavior:"auto"}); nav.appendChild(c);
 }
 let shownPage = null;
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-contact]")) { e.preventDefault(); window.scrollTo({top:total, behavior:"smooth"}); }
+});
+document.addEventListener("change", e => { if (e.target.matches("[data-visa]") && e.target.checked) setTimeout(() => window.scrollTo({top:total, behavior:"smooth"}), 600); });
 /* défilement des affiches : ralenti (SLOW) et lissé comme la vidéo */
 const SLOW = 2.6; let colT = 0, colY = null, lastPg = null, colAnim = false;
 function colTick(){ const d = colT - colY; if (Math.abs(d) < 0.3){ colY = colT; col.style.transform = "translateY(" + colY + "px)"; colAnim = false; return; } colY += d * 0.14; col.style.transform = "translateY(" + colY + "px)"; requestAnimationFrame(colTick); }
