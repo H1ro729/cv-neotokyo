@@ -210,8 +210,8 @@ img.ph{width:100%;object-fit:cover;display:block}
 <script>
 (() => {
 /* ---------- données ---------- */
-const NF = 602;                              // images (1 sur 2 de la vidéo 30 i/s)
-const fi = F => Math.max(0, (F + 1) / 2 - 1); // image Blender -> index (continu : permet le fondu entre images)
+const NF = 1204;                             // toutes les images de la vidéo (30 i/s)
+const fi = F => Math.max(0, F - 1);           // image Blender -> index (continu : permet le fondu entre images)
 const RECTS = {d:[0.2717, 0.0184, 0.7283, 0.9816], m:[0.0617, 0.0184, 0.938, 0.9816]}; // affiche plein écran (16:9 bureau / recadrage portrait téléphone)
 const SRC = {d:[1920, 1080, 's'], m:[1000, 1080, 'm']};
 let MODE = 'd';
@@ -242,13 +242,13 @@ document.getElementById("go-immersif").addEventListener("click", () => { start()
 document.getElementById("back").addEventListener("click", () => { window.NTF = null; window.NTP = 0; exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
-const DIR = {d:{l:'dl', h:'dh'}, m:{l:'ml', h:'mh'}};
-const VER = '?v=14';
+const DIR = {d:{l:'dl3', h:'dh3'}, m:{l:'ml3', h:'mh3'}};
+const VER = '?v=15';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
-const BLOB_MAX_H = 150;            // images HD gardées compressées en mémoire
-const BMP_MAX = 24;                // images décodées gardées prêtes
+const BLOB_MAX_H = 260;            // images HD gardées compressées en mémoire
+const BMP_MAX = 28;                // images décodées gardées prêtes
 const bmp = new Map(), dec = new Set();
 let lastBm = null;
 function st(){ return S[MODE] || (S[MODE] = mk()); }
@@ -267,17 +267,17 @@ function nextJob(s){
   };
   let j = tryJob('l', c); if (j) return j;
   /* les aperçus des ~3 paquets devant passent avant toute HD : on peut toujours défiler sans tomber sur du vide */
-  for (let r = 1; r < 25; r++){ j = tryJob('l', c + SENS * r); if (j) return j; }
-  if (Math.abs(cur - shown) > 45 || !started) j = null; else
-  for (let k = 0; k <= 14; k++){ j = tryJob('h', c + SENS * k) || (k <= 3 ? tryJob('h', c - SENS * k) : null); if (j) return j; }
+  for (let r = 1; r < 50; r++){ j = tryJob('l', c + SENS * r); if (j) return j; }
+  if (Math.abs(cur - shown) > 90 || !started) j = null; else
+  for (let k = 0; k <= 28; k++){ j = tryJob('h', c + SENS * k) || (k <= 6 ? tryJob('h', c - SENS * k) : null); if (j) return j; }
   for (let r = 1; r < NF; r++){ j = tryJob('l', c + SENS * r) || (r % 2 ? tryJob('l', c - SENS * r) : null); if (j) return j; }
-  for (let r = 15; r < 96; r++){ j = tryJob('h', c + SENS * r) || (r < 30 ? tryJob('h', c - SENS * r) : null); if (j) return j; }
+  for (let r = 29; r < 170; r++){ j = tryJob('h', c + SENS * r) || (r < 60 ? tryJob('h', c - SENS * r) : null); if (j) return j; }
   return null;
 }
 function pump(){
   if (!IDX) return;
   const mode = MODE, s = st(), c = Math.round(cur);
-  for (const [k, j] of s.ctl) if (j.lvl === 'h'){ const m = (j.p + 0.5) * j.per; if (Math.abs(m - c) > 110) j.ac.abort(); }
+  for (const [k, j] of s.ctl) if (j.lvl === 'h'){ const m = (j.p + 0.5) * j.per; if (Math.abs(m - c) > 200) j.ac.abort(); }
   while (s.act < 4){
     const job = nextJob(s); if (!job) return;
     const [lvl, p, key] = job, set = DIR[mode][lvl], info = IDX[set];
@@ -353,11 +353,11 @@ function exact(i){
 function draw(){
   if (!started) return;
   const f = Math.max(0, Math.min(NF - 1, net ? Math.round(shown) : shown)), i0 = Math.floor(f), t = f - i0;
-  window.NTF = 2 * f + 1;                       // image Blender affichée (pour l'ambiance sonore)
+  window.NTF = f + 1;                       // image Blender affichée (pour l'ambiance sonore)
   const i = t < 0.5 ? i0 : Math.min(NF - 1, i0 + 1);
   let bm = frameFor(i);
   { const s = st();
-    for (const k of [1, 2, 3, 4, 5, 6, -1]){ const j = i + SENS * k; if (j < 0 || j >= NF) continue;
+    for (const k of [1, 2, 3, 4, 5, 6, 7, 8, -1, -2]){ const j = i + SENS * k; if (j < 0 || j >= NF) continue;
       const hb = s.h.get(j); if (hb) decode(MODE + 'h' + j, hb); else if (s.l[j]) decode(MODE + 'l' + j, s.l[j]); } }
   if (!bm){
     for (let r = 1; r < 40 && !bm; r++){ for (const j of [i - r, i + r]) if (!bm && j >= 0 && j < NF && bmp.has(MODE + 'h' + j)) bm = bmp.get(MODE + 'h' + j); }
@@ -544,7 +544,7 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 
 </script>
 
-<script src="son.js?v=7" defer></script>
+<script src="son.js?v=8" defer></script>
 <script src="intro.js?v=2" defer></script>
 </body>
 </html>

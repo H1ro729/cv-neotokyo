@@ -144,14 +144,17 @@
   }
 
   /* moments de la vidéo (images Blender, 1..1203) : déclenchés en avançant */
+  // la carte d'identité qu'on sort de la poche puis qu'on range : frottement et petit déclic
+  function carteSort() {
+    const t = ctx.currentTime;
+    souffle(t, 0.35, 1800, 5200, 0.05, 1.2, 0.1);
+    bip(2200, 1800, t + 0.3, 0.05, 0.03, "square");
+  }
+  function carteRange() { const t = ctx.currentTime; souffle(t, 0.3, 4800, 1500, 0.04, 1.2, -0.1); }
   const EVTS = [
     [12, () => voiture(-1, 0.9, 2.4)],    // voiture de droite à gauche
-    [82, () => voiture(1, 0.9, 2.0)],     // voiture rapide de gauche à droite
     [130, () => voiture(-1, 1.0, 2.6)],   // berline sombre de droite à gauche
-    [184, () => voiture(1, 0.8, 2.4)],    // voiture claire, au premier plan
-    [204, voitureVolante],                 // la voiture volante
-    [278, drone],                          // le drone passe au-dessus
-    [366, holoOn], [444, holoOff],         // carte d'identité holographique
+    [362, carteSort], [446, carteRange],   // la carte d'identité en main
     [1160, dechire]                        // le ticket
   ];
   // le son ne joue que dans la rue : sur l'accueil, le bouton règle seulement le choix
