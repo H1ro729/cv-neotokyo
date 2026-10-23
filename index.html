@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610230303";
+(() => { const BUILD = "202610230610";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -132,7 +132,7 @@ a{color:inherit}
 .tile .acts a:last-child{padding:0;width:32px;font-size:15px}
 .tile .bdg{position:absolute;z-index:1;top:10px;left:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--neon);color:#fff;padding:3px 7px;border-radius:3px}
 @media (max-width:1180px){.lmain{grid-template-columns:minmax(0,1fr)}.ach{grid-column:auto;max-width:520px}}
-@media (max-width:900px){#home .bg{background-position:58% top;background-size:auto 70vh}#home .bg::after{background:linear-gradient(180deg,rgba(11,10,18,.45) 0,rgba(11,10,18,.85) 40vh,var(--night) 70vh)}.lbar{gap:16px}.tabs{display:none}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.tile{flex:0 0 min(70vw,300px);scroll-snap-align:start}}
+@media (max-width:900px){#home .bg{background-position:58% top;background-size:auto 70vh}#home .bg::after{background:linear-gradient(180deg,rgba(11,10,18,.45) 0,rgba(11,10,18,.85) 40vh,var(--night) 70vh)}.lbar{gap:12px 16px;flex-wrap:wrap;height:auto;padding:12px 0 0}.tabs{order:3;width:100%;height:42px;gap:22px}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.tile{flex:0 0 min(70vw,300px);scroll-snap-align:start}}
 @media (max-width:560px){.lbar .logo{display:none}.prof small{display:none}.play{font-size:22px;padding:13px 24px 12px}.hero .lede{font-size:16px}}
 
 /* ---------- expérience ---------- */
@@ -525,6 +525,7 @@ function draw(){
   const c = cover();
   ctx.fillStyle = "#0b0a12"; ctx.fillRect(0, 0, cv.width, cv.height);
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
+  if (MODE === 'm') fond(bm, c);
   /* fondu entre deux images consécutives : le défilement devient continu au lieu de sauter d'image en image */
   const a = exact(i0), b = i0 + 1 < NF ? exact(i0 + 1) : null;
   if (a && b && t > 0.001){
@@ -532,7 +533,27 @@ function draw(){
     ctx.globalAlpha = t; ctx.drawImage(b, 0, 0, b.naturalWidth || b.width, b.naturalHeight || b.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
     ctx.globalAlpha = 1; lastBm = t < 0.5 ? a : b;
   } else ctx.drawImage(bm, 0, 0, bm.naturalWidth || bm.width, bm.naturalHeight || bm.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
+  if (MODE === 'm') bords(c);
 }
+/* téléphone : au-dessus et en dessous de l'image, un prolongement flou et sombre de la même image (plus de bandes noires) */
+const fc = document.createElement('canvas'), fx = fc.getContext('2d'); fc.width = 24; fc.height = 26;
+function fond(img, c){
+  try {
+    fx.drawImage(img, 0, 0, img.naturalWidth || img.width, img.naturalHeight || img.height, 0, 0, 24, 26);
+    const W = cv.width, H = cv.height, sc = Math.max(W / 24, H / 26);
+    ctx.drawImage(fc, 0, 0, 24, 26, (W - 24 * sc) / 2, (H - 26 * sc) / 2, 24 * sc, 26 * sc);
+    ctx.fillStyle = "rgba(11,10,18,.5)"; ctx.fillRect(0, 0, W, H);
+  } catch (e) {}
+}
+function bords(c){
+  const e = 70 * DPR, y0 = c.y * DPR, y1 = (c.y + c.h) * DPR, W = cv.width;
+  let g = ctx.createLinearGradient(0, y0, 0, y0 + e); g.addColorStop(0, "rgba(11,10,18,.55)"); g.addColorStop(1, "rgba(11,10,18,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, y0, W, e);
+  g = ctx.createLinearGradient(0, y1 - e, 0, y1); g.addColorStop(0, "rgba(11,10,18,0)"); g.addColorStop(1, "rgba(11,10,18,.55)");
+  ctx.fillStyle = g; ctx.fillRect(0, y1 - e, W, e);
+}
+/* zone de la pluie : sur téléphone, seulement sur l'image */
+window.ntZone = () => (started && MODE === 'm') ? {y:cover().y, h:cover().h} : null;
 let started = false;
 const IDLE_ON = false;
 /* à l'arrêt, on se pose toujours sur une image réellement rendue (les images paires sont parfois des fondus) */
@@ -737,7 +758,7 @@ function resize(){
   VW = window.innerWidth; VH = window.innerHeight;
   MODE = VW / VH < 1 ? 'm' : 'd'; PXF = Math.max(20, VH * 0.045);
   cv.width = VW * DPR; cv.height = VH * DPR; loadAll();
-  measure(); build(); shownPage = null; onScroll(); idleSrc(); idleUpd();
+  measure(); build(); shownPage = null; onScroll(); idleSrc(); idleUpd(); if (window.ntPluie) window.ntPluie();
 }
 function start(){
   home.hidden = true; exp.hidden = false; started = true;
@@ -753,7 +774,9 @@ window.addEventListener("resize", () => { if (started) resize(); });
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) { pc.style.display = "none"; return; }
   let W = 0, H = 0, R = 1, gouttes = [], last = 0;
   function taille(){
-    R = Math.min(USE_VID ? 1 : 2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; pc.width = W * R; pc.height = H * R;
+    const z = window.ntZone && window.ntZone();
+    R = Math.min(USE_VID ? 1 : 2, devicePixelRatio || 1); W = innerWidth; H = z ? Math.round(z.h) : innerHeight; pc.width = W * R; pc.height = H * R;
+    pc.style.top = (z ? z.y : 0) + "px"; pc.style.height = H + "px"; pc.style.bottom = "auto";
     const n = Math.round(Math.min(320, W * H / 4200));
     gouttes = Array.from({length:n}, () => neuve(true));
   }
@@ -777,7 +800,7 @@ window.addEventListener("resize", () => { if (started) resize(); });
       px.beginPath(); px.moveTo(g.x, g.y); px.lineTo(g.x - g.l * VENT, g.y - g.l); px.stroke();
     }
   }
-  addEventListener("resize", taille); taille(); requestAnimationFrame(anime);
+  addEventListener("resize", taille); window.ntPluie = taille; taille(); requestAnimationFrame(anime);
 })();
 /* copier */
 document.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => {
