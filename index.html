@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610231635";
+(() => { const BUILD = "202610231640";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -840,7 +840,7 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 </script>
 
 <script src="son.js?v=11" defer></script>
-<script src="intro.js?v=4" defer></script>
+<script src="intro.js?v=5" defer></script>
 <script src="stats.js?v=2" defer></script>
 </body>
 </html>

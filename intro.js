@@ -43,6 +43,7 @@
 #intro .chg .barre{height:4px;border-radius:2px;background:#2a2638;overflow:hidden}
 #intro .chg .barre i{display:block;height:100%;width:0;background:#ff2e63;box-shadow:0 0 12px #ff2e63;transition:width .3s ease}
 #intro .chg .txt{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#a49fb3}
+#intro .chg:not(.attente){opacity:0;pointer-events:none}
 #intro .chg.attente{bottom:50%;transform:translate(-50%,50%)}
 #intro .chg.attente .txt{font-size:13px;color:#f3efe6}
 #intro.fin .chg{opacity:0}
