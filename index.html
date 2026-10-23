@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610230629";
+(() => { const BUILD = "202610231137";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -393,7 +393,7 @@ document.getElementById("back").addEventListener("click", () => { window.NTF = n
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl3', h:'dh3'}, m:{l:'ml3', h:'mh3'}};
-const VER = '?v=17';
+const VER = '?v=18';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
