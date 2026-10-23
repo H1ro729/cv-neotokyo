@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610231640";
+(() => { const BUILD = "202610231650";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -398,7 +398,7 @@ const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
 const BLOB_MAX_H = 260;            // images HD gardées compressées en mémoire
-const BMP_MAX = 28;                // images décodées gardées prêtes
+const BMP_MAX = 18;                // images décodées gardées prêtes (moins = moins de mémoire sur les PC modestes)
 const bmp = new Map(), dec = new Set();
 let lastBm = null;
 function st(){ return S[MODE] || (S[MODE] = mk()); }
@@ -451,8 +451,10 @@ function trimH(s){
 }
 /* décodage : Safari décode mieux en arrière-plan via <img>.decode() ; les autres via createImageBitmap */
 const VIA_IMG = /Apple/.test(navigator.vendor || '') || /[?&]img=1/.test(location.search);
+// Firefox décode createImageBitmap sur le fil principal (gels) : il passe aussi par <img>.decode()
+const DEC_IMG = VIA_IMG || /Firefox\//.test(navigator.userAgent);
 function decoder(blob){
-  if (!VIA_IMG) return createImageBitmap(blob);
+  if (!DEC_IMG) return createImageBitmap(blob);
   const u = URL.createObjectURL(blob), im = new Image(); im._u = u; im.decoding = 'async'; im.src = u;
   return im.decode().then(() => im, e => { URL.revokeObjectURL(u); throw e; });
 }
@@ -763,7 +765,7 @@ function idleUpd(){
   if (!atTop && !idle.paused) setTimeout(() => { if (exp.hidden || window.scrollY >= 8) idle.pause(); }, 500);
 }
 function resize(){
-  DPR = Math.min(2, window.devicePixelRatio || 1);
+  DPR = Math.min(2, window.devicePixelRatio || 1, Math.max(1, 1920 / Math.max(1, window.innerWidth)));   // pas plus de pixels que l'image source (grands écrans : beaucoup moins de travail)
   VW = window.innerWidth; VH = window.innerHeight;
   MODE = VW / VH < 1 ? 'm' : 'd'; PXF = Math.max(20, VH * 0.045);
   cv.width = VW * DPR; cv.height = VH * DPR; loadAll();
