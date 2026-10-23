@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610231915";
+(() => { const BUILD = "202610232125";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -398,7 +398,7 @@ const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
 const BLOB_MAX_H = 260;            // images HD gardées compressées en mémoire
-const BMP_MAX = 18;                // images décodées gardées prêtes (moins = moins de mémoire sur les PC modestes)
+const BMP_MAX = 28;                // images décodées gardées prêtes
 const bmp = new Map(), dec = new Set();
 let lastBm = null;
 function st(){ return S[MODE] || (S[MODE] = mk()); }
