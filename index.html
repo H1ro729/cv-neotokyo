@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610230627";
+(() => { const BUILD = "202610230629";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -716,7 +716,7 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("change", e => { if (e.target.matches("[data-visa]") && e.target.checked) setTimeout(() => window.scrollTo({top:total, behavior:"smooth"}), 600); });
 /* défilement des affiches : ralenti (SLOW) et lissé comme la vidéo */
-const SLOW = 2.6; let colT = 0, colY = null, lastPg = null, colAnim = false;
+const SLOW = 4.5; let colT = 0, colY = null, lastPg = null, colAnim = false;
 function colTick(){ const d = colT - colY; if (Math.abs(d) < 0.3){ colY = colT; col.style.transform = "translateY(" + colY + "px)"; colAnim = false; return; } colY += d * 0.14; col.style.transform = "translateY(" + colY + "px)"; requestAnimationFrame(colTick); }
 function kickCol(){ if (!colAnim){ colAnim = true; requestAnimationFrame(colTick); } }
 function showPage(p){ if (shownPage === p) return; shownPage = p; if (!p){ col.innerHTML = ""; return; } col.innerHTML = pageHTML(p); if (window.stat) window.stat("rue/affiche-" + p.n, "Rue : affiche " + p.n); col.style.width = geom.w + "px"; col.style.left = geom.x + "px"; }
