@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610222106";
+(() => { const BUILD = "202610230303";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -384,7 +384,7 @@ document.getElementById("back").addEventListener("click", () => { window.NTF = n
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl3', h:'dh3'}, m:{l:'ml3', h:'mh3'}};
-const VER = '?v=16';
+const VER = '?v=17';
 const S = {d:null, m:null};
 let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
 function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
@@ -496,7 +496,7 @@ function exact(i){
 }
 function draw(){
   if (!started) return;
-  const f = Math.max(0, Math.min(NF - 1, net ? Math.round(shown) : shown)), i0 = Math.floor(f), t = f - i0;
+  const f = Math.max(0, Math.min(NF - 1, net ? REEL(shown) : shown)), i0 = Math.floor(f), t = f - i0;
   window.NTF = f + 1;                       // image Blender affichée (pour l'ambiance sonore)
   const i = t < 0.5 ? i0 : Math.min(NF - 1, i0 + 1);
   let bm = frameFor(i);
@@ -534,6 +534,9 @@ function draw(){
   } else ctx.drawImage(bm, 0, 0, bm.naturalWidth || bm.width, bm.naturalHeight || bm.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
 }
 let started = false;
+const IDLE_ON = false;
+/* à l'arrêt, on se pose toujours sur une image réellement rendue (les images paires sont parfois des fondus) */
+const REEL = x => Math.max(0, Math.min(NF - 2, Math.round(x / 2) * 2));
 const DBG = {seek:0, bloc:0, err:'', fps:0};
 if (/[?&]debug=1/.test(location.search)){
   const el = document.createElement('div');
@@ -617,7 +620,7 @@ if (USE_VID){
   window.NTPRET = () => { const v = vget(); return v.ready ? 1 : 0.97 * v.prog; };
   draw = () => {
     if (!started) return;
-    const v = vget(), f = Math.max(0, Math.min(NF - 1, Math.round(shown)));
+    const v = vget(), f = Math.max(0, Math.min(NF - 1, net ? REEL(shown) : Math.round(shown)));
     window.NTF = f + 1; v.want = f; viser(v);
   };
   loadEl.textContent = "";
@@ -718,6 +721,7 @@ function onScroll(){
 /* ---------- boucle d'attente : respiration + pluie, tant qu'on n'a pas scrollé ---------- */
 const idle = document.getElementById("idle"); let idleMode = null, idleReady = false;
 function idleSrc(){
+  if (!IDLE_ON) return;   // boucle de départ coupée : elle venait de l'ancienne version du rendu (la pluie animée suffit)
   if (idleMode !== MODE){ idleMode = MODE; idleReady = false; idle.classList.remove("on"); idle.src = "img/idle_" + MODE + (idle.canPlayType('video/mp4; codecs="avc1.640020"') ? ".mp4" : ".webm") + VER; idle.load(); }
   const c = cover(); Object.assign(idle.style, {left:c.x + "px", top:c.y + "px", width:c.w + "px", height:c.h + "px"});
 }
