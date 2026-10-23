@@ -122,16 +122,17 @@
       await attendre(350); if (fin) return;
       s1.classList.add("on");
       // avancer
-      cap.innerHTML = tactile ? "Glissez vers le haut pour <b>avancer</b>" : "Faites défiler vers le haut pour <b>avancer</b>";
-      roue.style.animation = (tactile ? "doigtHaut" : "roueHaut") + " .9s ease-in-out 3";
-      if (flH) flH.style.animation = "flHaut .9s ease-in-out 3";
+      // souris : on avance en tournant la molette vers soi (vers le bas), comme sur n'importe quelle page
+      cap.innerHTML = tactile ? "Glissez vers le haut pour <b>avancer</b>" : "Faites défiler vers le bas pour <b>avancer</b><br><small>molette vers vous</small>";
+      roue.style.animation = (tactile ? "doigtHaut" : "roueBas") + " .9s ease-in-out 3";
+      if (tactile ? flH : flB) (tactile ? flH : flB).style.animation = (tactile ? "flHaut" : "flBas") + " .9s ease-in-out 3";
       filmVers(70, 2700);
       await attendre(2800); if (fin) return;
       // reculer
-      roue.style.animation = "none"; if (flH) flH.style.animation = "none"; void roue.offsetWidth;
-      cap.innerHTML = tactile ? "Glissez vers le bas pour <b>revenir en arrière</b>" : "Faites défiler vers le bas pour <b>revenir en arrière</b>";
-      roue.style.animation = (tactile ? "doigtBas" : "roueBas") + " .9s ease-in-out 2";
-      if (flB) flB.style.animation = "flBas .9s ease-in-out 2";
+      roue.style.animation = "none"; if (flH) flH.style.animation = "none"; if (flB) flB.style.animation = "none"; void roue.offsetWidth;
+      cap.innerHTML = tactile ? "Glissez vers le bas pour <b>revenir en arrière</b>" : "Faites défiler vers le haut pour <b>revenir en arrière</b>";
+      roue.style.animation = (tactile ? "doigtBas" : "roueHaut") + " .9s ease-in-out 2";
+      if (tactile ? flB : flH) (tactile ? flB : flH).style.animation = (tactile ? "flBas" : "flHaut") + " .9s ease-in-out 2";
       filmVers(30, 1800);
       await attendre(2000); if (fin) return;
       // le son

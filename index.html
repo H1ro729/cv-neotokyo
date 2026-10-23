@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610231137";
+(() => { const BUILD = "202610231635";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -775,6 +775,21 @@ function start(){
 }
 window.addEventListener("scroll", () => requestAnimationFrame(onScroll), {passive:true});
 window.addEventListener("resize", () => { if (started) resize(); });
+/* souris : si on tourne la molette dans le mauvais sens tout en haut de la rue, une petite bulle rappelle le bon sens */
+(() => {
+  let n = 0, tip = null, tm = 0;
+  addEventListener("wheel", e => {
+    if (!started || exp.hidden || e.deltaY >= 0 || window.scrollY > 4){ if (e.deltaY > 0) n = 0; return; }
+    if (++n < 3) return; n = 0;
+    if (!tip){
+      tip = document.createElement("div"); tip.innerHTML = "↓ Faites défiler <b>vers le bas</b> pour avancer";
+      Object.assign(tip.style, {position:"fixed", left:"50%", bottom:"14%", transform:"translateX(-50%)", zIndex:60, padding:"10px 16px", borderRadius:"999px",
+        background:"rgba(11,10,18,.85)", color:"#fff", font:"14px/1.2 var(--mono, monospace)", border:"1px solid rgba(255,255,255,.2)", transition:"opacity .4s", pointerEvents:"none", opacity:0});
+      document.body.appendChild(tip);
+    }
+    requestAnimationFrame(() => tip.style.opacity = 1); clearTimeout(tm); tm = setTimeout(() => tip.style.opacity = 0, 2600);
+  }, {passive:true});
+})();
 
 
 /* ---------- pluie animée par-dessus l'image : la rue reste vivante même quand on ne scrolle plus ---------- */
@@ -825,7 +840,7 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 </script>
 
 <script src="son.js?v=11" defer></script>
-<script src="intro.js?v=3" defer></script>
+<script src="intro.js?v=4" defer></script>
 <script src="stats.js?v=2" defer></script>
 </body>
 </html>
