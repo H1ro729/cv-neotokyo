@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610232125";
+(() => { const BUILD = "202610232200";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -586,7 +586,9 @@ if (/[?&]debug=1/.test(location.search)){
 // ordinateur sous Safari (le téléphone, lui, défile bien avec les images)
 const H264 = document.createElement('video').canPlayType('video/mp4; codecs="avc1.640028"') !== '';
 const VTEST = /[?&]vid=webm/.test(location.search);   // essai sous Chromium (sans H.264)
-const USE_VID = VTEST || (H264 && (/[?&]vid=1/.test(location.search) || (VIA_IMG && !/[?&]img=1/.test(location.search) && matchMedia("(hover: hover) and (pointer: fine)").matches)));
+// tous les ordinateurs (Safari, Chrome, Edge, Firefox) : la vidéo est bien plus fluide et légère (80 Mo au lieu de 300) ;
+// le téléphone garde les images ; ?img=1 force les images, et en cas de souci la page y revient toute seule
+const USE_VID = VTEST || (H264 && !/[?&]img=1/.test(location.search) && (/[?&]vid=1/.test(location.search) || matchMedia("(hover: hover) and (pointer: fine)").matches));
 if (USE_VID){
   const VS = VTEST ? {d:'pk/rue_d.webm', m:'pk/rue_m.webm'} : {d:'pk/rue_d.mp4', m:'pk/rue_m.mp4'}, VV = {};
   const vget = () => {
