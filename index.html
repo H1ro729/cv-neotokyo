@@ -257,18 +257,21 @@ h1 span { color: var(--magenta); }
   // la vidéo de fond : si le navigateur bloque la lecture, l'image fixe reste affichée
   const v = document.getElementById('boucle');
   // iPhone en mode économie d'énergie : la lecture automatique est bloquée, on relance au premier geste
-  const lancer = () => { v.muted = true; if (v.paused) v.play().catch(() => {}); };
-  lancer();
-  ['loadedmetadata', 'canplay'].forEach((ev) => v.addEventListener(ev, lancer));
-  // si le navigateur refuse la lecture automatique (mode économie d'énergie, réglage Safari…) : la même boucle en image animée, qui tourne toujours
+  // la vidéo d'abord ; l'image animée seulement si le navigateur REFUSE la lecture (pas pendant le simple chargement)
   let anim = null;
   const secours = () => {
     if (!v.paused || anim) return;
-    anim = document.createElement('img'); anim.src = 'media/salon_anim.webp'; anim.alt = '';
+    anim = document.createElement('img'); anim.src = 'media/salon_anim.webp?v=2'; anim.alt = '';
     anim.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none';
     v.parentNode.insertBefore(anim, v.nextSibling);
   };
-  setTimeout(secours, 1500);
+  const lancer = () => {
+    v.muted = true; if (!v.paused) return;
+    const p = v.play();
+    if (p && p.catch) p.catch((e) => { if (e && e.name === 'NotAllowedError') secours(); });
+  };
+  lancer();
+  ['loadedmetadata', 'canplay'].forEach((ev) => v.addEventListener(ev, lancer));
   v.addEventListener('playing', () => { if (anim) { anim.remove(); anim = null; } });
   ['pointerdown', 'touchstart', 'keydown', 'click'].forEach((ev) => document.addEventListener(ev, lancer, { passive: true }));
   document.addEventListener('visibilitychange', () => { if (!document.hidden) lancer(); });
