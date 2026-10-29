@@ -200,14 +200,25 @@ h1 span { color: var(--magenta); }
     cv: { nom: 'CV 1 page', url: 'cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4', fichier: 'CV_Guillaume_Belle-Croix_1page.pdf', i: 1 },
     dossier: { nom: 'Dossier complet · 7 pages', url: 'cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2', fichier: 'CV_Guillaume_Belle-Croix_dossier.pdf', i: 2 },
   };
-  document.querySelectorAll('[data-doc]').forEach((b) => b.addEventListener('click', () => {
-    const d = DOCS[b.dataset.doc];
+  function preparerDoc(cle) {
+    const d = DOCS[cle];
     document.getElementById('doc-ouvrir').href = d.url; document.getElementById('doc-telecharger').href = d.url;
     document.getElementById('doc-telecharger').setAttribute('download', d.fichier);
     document.getElementById('doc-nom').textContent = d.nom; document.getElementById('doc-fichier').textContent = d.fichier;
-    index = d.i; montrer('doc');
-  }));
-  document.getElementById('retour-doc').addEventListener('click', () => montrer('menu'));
+    index = d.i;
+  }
+  /* historique du navigateur : chaque écran (menu, contact, CV, dossier) a sa propre entrée,
+     la flèche retour ramène à l'écran précédent du site au lieu de le quitter */
+  function afficher(nom, cle) { if (nom === 'doc' && cle) preparerDoc(cle); montrer(nom); }
+  function aller(nom, cle) {
+    if (nom === courante && !cle) return;
+    afficher(nom, cle);
+    history.pushState({ v: nom, d: cle || null }, '', nom === 'titre' ? location.pathname : '#' + (cle || nom));
+  }
+  const revenir = () => { if (history.state && history.state.v && history.state.v !== 'titre') history.back(); else montrer('titre'); };
+  addEventListener('popstate', (e) => { const st = e.state || { v: 'titre' }; afficher(st.v, st.d); });
+  document.querySelectorAll('[data-doc]').forEach((b) => b.addEventListener('click', () => aller('doc', b.dataset.doc)));
+  document.getElementById('retour-doc').addEventListener('click', revenir);
   let courante = 'titre';
   const tuiles = () => Array.from(document.querySelectorAll('#menu .tuile'));
   let index = 0;
@@ -227,22 +238,22 @@ h1 span { color: var(--magenta); }
     t[index].focus({ preventScroll: true });
   }
 
-  document.getElementById('demarrer').addEventListener('click', () => montrer('menu'));
-  document.getElementById('ouvrir-contact').addEventListener('click', () => montrer('contact'));
-  document.getElementById('retour-contact').addEventListener('click', () => { index = 3; montrer('menu'); });
+  document.getElementById('demarrer').addEventListener('click', () => aller('menu'));
+  document.getElementById('ouvrir-contact').addEventListener('click', () => aller('contact'));
+  document.getElementById('retour-contact').addEventListener('click', () => { index = 3; revenir(); });
   tuiles().forEach((el, k) => el.addEventListener('mouseenter', () => { index = k; tuiles().forEach((x, j) => x.classList.toggle('actif', j === k)); }));
 
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (courante === 'titre') { e.preventDefault(); montrer('menu'); return; }
-    if (e.key === 'Escape') { e.preventDefault(); montrer(courante === 'contact' || courante === 'doc' ? 'menu' : 'titre'); return; }
+    if (courante === 'titre') { e.preventDefault(); aller('menu'); return; }
+    if (e.key === 'Escape') { e.preventDefault(); revenir(); return; }
     if (courante === 'menu') {
       if (e.key === 'ArrowDown') { e.preventDefault(); choisir(index + 1); }
       if (e.key === 'ArrowUp') { e.preventDefault(); choisir(index - 1); }
     }
   });
   // n'importe quel clic ou toucher sur l'écran titre ouvre le menu
-  document.addEventListener('pointerdown', (e) => { if (courante === 'titre' && !e.target.closest('a')) { e.preventDefault(); montrer('menu'); } });
+  document.addEventListener('pointerdown', (e) => { if (courante === 'titre' && !e.target.closest('a')) { e.preventDefault(); aller('menu'); } });
 
   document.querySelectorAll('.copier').forEach((b) => b.addEventListener('click', async () => {
     const txt = b.dataset.copie;
@@ -285,7 +296,11 @@ h1 span { color: var(--magenta); }
   v.addEventListener('playing', () => { if (anim) { anim.remove(); anim = null; } });
   ['pointerdown', 'touchstart', 'keydown', 'click'].forEach((ev) => document.addEventListener(ev, lancer, { passive: true }));
   document.addEventListener('visibilitychange', () => { if (!document.hidden) lancer(); });
+  // au chargement : l'accueil, puis l'écran demandé par l'adresse (#menu, #contact, #cv, #dossier) s'il y en a un
+  const h = (location.hash || '').slice(1);
+  history.replaceState({ v: 'titre' }, '', location.pathname);
   montrer('titre');
+  if (h === 'menu' || h === 'contact') aller(h); else if (h === 'cv' || h === 'dossier') { history.pushState({ v: 'menu' }, '', '#menu'); aller('doc', h); }
 })();
 </script>
 
