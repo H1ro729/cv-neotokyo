@@ -259,11 +259,21 @@ h1 span { color: var(--magenta); }
   // iPhone en mode économie d'énergie : la lecture automatique est bloquée, on relance au premier geste
   // la vidéo d'abord ; l'image animée seulement si le navigateur REFUSE la lecture (pas pendant le simple chargement)
   let anim = null;
+  // secours si le navigateur REFUSE la lecture automatique : la même boucle en images, dessinée à 24 i/s sur un canvas (fluide et nette)
   const secours = () => {
     if (!v.paused || anim) return;
-    anim = document.createElement('img'); anim.src = 'media/salon_anim.webp?v=2'; anim.alt = '';
-    anim.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;max-width:none';
-    v.parentNode.insertBefore(anim, v.nextSibling);
+    const cv = document.createElement('canvas'); cv.width = 1280; cv.height = 720;
+    cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+    v.parentNode.insertBefore(cv, v.nextSibling); anim = cv;
+    const ctx = cv.getContext('2d'), N = 96, imgs = new Array(N); let pretes = 0, t0 = 0;
+    for (let i = 0; i < N; i++){ const im = new Image(); im.decoding = 'async'; im.src = 'media/salon_seq/f_' + String(i + 1).padStart(2, '0') + '.webp';
+      im.onload = () => { imgs[i] = im; pretes++; if (i === 0) ctx.drawImage(im, 0, 0, 1280, 720); }; }
+    const boucle = (t) => {
+      if (anim !== cv) return;
+      if (pretes === N){ if (!t0) t0 = t; const k = Math.floor((t - t0) / (1000 / 24)) % N; ctx.drawImage(imgs[k], 0, 0, 1280, 720); }
+      requestAnimationFrame(boucle);
+    };
+    requestAnimationFrame(boucle);
   };
   const lancer = () => {
     v.muted = true; if (!v.paused) return;
