@@ -168,6 +168,7 @@ h1 span { color: var(--magenta); }
         <li><a class="tuile" href="rue.html#jouer"><b>CV immersif</b><small>Une rue de Neo-Tokyo, mon parcours affiché sur le panneau</small><i>Vidéo</i></a></li>
         <li><button class="tuile" type="button" data-doc="cv"><b>CV 1 page</b><small>L'essentiel : formation, expériences, compétences</small><i>PDF</i></button></li>
         <li><button class="tuile" type="button" data-doc="dossier"><b>Dossier complet</b><small>7 pages : esport, gendarmerie, projets, événements</small><i>PDF</i></button></li>
+        <li><a class="tuile" href="projets/"><b>Mes projets</b><small>Clutch Esport · INSEEC Airlines</small><i>Voir</i></a></li>
         <li><button class="tuile" type="button" id="ouvrir-contact"><b>Contact</b><small>Stage, alternance, CDD ou job étudiant</small><i>Ouvrir</i></button></li>
       </ul>
       <div class="pied" aria-hidden="true"><span><kbd>↑ ↓</kbd> choisir</span><span><kbd>Entrée</kbd> ouvrir</span><span><kbd>Échap</kbd> retour</span></div>
@@ -240,7 +241,7 @@ h1 span { color: var(--magenta); }
 
   document.getElementById('demarrer').addEventListener('click', () => aller('menu'));
   document.getElementById('ouvrir-contact').addEventListener('click', () => aller('contact'));
-  document.getElementById('retour-contact').addEventListener('click', () => { index = 3; revenir(); });
+  document.getElementById('retour-contact').addEventListener('click', () => { index = 4; revenir(); });
   tuiles().forEach((el, k) => el.addEventListener('mouseenter', () => { index = k; tuiles().forEach((x, j) => x.classList.toggle('actif', j === k)); }));
 
   document.addEventListener('keydown', (e) => {
