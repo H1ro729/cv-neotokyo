@@ -1,855 +1,238 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<script>
-/* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610291400";
-  fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
-    if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
-  }).catch(() => {}); })();
-</script>
-
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="CV immersif de Guillaume Belle-Croix : une rue de Neo-Tokyo sous la pluie, à parcourir au scroll. Esport, digital, événementiel.">
+<title>Guillaume Belle-Croix · CV interactif</title>
+<meta name="description" content="Guillaume Belle-Croix : esport, événementiel, digital. CV immersif dans une rue de Neo-Tokyo, CV 1 page, dossier et contact. Stage, alternance, CDD.">
 <link rel="canonical" href="https://guillaume-bellecroix.fr/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Guillaume Belle-Croix">
 <meta property="og:locale" content="fr_FR">
-<meta property="og:title" content="Guillaume Belle-Croix · CV immersif Neo-Tokyo">
-<meta property="og:description" content="Esport, digital, événementiel : un CV à parcourir comme un jeu vidéo, dans une rue de Neo-Tokyo sous la pluie. Stage, alternance, CDD.">
+<meta property="og:title" content="Guillaume Belle-Croix · CV interactif">
+<meta property="og:description" content="Esport, digital, événementiel : un CV à parcourir comme un jeu vidéo. Stage, alternance, CDD.">
 <meta property="og:url" content="https://guillaume-bellecroix.fr/">
 <meta property="og:image" content="https://guillaume-bellecroix.fr/img/og.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Guillaume Belle-Croix, CV immersif : une rue de Neo-Tokyo sous la pluie, à parcourir au scroll.">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Guillaume Belle-Croix · CV immersif Neo-Tokyo">
-<meta name="twitter:description" content="Esport, digital, événementiel : un CV à parcourir comme un jeu vidéo, dans une rue de Neo-Tokyo sous la pluie. Stage, alternance, CDD.">
-<meta name="twitter:image" content="https://guillaume-bellecroix.fr/img/og.jpg">
-<meta name="theme-color" content="#0b0a12">
+<meta name="theme-color" content="#07080c">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<title>Guillaume Belle-Croix · CV Neo-Tokyo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500&family=Noto+Sans+JP:wght@700&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Layout : accueil plein écran (3 cases) -> expérience au scroll (canvas fixe + pages d'affiches superposées, alignées sur l'affiche filmée) */
-:root{
-  --night:#0b0a12; --ink:#f3efe6; --muted:#a49fb3; --line:#2a2638;
-  --neon:#ff2e63; --sign:#ffc420; --paper:#e2dac8;
-  --display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
-  --body:"IBM Plex Sans","Segoe UI",Roboto,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
-  --jp:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
-  color-scheme:dark;
+/* Mise en page : la boucle du salon en plein écran, un panneau de verre fumé à gauche façon menu de jeu (écran titre → menu de tuiles) */
+:root {
+  --nuit: #07080c;          /* fond derrière la vidéo */
+  --verre: rgba(22, 24, 32, 0.46);
+  --verre-fort: rgba(30, 33, 44, 0.62);
+  --trait: rgba(222, 226, 240, 0.16);
+  --texte: #eef0f6;
+  --doux: rgba(226, 230, 242, 0.68);
+  --magenta: #f2f3f5;       /* accent neutre : blanc cassé */
+  --cyan: rgba(230, 232, 238, 0.6);
+  --f-titre: "Chakra Petch", "Rajdhani", "Segoe UI", system-ui, sans-serif;
+  --f-texte: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
 }
-html,body{background:var(--night);color:var(--ink)}
-body{font-family:var(--body);font-size:16px;line-height:1.55}
-a{color:inherit}
-:focus-visible{outline:2px solid var(--sign);outline-offset:3px}
-
-/* ---------- accueil : écran de lancement façon jeu moderne, sobre ---------- */
-.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--sign);display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-#home{position:relative;min-height:100vh;min-height:100svh;overflow:hidden;display:flex;flex-direction:column;
-  padding:0 max(20px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) max(20px,env(safe-area-inset-left,0px))}
-#home[hidden]{display:none}
-#home .bg{position:absolute;inset:0;background:var(--night) url("img/dh/000.webp?v=16") 62% center/cover no-repeat}
-#home .bg::after{content:"";position:absolute;inset:0;background:
-  linear-gradient(90deg,rgba(11,10,18,.94) 0%,rgba(11,10,18,.78) 34%,rgba(11,10,18,.18) 72%,rgba(11,10,18,.35) 100%),
-  linear-gradient(0deg,rgba(11,10,18,.95) 0%,rgba(11,10,18,0) 42%)}
-.lbar{position:relative;z-index:2;display:flex;align-items:center;gap:26px;height:68px;border-bottom:1px solid rgba(255,255,255,.07)}
-.lbar .logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
-.lbar .logo span{color:var(--neon)}
-.tabs{display:flex;gap:22px;align-items:stretch;height:100%}
-.tabs a{display:flex;align-items:center;font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;position:relative}
-.tabs a:hover{color:var(--ink)}
-.tabs a[aria-current]{color:var(--ink)}
-.tabs{position:relative}
-.tabs .ind{position:absolute;left:0;bottom:-1px;height:2px;width:0;background:var(--neon);transition:transform .32s cubic-bezier(.3,.7,.2,1),width .32s cubic-bezier(.3,.7,.2,1)}
-/* animations d'entrée et de sortie */
-@keyframes monte{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.hero>*,.ach,.lrow .tile,.lbar{animation:monte .55s cubic-bezier(.2,.7,.2,1) backwards}
-.hero>:nth-child(2){animation-delay:.07s}.hero>:nth-child(3){animation-delay:.14s}.hero>:nth-child(4){animation-delay:.21s}
-.ach{animation-delay:.18s}.lrow .tile:nth-child(1){animation-delay:.24s}.lrow .tile:nth-child(2){animation-delay:.3s}.lrow .tile:nth-child(3){animation-delay:.36s}.lrow .tile:nth-child(4){animation-delay:.42s}
-#home .bg{animation:fond 1.4s ease both}@keyframes fond{from{opacity:0;transform:scale(1.04)}to{opacity:1;transform:none}}
-#home .lmain,#home .lrow{transition:opacity .28s ease,transform .28s ease}
-#home.sortie .lmain,#home.sortie .lrow{opacity:0;transform:translateY(-10px)}
-.tile:active,.play:active,.btn2:active{transform:scale(.97)}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-.prof{margin-left:auto;display:flex;align-items:center;gap:10px;padding:4px 14px 4px 4px;border-radius:999px;background:rgba(255,255,255,.06);font-size:14px;white-space:nowrap}
-.prof img{width:32px;height:32px;border-radius:50%;object-fit:cover}
-.prof b{font-weight:600}.prof .dot{width:8px;height:8px;border-radius:50%;background:#3ddc84}
-.prof small{color:var(--muted);font-size:13px}
-.lmain{position:relative;z-index:1;flex:1;display:grid;grid-template-columns:minmax(0,640px) 1fr minmax(0,330px);gap:32px;align-items:start;padding-top:clamp(36px,9vh,110px)}
-.hero{display:grid;gap:18px}
-.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(50px,7vw,104px);line-height:.88;letter-spacing:.01em;text-transform:uppercase;margin:0}
-.hero h1 span{color:var(--neon);white-space:nowrap}
-.hero .lede{margin:0;color:#c9c4d4;font-size:18px;line-height:1.5;max-width:52ch}
-.chips{display:flex;gap:8px;flex-wrap:wrap}
-.chips span{font-size:13px;font-weight:500;padding:5px 11px;border-radius:4px;background:rgba(255,255,255,.07);color:#dcd7e4}
-.chips .ok{background:rgba(61,220,132,.12);color:#3ddc84}
-.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px}
-.play{display:inline-flex;align-items:center;gap:12px;font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.06em;text-transform:uppercase;
-  color:#fff;background:var(--neon);border:0;border-radius:6px;padding:14px 30px 13px;cursor:pointer}
-.play svg{width:18px;height:18px}
-.play:hover{filter:brightness(1.08)}
-.btn2{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;letter-spacing:.04em;text-decoration:none;color:var(--ink);
-  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:14px 18px}
-.btn2:hover{background:rgba(255,255,255,.14)}
-.meta{font-size:13px;color:var(--muted)}
-.ach{grid-column:3;background:rgba(14,13,22,.82);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:18px 20px;display:grid;gap:14px}
-.ach h2{margin:0;display:flex;justify-content:space-between;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-.ach h2 span{color:var(--sign)}
-.ac{display:flex;gap:12px;align-items:center}
-.ac i{flex:none;width:42px;height:42px;border-radius:8px;display:grid;place-items:center;font-style:normal;font-family:var(--mono);font-size:11px;color:var(--night);background:var(--sign)}
-.ac i.b{background:#8fa2ff}.ac i.c{background:#3ddc84}.ac i.d{background:rgba(255,255,255,.1);color:var(--muted);border:1px dashed rgba(255,255,255,.25)}
-.ac>img,.ac .av{flex:none;width:44px;height:44px;border-radius:8px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
-.ac .av{position:relative;display:block;overflow:hidden}.ac .av img{width:100%;height:100%;object-fit:cover;display:block}
-.ac .av svg{position:absolute;inset:0;margin:auto;width:18px;height:18px;color:#fff}
-.ac.lock b{color:var(--muted)}
-.ac .av.q{display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:26px;color:var(--muted);background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
-.ac b{display:block;font-size:15px;font-weight:600;line-height:1.2}
-.ac small{color:var(--muted);font-size:13px}
-.prog{height:5px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}.prog i{display:block;height:100%;width:66%;background:var(--sign)}
-.lrow{position:relative;z-index:1;display:grid;gap:12px;margin-top:28px}
-.lrow h2{margin:0;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
-.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.tile{position:relative;display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#15131f center/cover no-repeat;text-decoration:none;color:var(--ink);
-  border:1px solid rgba(255,255,255,.08);cursor:pointer;font:inherit;text-align:left;padding:0;transition:transform .18s ease,border-color .18s ease}
-.tile::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(11,10,18,.92) 0%,rgba(11,10,18,.1) 62%)}
-.tile:hover,.tile:focus-visible{transform:translateY(-3px);border-color:rgba(255,46,99,.7)}
-.tile .t{pointer-events:none;position:absolute;z-index:1;left:14px;right:14px;bottom:12px;display:grid;gap:2px}
-.tile b{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing:.02em}
-.tile small{font-size:12.5px;color:#bdb7c9}
-.tile.plain{background:linear-gradient(135deg,rgba(255,46,99,.16),rgba(255,255,255,.03) 60%)}
-.tile.plain::after{display:none}
-.tile.plain .arr{position:absolute;top:14px;right:16px;font-size:24px;color:var(--neon);transition:transform .2s}
-.tile.plain:hover .arr{transform:translateX(4px)}
-.tile.pdf .cover{position:absolute;inset:0;z-index:1}
-.tile .acts{position:absolute;z-index:2;right:12px;bottom:12px;display:flex;gap:6px}
-.tile .acts a{display:inline-flex;align-items:center;justify-content:center;min-width:36px;height:32px;padding:0 12px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;color:var(--ink);background:rgba(255,255,255,.14);backdrop-filter:blur(6px);transition:background .15s}
-.tile .acts a:hover{background:var(--neon)}
-.tile .acts a:last-child{padding:0;width:32px;font-size:15px}
-.tile .bdg{position:absolute;z-index:1;top:10px;left:10px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;background:var(--neon);color:#fff;padding:3px 7px;border-radius:3px}
-@media (max-width:1180px){.lmain{grid-template-columns:minmax(0,1fr)}.ach{grid-column:auto;max-width:520px}}
-@media (max-width:900px){#home .bg{background-position:58% top;background-size:auto 70vh}#home .bg::after{background:linear-gradient(180deg,rgba(11,10,18,.45) 0,rgba(11,10,18,.85) 40vh,var(--night) 70vh)}.lbar{gap:12px 16px;flex-wrap:wrap;height:auto;padding:12px 0 0}.tabs{order:3;width:100%;height:42px;gap:22px}.tiles{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}.tile{flex:0 0 min(70vw,300px);scroll-snap-align:start}}
-@media (max-width:560px){.lbar .logo{display:none}.prof small{display:none}.play{font-size:22px;padding:13px 24px 12px}.hero .lede{font-size:16px}}
-
-/* ---------- expérience ---------- */
-#exp[hidden]{display:none}
-#stage{position:fixed;inset:0;z-index:1;background:var(--night)}
-#cv{width:100%;height:100%;display:block}
-#idle{position:absolute;left:0;top:0;opacity:0;transition:opacity .45s ease;pointer-events:none;object-fit:cover;background:transparent}
-#idle.on{opacity:1}
-#pluie{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transition:opacity .5s}
-#track{position:relative;z-index:0}
-#hud{position:fixed;z-index:5;left:0;right:0;bottom:0;display:flex;gap:14px;align-items:center;justify-content:space-between;
-  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
-#hud > *{pointer-events:auto}
-.home-btn{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:rgba(11,10,18,.7);color:var(--ink);border:1px solid var(--line);padding:9px 12px;cursor:pointer}
-#chapters{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-#chapters button{font-family:var(--mono);font-size:11px;letter-spacing:.08em;background:rgba(11,10,18,.7);color:var(--muted);border:1px solid var(--line);padding:8px 10px;cursor:pointer}
-#chapters button.on{color:var(--night);background:var(--sign);border-color:var(--sign)}
-@media (max-width:900px){#chapters button span{display:none}}
-/* téléphone : barre du bas plus discrète (petites pastilles sur une seule ligne) */
-@media (max-width:600px){
-  #hud{gap:8px;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
-  .home-btn{font-size:0;padding:0;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:none}
-  .home-btn::before{content:"←";font-size:15px;letter-spacing:0}
-  #chapters{flex-wrap:nowrap;gap:4px}
-  #chapters button{font-size:10px;letter-spacing:.02em;padding:0;min-width:28px;height:28px;border-radius:14px}
-  #chapters button:last-child{padding:0 9px}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--nuit); color: var(--texte); font-family: var(--f-texte); font-size: 16px;
+  overflow: hidden; -webkit-font-smoothing: antialiased;
 }
-#bar{position:fixed;z-index:5;left:0;top:env(safe-area-inset-top,0px);height:3px;width:0;background:var(--neon)}
-#hint{position:fixed;z-index:4;left:50%;bottom:calc(76px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--ink);background:rgba(11,10,18,.6);padding:8px 14px;border:1px solid var(--line);transition:opacity .4s}
-#load{position:fixed;z-index:6;right:max(16px,env(safe-area-inset-right,0px));top:calc(14px + env(safe-area-inset-top,0px));font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em}
+.fond { position: fixed; inset: 0; z-index: 0; }
+.fond video, .fond img { width: 100%; height: 100%; object-fit: cover; display: block; max-width: none; }
+.fond::after {            /* assombrit très légèrement la gauche */
+  content: ""; position: absolute; inset: 0; opacity: .55;
+  background: linear-gradient(90deg, rgba(5,6,10,.72) 0%, rgba(5,6,10,.35) 38%, rgba(5,6,10,0) 62%),
+              linear-gradient(0deg, rgba(5,6,10,.55) 0%, rgba(5,6,10,0) 22%);
+}
+.scene {
+  position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: center;
+  padding-block: clamp(20px, 5vh, 56px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px), 5vw);
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.panneau {
+  width: min(440px, 100%); background: var(--verre); border: 1px solid var(--trait);
+  backdrop-filter: blur(16px) saturate(1.15); -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 22px;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+.entete { display: flex; flex-direction: column; gap: 6px; }
+.badge { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+h1 { font-family: var(--f-titre); font-weight: 700; font-size: clamp(30px, 4.2vw, 44px); line-height: .98; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h1 span { color: var(--magenta); }
+.role { font-family: var(--f-titre); font-weight: 500; font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: var(--doux); }
 
-/* page d'affiche */
-#page{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0}
-#page .veil{position:absolute;inset:0;background:var(--night)}
-#col{position:absolute;top:0;left:0;will-change:transform}
-#col .poster{display:block;width:100%;aspect-ratio:1000/1189;max-width:100%;background:var(--paper) center/cover no-repeat}
-#col .body{padding-block:56px 64px;display:grid;gap:40px}
-.p-head{display:grid;gap:10px}
-.p-head .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1)}
-.p-head h2{font-family:var(--display);font-weight:900;font-size:clamp(40px,6vw,72px);line-height:.9;text-transform:uppercase;margin:0;text-wrap:balance}
-.facts{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.facts li{display:flex;gap:12px;align-items:baseline}
-.facts li::before{content:"";flex:none;width:10px;height:10px;background:var(--c1);transform:translateY(-1px)}
-.todo{border:1px dashed #5a536d;padding:18px 20px;color:var(--muted);font-size:15px;background:rgba(255,255,255,.02)}
-.todo strong{display:block;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);margin-bottom:6px}
-.txt{border-left:2px solid var(--c1);padding:4px 0 4px 18px;font-size:16px;line-height:1.6}
-.txt strong{display:block;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);margin-bottom:8px}
-.txt p{margin:0;max-width:62ch}
-.fiches{display:grid;gap:16px}
-/* affiche 06 : recommandation façon dossier */
-.r6{display:grid;gap:16px}
-.r6g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}.r6g3{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:16px}
-.r6c,.r6s{padding:16px 18px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035)}
-.r6 h4{margin:0 0 12px;font-size:17px;font-weight:600;display:flex;gap:8px;align-items:baseline}
-.r6 h4 em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em}
-.r6c ul{list-style:none;margin:0;padding:0;display:grid;gap:7px;font-size:14.5px}
-.r6c li{display:flex;gap:10px;align-items:baseline}.r6c li::before{content:"";flex:none;width:7px;height:7px;background:var(--c1)}
-.r6t{display:flex;flex-wrap:wrap;gap:6px}
-.r6t span{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 8px;border-radius:4px;background:rgba(255,255,255,.07)}
-.r6l{display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center;font-size:14.5px}
-.r6l i{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--c1) var(--v),rgba(255,255,255,.12) var(--v))}
-.r6l i.n5{--v:100%}.r6l i.n2{--v:42%}
-.r6l small{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
-.r6d{margin:0;font-size:14px;color:var(--muted)}.r6d b{color:var(--ink)}
-.r6reco{padding:20px 22px;border-radius:10px;background:var(--c1);color:#062a1a}
-.r6reco h4{color:#062a1a}.r6reco p{margin:0;font-size:15px;line-height:1.6}
-.r6s ol{list-style:none;margin:0;padding:0;display:grid;gap:12px}
-.r6s li{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:center;font-size:14.5px}
-.r6s li b{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;background:rgba(255,255,255,.1)}
-.r6s li:first-child b{background:var(--c1);color:#062a1a}
-.r6s li small{font-family:var(--mono);font-size:10.5px;color:var(--muted)}
-.r6v{display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:center;padding:16px 20px;border:1.5px dashed rgba(255,255,255,.25);border-radius:10px;cursor:pointer}
-.r6vt{grid-column:1/-1;font-weight:600;font-size:17px}
-.r6vc{display:flex;gap:10px;align-items:center;font-size:15px}.r6vc em{font-family:"Caveat","Segoe Print",cursive;font-style:normal;color:var(--c1);font-size:16px}
-.r6vc input{width:20px;height:20px;accent-color:var(--c1)}
-.r6go{font:inherit;font-weight:600;font-size:14px;border:0;border-radius:6px;padding:10px 16px;background:var(--c1);color:#062a1a;cursor:pointer}
-@media (max-width:760px){.r6g2,.r6g3{grid-template-columns:1fr}.r6v{grid-template-columns:1fr}}
-.fiche{display:grid;grid-template-columns:minmax(0,38%) 1fr;gap:22px;align-items:start;padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.035);color:inherit;text-decoration:none;transition:border-color .18s,transform .18s}
-a.fiche:hover{border-color:var(--c1);transform:translateY(-2px)}
-.fph{display:block;background:#f1ece2;padding:7px 7px 18px;box-shadow:0 8px 20px rgba(0,0,0,.5);transform:rotate(-1.5deg)}
-.fiche:nth-child(2) .fph{transform:rotate(1.2deg)}
-.fph img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
-.fco{display:grid;gap:10px;min-width:0}
-.fhd{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.fhd b{font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase;line-height:1}
-.fhd em{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.frw{display:grid;grid-template-columns:78px 1fr;gap:12px;padding-top:9px;border-top:1px solid rgba(255,255,255,.08);font-size:14px;line-height:1.5}
-.frw i{font-style:normal;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c1);padding-top:3px}
-.fgo{justify-self:start;font-weight:600;font-size:14px;color:var(--c1)}
-@media (max-width:640px){.fiche{grid-template-columns:1fr;padding:14px}.fph{max-width:320px}}
-img.ph{width:100%;object-fit:cover;display:block}
-.collage{display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:clamp(34px,4.2vw,58px);gap:14px;padding:10px 4px 18px}
-.pf{margin:0;position:relative;background:#f1ece2;padding:8px 8px 26px;box-shadow:0 10px 26px rgba(0,0,0,.55);overflow:visible}
-.pf img{width:100%;height:100%;object-fit:cover;display:block}
-.pf figcaption{position:absolute;left:10px;right:10px;bottom:5px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#2a2533;line-height:1.15}
-@media (max-width:600px){.pf{padding:6px 6px 30px}.pf figcaption{font-size:9px;letter-spacing:.04em}}
-.pf::before{content:"";position:absolute;top:-9px;left:50%;width:62px;height:18px;transform:translateX(-50%) rotate(-3deg);background:rgba(233,227,207,.75);box-shadow:0 1px 3px rgba(0,0,0,.25)}
-.pf.a{grid-column:1/6;grid-row:1/9;transform:rotate(-2.4deg)}
-.pf.b{grid-column:6/13;grid-row:2/8;transform:rotate(1.6deg)}
-.pf.c{grid-column:7/11;grid-row:8/15;transform:rotate(-1.2deg);z-index:1}
-.pf.d{grid-column:2/7;grid-row:9/15;transform:rotate(2.8deg)}
-.pf.b::before{left:24%}.pf.d::before{left:70%;transform:translateX(-50%) rotate(4deg)}
-.photos{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.ph{aspect-ratio:4/3;max-width:100%;border:1px dashed #5a536d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--muted);
-  font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:repeating-linear-gradient(135deg,rgba(255,255,255,.02) 0 10px,transparent 10px 20px)}
-.ph b{font-family:var(--display);font-size:30px;color:#4b455c;letter-spacing:0}
-.sec-title{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
-.link{color:var(--c1);text-decoration-thickness:1px;text-underline-offset:3px}
+/* écran titre */
+.titre .appuie {
+  border-top: 1px solid var(--trait); padding-top: 18px; display: flex; align-items: center; gap: 12px;
+  font-family: var(--f-titre); font-weight: 600; font-size: 15px; letter-spacing: .22em; text-transform: uppercase;
+  animation: souffle 2.4s ease-in-out infinite; background: none; border-left: 0; border-right: 0; border-bottom: 0;
+  color: var(--texte); cursor: pointer; text-align: left; width: 100%;
+}
+.touche { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0; border: 1px solid var(--trait); padding: 3px 7px; color: var(--cyan); }
+@keyframes souffle { 0%,100% { opacity: 1 } 50% { opacity: .45 } }
 
-/* fin : contact */
-#contact{position:fixed;inset:0;z-index:4;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px}
-#contact .box{width:min(560px,100%);background:rgba(11,10,18,.9);border:1px solid var(--neon);padding:28px;display:grid;gap:16px}
-#contact h3{font-family:var(--display);font-weight:900;font-size:44px;line-height:.95;text-transform:uppercase;margin:0}
-#contact h3 span{font-family:var(--jp);font-size:18px;color:var(--neon);margin-left:8px;vertical-align:middle}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px}
-.row .val{font-family:var(--mono);font-size:17px;user-select:all;min-width:0;overflow-wrap:anywhere}
-.row .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);width:100%}
-.btns{display:flex;gap:8px}
-.btns a,.btns button{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 12px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;text-decoration:none}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* menu */
+.menu { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.tuile {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 14px;
+  padding: 14px 16px; background: var(--verre-fort); border: 1px solid var(--trait); color: var(--texte);
+  text-decoration: none; cursor: pointer; font: inherit; text-align: left; width: 100%;
+  transition: background .18s, border-color .18s, transform .18s;
+}
+.tuile b { font-family: var(--f-titre); font-weight: 600; font-size: 18px; letter-spacing: .06em; text-transform: uppercase; }
+.tuile small { grid-column: 1; font-size: 14px; color: var(--doux); min-width: 0; }
+.tuile i { grid-row: 1 / span 2; grid-column: 2; font-style: normal; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; color: var(--doux); text-transform: uppercase; }
+.tuile:hover, .tuile:focus-visible, .tuile.actif {
+  background: rgba(255, 255, 255, .12); border-color: var(--magenta); outline: none; transform: translateX(4px);
+}
+.tuile.actif i, .tuile:hover i { color: var(--magenta); }
+.pied { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--f-mono); font-size: 11px; color: var(--doux); border-top: 1px solid var(--trait); padding-top: 14px; }
+.pied kbd { font-family: inherit; color: var(--texte); }
+
+/* contact */
+.contact { display: flex; flex-direction: column; gap: 10px; }
+.ligne { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 12px 14px; background: var(--verre-fort); border: 1px solid var(--trait); }
+.ligne span { font-family: var(--f-mono); font-size: 15px; user-select: all; min-width: 0; overflow-wrap: anywhere; }
+.ligne label { grid-column: 1 / -1; font-family: var(--f-titre); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--cyan); }
+.copier { text-decoration: none; font-family: var(--f-mono); font-size: 11px; background: none; color: var(--texte); border: 1px solid var(--trait); padding: 6px 10px; cursor: pointer; text-transform: uppercase; letter-spacing: .08em; }
+.copier:hover, .copier:focus-visible { border-color: var(--magenta); outline: none; }
+.retour { align-self: flex-start; font-family: var(--f-titre); font-size: 13px; letter-spacing: .18em; text-transform: uppercase; background: none; border: 0; color: var(--doux); cursor: pointer; padding: 4px 0; }
+.retour:hover, .retour:focus-visible { color: var(--magenta); outline: none; }
+
+.vue { display: flex; flex-direction: column; gap: 22px; animation: entre .35s ease-out both; }
+@keyframes entre { from { opacity: 0; transform: translateX(-10px) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .titre .appuie, .vue { animation: none; } .tuile { transition: none; } }
+@media (max-width: 520px) {
+  .scene { justify-content: flex-end; }
+  .panneau { padding: 22px 18px 18px; }
+  .fond::after { background: linear-gradient(0deg, rgba(5,6,10,.85) 0%, rgba(5,6,10,.35) 55%, rgba(5,6,10,0) 80%); }
+}
+/* style unique : cases grises très translucides, contour fin, texte blanc — le titre, les tuiles et le contact */
+.panneau { background: none !important; border: 0 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; clip-path: none !important; padding: 0 !important; width: min(380px, 100%) !important; }
+.panneau .entete { display: none; }
+.tuile, .ligne { background: rgba(225, 228, 235, 0.06); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); padding: 16px 20px; }
+.tuile b { font-size: 15px; letter-spacing: .22em; font-weight: 600; }
+.tuile small { font-size: 13px; color: rgba(240, 242, 246, .72); }
+.tuile i { color: rgba(240, 242, 246, .55); }
+.tuile:hover, .tuile:focus-visible, .tuile.actif { background: rgba(225, 228, 235, 0.14); border-color: rgba(255, 255, 255, 0.55); transform: translateX(4px); }
+.tuile.actif i, .tuile:hover i { color: #fff; }
+.pied { border-top: 0; padding-top: 4px; color: rgba(240, 242, 246, .55); }
+.copier { border-color: rgba(255, 255, 255, 0.3); }
+.copier:hover, .copier:focus-visible, .retour:hover, .retour:focus-visible { border-color: #fff; color: #fff; }
+@media (hover: none) { .pied { display: none; } }
+/* écran titre : une simple case grise translucide, rien d'autre */
+.panneau.seul { width: min(360px, 100%); padding: 0; gap: 0; clip-path: none; background: rgba(225, 228, 235, 0.06); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.panneau.seul .entete { display: none; }
+.panneau.seul .titre .appuie { border: 0; padding: 22px 26px; justify-content: center; text-align: center; font-size: 16px; letter-spacing: .32em; }
 </style>
+
 </head>
 <body>
+<div class="fond" aria-hidden="true">
+  <video id="boucle" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="media/salon.jpg">
+    <source src="media/salon.mp4" type="video/mp4">
+  </video>
+</div>
 
-<section id="home">
-  <div class="bg" aria-hidden="true"></div>
-  <header class="lbar">
-    <div class="logo">G. Belle-Croix<span>.</span></div>
-    <nav class="tabs" aria-label="Navigation"><i class="ind" aria-hidden="true"></i><a href="./" aria-current="page">Accueil</a><a href="projets/">Projets</a><a href="contact/">Contact</a></nav>
-    <div class="prof"><img src="img/avatar.webp" alt="" width="32" height="32"><b>Guillaume</b><span class="dot" aria-hidden="true"></span><small>Disponible</small></div>
-  </header>
-  <div class="lmain">
-    <div class="hero">
+<main class="scene">
+  <section class="panneau" aria-live="polite">
+    <header class="entete">
+      <div class="badge">CV interactif · v1</div>
       <h1>Guillaume<br><span>Belle-Croix</span></h1>
-      <p class="lede">Esport, événementiel, digital. Je cherche un stage ou une alternance.</p>
-      <div class="cta">
-        <button class="play" id="go-immersif" type="button"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg>Jouer</button>
-      </div>
-      <div class="meta">CV en 3D · à parcourir au scroll · son conseillé</div>
-    </div>
-    <aside class="ach" aria-label="Succès">
-      <h2>Succès <span>2 / 3</span></h2>
-      <div class="ac"><img src="img/succes/gendarme.webp" alt="" width="44" height="44"><div><b>Gendarme adjoint</b><small>2024 – 2026</small></div></div>
-      <div class="ac"><img src="img/succes/inseec.webp" alt="" width="44" height="44"><div><b>Étudiant INSEEC Bachelor</b><small>Bordeaux · 2026</small></div></div>
-      <div class="ac lock"><span class="av q" aria-hidden="true">?</span><div><b>Prochain succès</b><small>Ton stage ou ton alternance ?</small></div></div>
-      <div class="prog" aria-hidden="true"><i></i></div>
-    </aside>
-  </div>
-  <div class="lrow">
-    <h2>Continuer</h2>
-    <div class="tiles">
-      <button class="tile" type="button" id="tile-cv" style="background-image:url(img/t_cv.webp?v=2)"><span class="bdg">3D</span><span class="t"><b>CV immersif</b></span></button>
-      <div class="tile pdf" style="background-image:url(img/t_dossier.webp?v=5);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" aria-label="Voir le dossier"></a>
-        <span class="t"><b>Dossier</b><small>PDF · 7 pages</small></span>
-        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" download="CV_Guillaume_Belle-Croix_dossier.pdf" aria-label="Télécharger le dossier">↓</a></span></div>
-      <div class="tile pdf" style="background-image:url(img/t_fiche.webp?v=4);background-position:center top"><a class="cover" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" aria-label="Voir le CV 1 page"></a>
-        <span class="t"><b>CV</b><small>PDF · 1 page</small></span>
-        <span class="acts"><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener">Voir</a><a href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" download="CV_Guillaume_Belle-Croix_1page.pdf" aria-label="Télécharger le CV">↓</a></span></div>
-      <a class="tile plain" href="projets/"><span class="arr" aria-hidden="true">→</span><span class="t"><b>Mes projets</b><small>Clutch Esport · INSEEC Airlines</small></span></a>
-    </div>
-  </div>
-</section>
+      <div class="role">Esport · Événementiel · Digital</div>
+    </header>
 
-<section id="exp" hidden>
-  <div id="stage"><canvas id="cv"></canvas><video id="idle" muted loop playsinline preload="none" aria-hidden="true"></video><canvas id="pluie" aria-hidden="true"></canvas></div>
-  <div id="bar"></div>
-  <div id="load">Chargement 0 %</div>
-  <div id="page" aria-live="polite"><div class="veil"></div><div id="col"></div></div>
-  <div id="contact">
-    <div class="box">
-      <div class="kicker"><span>Contact</span></div>
-      <h3>Recrutez-moi<span>連絡先</span></h3>
-      <div class="row"><span class="lbl">Téléphone</span><span class="val" id="tel">06 42 49 93 22</span>
-        <span class="btns"><button type="button" data-copy="tel">Copier</button><a href="tel:+33642499322" target="_blank" rel="noopener">Appeler</a></span></div>
-      <div class="row"><span class="lbl">E-mail</span><span class="val" id="mail">Guillaume_blcx@icloud.com</span>
-        <span class="btns"><button type="button" data-copy="mail">Copier</button><a href="mailto:Guillaume_blcx@icloud.com" target="_blank" rel="noopener">Écrire</a></span></div>
+    <div class="vue titre" id="v-titre">
+      <button class="appuie" id="demarrer" type="button">Press any button</button>
     </div>
-  </div>
-  <div id="hud">
-    <button class="home-btn" id="back" type="button">← Accueil</button>
-    <nav id="chapters" aria-label="Chapitres"></nav>
-  </div>
-  <div id="track"></div>
-</section>
+
+    <div class="vue" id="v-menu" hidden>
+      <ul class="menu" id="menu">
+        <li><a class="tuile" href="rue.html#jouer"><b>CV immersif</b><small>Une rue de Neo-Tokyo, mon parcours affiché sur le panneau</small><i>Vidéo</i></a></li>
+        <li><a class="tuile" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener"><b>CV 1 page</b><small>L'essentiel : formation, expériences, compétences</small><i>PDF</i></a></li>
+        <li><a class="tuile" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener"><b>Dossier complet</b><small>7 pages : esport, gendarmerie, projets, événements</small><i>PDF</i></a></li>
+        <li><button class="tuile" type="button" id="ouvrir-contact"><b>Contact</b><small>Stage, alternance, CDD ou job étudiant</small><i>Ouvrir</i></button></li>
+      </ul>
+      <div class="pied" aria-hidden="true"><span><kbd>↑ ↓</kbd> choisir</span><span><kbd>Entrée</kbd> ouvrir</span><span><kbd>Échap</kbd> retour</span></div>
+    </div>
+
+    <div class="vue" id="v-contact" hidden>
+      <div class="contact">
+        <div class="ligne"><label>Téléphone</label><span id="c-tel">06 42 49 93 22</span><button class="copier" type="button" data-copie="06 42 49 93 22">Copier</button></div>
+        <div class="ligne"><label>E-mail</label><span id="c-mail">guillaume_blcx@icloud.com</span><button class="copier" type="button" data-copie="guillaume_blcx@icloud.com">Copier</button></div>
+        <div class="ligne"><label>Fiche contact</label><span>Ajouter à mes contacts</span><a class="copier" href="contact/guillaume-belle-croix.vcf">Télécharger</a></div>
+        <div class="ligne"><label>Basé à</label><span id="c-ville">Bordeaux · INSEEC Marketing &amp; communication digitale</span></div>
+      </div>
+      <button class="retour" type="button" id="retour-contact">← Retour au menu</button>
+    </div>
+  </section>
+</main>
 
 <script>
 (() => {
-/* ---------- données ---------- */
-const NF = 1204;                             // toutes les images de la vidéo (30 i/s)
-const fi = F => Math.max(0, F - 1);           // image Blender -> index (continu : permet le fondu entre images)
-const RECTS = {d:[0.2717, 0.0184, 0.7283, 0.9816], m:[0.0617, 0.0184, 0.938, 0.9816]}; // affiche plein écran (16:9 bureau / recadrage portrait téléphone)
-const SRC = {d:[1920, 1080, 's'], m:[1000, 1080, 'm']};
-let MODE = 'd';
-const P = [
-  {n:1, deb:665, fin:671, c1:"#ffc420", eyebrow:"01 · Qui suis-je ?", title:"Guillaume Belle-Croix",
-   facts:["21 ans · Bordeaux","Esport · Digital · Événementiel","Étudiant INSEEC Bachelor"],
-   txt:[["Présentation","Moi c'est Guillaume, j'ai 21 ans. J'ai passé deux ans dans la Gendarmerie nationale, et le jeu vidéo m'a toujours suivi. Aujourd'hui je reprends mes études à l'INSEEC avec une idée bien précise : <b>travailler dans l'esport, côté coulisses</b>. Les événements, les partenariats, les équipes, la communauté."],["Ce qui me ressemble","Du terrain, j'ai gardé la rigueur et le calme. J'aime créer et apprendre par moi-même : ce CV en 3D, mon site de pronos, Blender, Roblox… Et la scène esport, je la connais vraiment, en tant que joueur et en tant que spectateur. On peut compter sur moi, je suis à l'heure et j'aime travailler en équipe."],["Voyager","J'essaie de partir au moins une fois par an. Mon coup de cœur reste <b>le Japon</b> : la culture, l'histoire, la façon dont tout est pensé, et les gens."]], ph:[["img/p1/japon.webp","Japon","a"],["img/p1/arena.webp","Valorant Champions · Paris","b"],["img/p1/uniforme.webp?v=2","Deux ans d'uniforme","c"],["img/p1/lunettes.webp","","d"]]},
-  {n:2, deb:743, fin:749, c1:"#26c8e8", eyebrow:"02 · Formation", title:"INSEEC Bachelor",
-   facts:["Marketing & communication digitale","Campus de Bordeaux","Rentrée 2026"],
-   txt:[["Le programme","On y voit la stratégie de marque, le marketing digital, les réseaux sociaux et la création de contenu, avec pas mal de projets en équipe et d'oraux."],["Pourquoi ce choix","Dans l'esport, presque tout passe par le digital : les communautés, les streams, les réseaux, les partenariats avec les marques. Je veux apprendre à maîtriser tout ça pour le mettre au service d'une équipe ou d'un événement."]], ph:[]},
-  {n:3, deb:821, fin:827, c1:"#ce182c", eyebrow:"03 · Expérience", title:"Gendarme Adjoint Volontaire",
-   facts:["2024 — 2026 · 2 ans","Rigueur · sang-froid · équipe","Terrain & gestion du public"],
-   txt:[["Missions","Patrouilles et sécurité publique, accueil du public, gestion des effectifs, interventions en équipe, de jour comme de nuit. Avec des procédures à respecter à la lettre."],["Ce que j'en retire","J'ai appris à gérer du monde, à anticiper et à garder mon calme quand ça se tend. Surtout, ces deux ans m'ont appris à me connaître : comment je réagis sous pression, ce qui me motive vraiment. J'en suis sorti plus mûr, et je sais mieux où je veux aller."]], ph:[["img/p3/patrouille.webp","Avant la patrouille","a"],["img/p3/camarades.webp?v=2","Entre camarades","b"],["img/p3/terrain.webp?v=3","Sur le terrain","c"]]},
-  {n:4, deb:899, fin:905, c1:"#f0326e", eyebrow:"04 · Esport", title:"Vainqueur EWC 2026 Paris",
-   facts:[],
-   txt:[["Le tournoi","Le 12 juillet 2026, j'ai gagné la finale du tournoi communautaire Valorant de l'EWC à Paris, en 1v1, <b>10 à 4</b>."],["Depuis tout petit","Je joue aux jeux vidéo depuis que je suis petit. Aujourd'hui je joue beaucoup moins : ce qui m'intéresse vraiment, c'est <b>la scène esport</b>. Les équipes, les compétitions, et tout le travail qu'il y a derrière."],["Sur place","Valorant Champions 2025, EWC 2026… J'essaie d'aller sur au moins un gros événement par an, et je suis à fond derrière les <b>équipes françaises</b>. L'ambiance d'une salle, je connais, côté joueur comme côté public."]],
-   ph:[["img/p4/champions.webp?v=2","Valorant Champions 2025 · Paris","a"],["img/p4/gentlemates.webp?v=2","Avec Gentle Mates · EWC 2026","b"],["img/p4/vitality.webp?v=2","Team Vitality sur scène · EWC 2026","c"],["img/p4/gentlemates_match.webp?v=4","Gentle Mates en match · EWC 2026","d"]]},
-  {n:5, deb:977, fin:983, c1:"#7c4dff", eyebrow:"05 · Réalisations", title:"Mes projets",
-   facts:[],
-   txt:[["Ce qui me motive","Ce que j'aime, c'est prendre un projet <b>de l'idée jusqu'au bout</b> et apprendre en route. Chacun de ces trois projets m'a fait découvrir quelque chose de nouveau : le web, la 3D, la communication d'un événement."],
-        ["Et toujours un projet en cours","J'ai aussi fait deux jeux sur Roblox, je gère un serveur Discord autour de l'IA et je prépare une marque de vêtements. Quand je ne sais pas faire quelque chose, <b>je l'apprends</b>."]],
-   fiches:[
-    {img:"projets/clutch.webp", pos:"left top", t:"Clutch Esport", tag:"Fiche 5.1", obj:"Créer une communauté autour des pronos esport, gratuitement, avec des crédits virtuels.", real:"J'ai tout fait : le concept, l'identité visuelle, le site, la mise en ligne et le nom de domaine. 7 jeux, un classement et des cartes de pros à collectionner.", res:"<b>Site en ligne</b>", href:"https://clutch-esport.com", go:"clutch-esport.com ↗"},
-    {img:"img/dh/000.webp?v=16", pos:"center", t:"CV immersif en 3D", tag:"Fiche 5.2", obj:"Présenter mon parcours autrement, comme quelque chose qu'on vit.", real:"Une rue de Tokyo sous la pluie que j'ai modélisée sur <b>Blender</b>, filmée en vue à la première personne, et un site qu'on parcourt au scroll, avec le son.", res:"<b>Vous êtes dedans</b>", href:"", go:""},
-    {img:"projets/airlines/cover.webp", pos:"center", t:"INSEEC Airlines", tag:"Fiche 5.3 · Concept", obj:"Imaginer une soirée étudiante sur le thème du voyage en avion.", real:"L'idée vient de moi, et j'ai créé tout le support : un film de présentation en 3D sur Blender et un lecteur avec les documents de bord.", res:"<b>Tout est en ligne</b> sur mon site", href:"projets/airlines/", go:"Voir le film →"}
-   ], ph:[]},
-  {n:6, deb:1055, fin:1061, c1:"#32dc8c", eyebrow:"06 · Recommandation", title:"Stage & Alternance",
-   facts:[], txt:[], ph:[],
-   html:`<div class="r6">
-<div class="r6g2">
- <div class="r6c"><h4>Marketing &amp; communication <em>6.1</em></h4><ul><li>Marketing et communication digitale</li><li>Réseaux sociaux, création de contenu</li><li>Storytelling, direction artistique</li><li>Prise de parole</li></ul></div>
- <div class="r6c"><h4>Projet &amp; événement <em>6.2</em></h4><ul><li>De l'idée au lancement</li><li>Accueil et gestion du public</li><li>Travail en équipe, gestion des effectifs</li><li>Gestion des imprévus et du stress</li></ul></div>
-</div>
-<div class="r6g3">
- <div class="r6c"><h4>Outils <em>6.3</em></h4><div class="r6t"><span>Blender</span><span>Création de sites</span><span>Discord</span></div></div>
- <div class="r6c"><h4>Savoir-être <em>6.4</em></h4><div class="r6t"><span>Adaptabilité</span><span>Sang-froid</span><span>Rigueur</span><span>Fiabilité</span><span>Esprit d'équipe</span><span>Curiosité</span></div></div>
- <div class="r6c"><h4>Langues <em>6.5</em></h4><div class="r6l"><span>Français</span><i class="n5"></i><small>Natif</small><span>Anglais</span><i class="n2"></i><small>Interm.</small></div></div>
-</div>
-<p class="r6d"><b>En dehors :</b> je joue sur PC, je crée des sites, je fais un peu de sport et j'ai toujours un projet en route.</p>
-<div class="r6g2">
- <div class="r6reco"><h4>Recommandation</h4><p>Me faire une place dans votre équipe, en <b>partenariats et management esport</b>, en <b>événementiel</b> ou en <b>marketing digital</b>. En <b>stage ou en alternance</b>, et je suis aussi ouvert à un CDD ou un job étudiant, à Bordeaux ou ailleurs.</p></div>
- <div class="r6s"><h4>Prochaines étapes <em>6.6</em></h4><ol><li><b>1</b><span>Découvrir mon parcours</span><small>fait</small></li><li><b>2</b><span>Parcourir le CV en 3D</span><small>en cours</small></li><li><b>3</b><span>Planifier un entretien</span><small>à votre convenance</small></li></ol></div>
-</div>
-<label class="r6v"><span class="r6vt">Visa de la direction</span><span class="r6vc"><input type="checkbox" data-visa> Entretien accordé <em>← à cocher 😉</em></span><button type="button" class="r6go" data-contact>Me contacter ↓</button></label>
-</div>`},
-];
+  const vues = { titre: document.getElementById('v-titre'), menu: document.getElementById('v-menu'), contact: document.getElementById('v-contact') };
+  let courante = 'titre';
+  const tuiles = () => Array.from(document.querySelectorAll('#menu .tuile'));
+  let index = 0;
 
-/* ---------- accueil ---------- */
-const home = document.getElementById("home"), exp = document.getElementById("exp");
-// onglets : le trait glisse vers l'onglet cliqué, puis la page s'efface avant de changer
-(() => {
-  const nav = document.querySelector(".tabs"), ind = nav && nav.querySelector(".ind");
-  const pose = a => { if (ind && a) { ind.style.width = a.offsetWidth + "px"; ind.style.transform = "translateX(" + a.offsetLeft + "px)"; } };
-  const cur = () => nav && nav.querySelector("a[aria-current]");
-  if (ind) { ind.style.transition = "none"; pose(cur()); requestAnimationFrame(() => ind.style.transition = ""); addEventListener("resize", () => pose(cur())); }
-  document.querySelectorAll("#home a[href]").forEach(a => a.addEventListener("click", e => {
-    if (a.target === "_blank" || a.hasAttribute("download") || e.metaKey || e.ctrlKey || e.shiftKey) { if (nav && nav.contains(a)) pose(a); return; }
-    const u = new URL(a.href, location.href); if (u.origin !== location.origin || u.pathname === location.pathname) return;
-    e.preventDefault(); if (nav && nav.contains(a)) pose(a);
-    document.getElementById("home").classList.add("sortie"); setTimeout(() => location.href = a.href, 300);
+  function montrer(nom) {
+    for (const [k, el] of Object.entries(vues)) el.hidden = (k !== nom);
+    document.querySelector('.panneau').classList.toggle('seul', nom === 'titre');
+    courante = nom;
+    if (nom === 'menu') choisir(index);
+    if (nom === 'contact') document.querySelector('#v-contact .copier').focus();
+    if (nom === 'titre') document.getElementById('demarrer').focus();
+  }
+  function choisir(i) {
+    const t = tuiles(); index = (i + t.length) % t.length;
+    t.forEach((el, k) => el.classList.toggle('actif', k === index));
+    t[index].focus({ preventScroll: true });
+  }
+
+  document.getElementById('demarrer').addEventListener('click', () => montrer('menu'));
+  document.getElementById('ouvrir-contact').addEventListener('click', () => montrer('contact'));
+  document.getElementById('retour-contact').addEventListener('click', () => { index = 3; montrer('menu'); });
+  tuiles().forEach((el, k) => el.addEventListener('mouseenter', () => { index = k; tuiles().forEach((x, j) => x.classList.toggle('actif', j === k)); }));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (courante === 'titre') { e.preventDefault(); montrer('menu'); return; }
+    if (e.key === 'Escape') { e.preventDefault(); montrer(courante === 'contact' ? 'menu' : 'titre'); return; }
+    if (courante === 'menu') {
+      if (e.key === 'ArrowDown') { e.preventDefault(); choisir(index + 1); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); choisir(index - 1); }
+    }
+  });
+  // n'importe quel clic ou toucher sur l'écran titre ouvre le menu
+  document.addEventListener('pointerdown', (e) => { if (courante === 'titre' && !e.target.closest('a')) { e.preventDefault(); montrer('menu'); } });
+
+  document.querySelectorAll('.copier').forEach((b) => b.addEventListener('click', async () => {
+    const txt = b.dataset.copie;
+    try { await navigator.clipboard.writeText(txt); b.textContent = 'Copié'; }
+    catch (err) {
+      const s = b.previousElementSibling; const r = document.createRange(); r.selectNodeContents(s);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = 'Sélectionné';
+    }
+    setTimeout(() => { b.textContent = 'Copier'; }, 1600);
   }));
-  addEventListener("pageshow", e => { if (e.persisted) { document.getElementById("home").classList.remove("sortie"); pose(cur()); } });
+
+  // la vidéo de fond : si le navigateur bloque la lecture, l'image fixe reste affichée
+  const v = document.getElementById('boucle');
+  // iPhone en mode économie d'énergie : la lecture automatique est bloquée, on relance au premier geste
+  const lancer = () => { v.muted = true; if (v.paused) v.play().catch(() => {}); };
+  lancer();
+  ['pointerdown', 'touchstart', 'keydown', 'click'].forEach((ev) => document.addEventListener(ev, lancer, { passive: true }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) lancer(); });
+  montrer('titre');
 })();
-["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { if (window.stat) window.stat("rue/entree", "Entrée dans le CV immersif"); start(); if (window.lancerIntro) window.lancerIntro(); }));
-document.getElementById("back").addEventListener("click", () => { window.NTF = null; window.NTP = 0; exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
-
-/* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
-const DIR = {d:{l:'dl3', h:'dh3'}, m:{l:'ml3', h:'mh3'}};
-const VER = '?v=19';
-const S = {d:null, m:null};
-let IDX = null; const idxP = fetch('pk/index.json' + VER).then(r => r.json()).then(j => { IDX = j; pump(); });
-function mk(){ return {l:new Array(NF), h:new Map(), lN:0, busy:new Set(), act:0, ctl:new Map()}; }
-const BLOB_MAX_H = 260;            // images HD gardées compressées en mémoire
-const BMP_MAX = 28;                // images décodées gardées prêtes
-const bmp = new Map(), dec = new Set();
-let lastBm = null;
-function st(){ return S[MODE] || (S[MODE] = mk()); }
-function have(s, lvl, i){ return lvl === 'l' ? s.l[i] !== undefined : s.h.has(i); }
-/* file d'attente par paquets, par priorité :
-   1. l'aperçu de l'image courante ; 2. la HD juste autour (surtout devant, dans le sens du défilement) ;
-   3. les aperçus de proche en proche ; 4. une fenêtre HD plus large */
-let SENS = 1;
-function nextJob(s){
-  const c = Math.round(cur), seen = new Set();
-  const tryJob = (lvl, i) => {
-    if (i < 0 || i >= NF || have(s, lvl, i)) return null;
-    const per = IDX[DIR[MODE][lvl]].per, p = Math.floor(i / per), key = lvl + p;
-    if (s.busy.has(key) || seen.has(key)) return null;
-    seen.add(key); return [lvl, p, key];
-  };
-  let j = tryJob('l', c); if (j) return j;
-  /* les aperçus des ~3 paquets devant passent avant toute HD : on peut toujours défiler sans tomber sur du vide */
-  for (let r = 1; r < 50; r++){ j = tryJob('l', c + SENS * r); if (j) return j; }
-  if (Math.abs(cur - shown) > 90 || !started) j = null; else
-  for (let k = 0; k <= 28; k++){ j = tryJob('h', c + SENS * k) || (k <= 6 ? tryJob('h', c - SENS * k) : null); if (j) return j; }
-  for (let r = 1; r < NF; r++){ j = tryJob('l', c + SENS * r) || (r % 2 ? tryJob('l', c - SENS * r) : null); if (j) return j; }
-  for (let r = 29; r < 170; r++){ j = tryJob('h', c + SENS * r) || (r < 60 ? tryJob('h', c - SENS * r) : null); if (j) return j; }
-  return null;
-}
-function pump(){
-  if (!IDX) return;
-  const mode = MODE, s = st(), c = Math.round(cur);
-  for (const [k, j] of s.ctl) if (j.lvl === 'h'){ const m = (j.p + 0.5) * j.per; if (Math.abs(m - c) > 200) j.ac.abort(); }
-  while (s.act < 4){
-    const job = nextJob(s); if (!job) return;
-    const [lvl, p, key] = job, set = DIR[mode][lvl], info = IDX[set];
-    s.act++; s.busy.add(key);
-    const ac = new AbortController(); s.ctl.set(key, {ac, lvl, p, per:info.per});
-    fetch('pk/' + set + '_' + String(p).padStart(3, '0') + '.bin' + VER, {signal:ac.signal}).then(r => { if (!r.ok) throw 0; return r.blob(); }).then(pack => {
-      info.packs[p].forEach(([o, n], k) => {
-        const i = p * info.per + k, bl = pack.slice(o, o + n, 'image/webp');
-        if (lvl === 'l'){ if (s.l[i] === undefined){ s.l[i] = bl; s.lN++; } } else s.h.set(i, bl);
-      });
-      if (lvl === 'l') updLoad(); else trimH(s);
-      draw();
-    }).catch(() => {}).finally(() => { s.act--; s.busy.delete(key); s.ctl.delete(key); pump(); });
-  }
-}
-function trimH(s){
-  if (s.h.size <= BLOB_MAX_H) return;
-  const c = Math.round(cur);
-  const far = [...s.h.keys()].sort((a, b) => Math.abs(b - c) - Math.abs(a - c));
-  while (s.h.size > BLOB_MAX_H) s.h.delete(far.shift());
-}
-/* décodage : Safari décode mieux en arrière-plan via <img>.decode() ; les autres via createImageBitmap */
-const VIA_IMG = /Apple/.test(navigator.vendor || '') || /[?&]img=1/.test(location.search);
-// Firefox décode createImageBitmap sur le fil principal (gels) : il passe aussi par <img>.decode()
-const DEC_IMG = VIA_IMG || /Firefox\//.test(navigator.userAgent);
-function decoder(blob){
-  if (!DEC_IMG) return createImageBitmap(blob);
-  const u = URL.createObjectURL(blob), im = new Image(); im._u = u; im.decoding = 'async'; im.src = u;
-  return im.decode().then(() => im, e => { URL.revokeObjectURL(u); throw e; });
-}
-function liberer(o){ if (!o || o === lastBm) return; if (o.close) o.close(); if (o._u) URL.revokeObjectURL(o._u); }
-function decode(key, blob){
-  if (bmp.has(key) || dec.has(key)) return;
-  dec.add(key);
-  decoder(blob).then(b => {
-    dec.delete(key); bmp.set(key, b);
-    while (bmp.size > BMP_MAX){ const k = bmp.keys().next().value; if (k === key) break; liberer(bmp.get(k)); bmp.delete(k); }
-    draw();
-  }).catch(() => dec.delete(key));
-}
-function frameFor(i){
-  const s = st(), kH = MODE + 'h' + i, kL = MODE + 'l' + i;
-  if (bmp.has(kH)){ const b = bmp.get(kH); bmp.delete(kH); bmp.set(kH, b); return b; }
-  const hb = s.h.get(i); if (hb) decode(kH, hb);
-  /* une image HD voisine (±3) vaut mieux qu'un aperçu flou agrandi */
-  for (let r = 1; r <= 3; r++) for (const j of [i - r, i + r]) if (bmp.has(MODE + 'h' + j)) return bmp.get(MODE + 'h' + j);
-  if (bmp.has(kL)) return bmp.get(kL);
-  const lb = s.l[i]; if (lb) decode(kL, lb);
-  return null;
-}
-const loadEl = document.getElementById("load");
-let attente = false;
-function updLoad(){ const s = st(); const p = Math.round(100 * s.lN / NF); loadEl.textContent = p < 100 ? "Chargement " + p + " %" : (attente ? "Chargement…" : ""); }
-function loadAll(){ st(); pump(); }
-/* avancement du chargement avant d'ouvrir la rue : tous les aperçus + la HD du début */
-const HD0 = 60;
-window.NTPRET = () => { const s = st(); let h = 0; for (let i = 0; i < HD0; i++) if (s.h.has(i)) h++; return 0.8 * Math.min(1, s.lN / NF) + 0.2 * h / HD0; };
-
-/* ---------- canvas ---------- */
-const cv = document.getElementById("cv"), ctx = cv.getContext("2d");
-let VW = 0, VH = 0, DPR = 1, cur = 0, shown = 0, animating = false;
-let net = true;               // à l'arrêt : image entière, nette (pas de fondu entre deux images)
-function tick(){ const d = cur - shown; if (Math.abs(d) < 0.01){ shown = cur; net = true; draw(); animating = false; pump(); return; } net = false; shown += d * 0.14; draw(); requestAnimationFrame(tick); }
-function kick(){ const d = cur - shown; if (Math.abs(d) > 0.01) SENS = d > 0 ? 1 : -1; if (!animating){ animating = true; requestAnimationFrame(tick); } pump(); }
-function cover(){
-  if (MODE === 'm'){ const s = VW / 1000; const w = VW, h = 1080 * s; return {s, w, h, x:0, y:Math.max(0, (VH - h) * 0.42)}; }
-  const s = Math.max(VW / 1920, VH / 1080); const w = 1920 * s, h = 1080 * s; return {s, w, h, x:(VW - w) / 2, y:(VH - h) / 2}; }
-/* image exacte i si elle est déjà décodée (HD sinon aperçu), sans repli sur une voisine */
-function exact(i){
-  if (i < 0 || i >= NF) return null;
-  const s = st(), kH = MODE + 'h' + i, kL = MODE + 'l' + i;
-  if (bmp.has(kH)) return bmp.get(kH);
-  const hb = s.h.get(i); if (hb) decode(kH, hb);
-  if (bmp.has(kL)) return bmp.get(kL);
-  const lb = s.l[i]; if (lb) decode(kL, lb);
-  return null;
-}
-function draw(){
-  if (!started) return;
-  const f = Math.max(0, Math.min(NF - 1, net ? REEL(shown) : shown)), i0 = Math.floor(f), t = f - i0;
-  window.NTF = f + 1;                       // image Blender affichée (pour l'ambiance sonore)
-  const i = t < 0.5 ? i0 : Math.min(NF - 1, i0 + 1);
-  let bm = frameFor(i);
-  { const s = st();
-    for (const k of [1, 2, 3, 4, 5, 6, 7, 8, -1, -2]){ const j = i + SENS * k; if (j < 0 || j >= NF) continue;
-      const hb = s.h.get(j); if (hb) decode(MODE + 'h' + j, hb); else if (s.l[j]) decode(MODE + 'l' + j, s.l[j]); } }
-  if (!bm){
-    for (let r = 1; r < 40 && !bm; r++){ for (const j of [i - r, i + r]) if (!bm && j >= 0 && j < NF && bmp.has(MODE + 'h' + j)) bm = bmp.get(MODE + 'h' + j); }
-  }
-  /* rien de prêt à cet endroit (défilement très rapide juste après l'arrivée) : l'aperçu chargé le plus proche,
-     plutôt que de rester figé sur une image d'un tout autre endroit de la rue */
-  if (!bm){
-    const s = st();
-    for (let r = 1; r < NF; r++){
-      const j = [i - r, i + r].find(x => x >= 0 && x < NF && (bmp.has(MODE + 'l' + x) || s.l[x]));
-      if (j === undefined) continue;
-      if (bmp.has(MODE + 'l' + j)) bm = bmp.get(MODE + 'l' + j); else decode(MODE + 'l' + j, s.l[j]);
-      break;
-    }
-  }
-  attente = !st().l[i] && !st().h.has(i);
-  if (st().lN >= NF){ const tx = attente ? "Chargement…" : ""; if (loadEl.textContent !== tx) loadEl.textContent = tx; }
-  if (!bm) bm = lastBm;
-  if (!bm) return;
-  lastBm = bm;
-  const c = cover();
-  ctx.fillStyle = "#0b0a12"; ctx.fillRect(0, 0, cv.width, cv.height);
-  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = "high";
-  if (MODE === 'm') fond(bm, c);
-  /* fondu entre deux images consécutives : le défilement devient continu au lieu de sauter d'image en image */
-  const a = exact(i0), b = i0 + 1 < NF ? exact(i0 + 1) : null;
-  if (a && b && t > 0.001){
-    ctx.globalAlpha = 1; ctx.drawImage(a, 0, 0, a.naturalWidth || a.width, a.naturalHeight || a.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
-    ctx.globalAlpha = t; ctx.drawImage(b, 0, 0, b.naturalWidth || b.width, b.naturalHeight || b.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
-    ctx.globalAlpha = 1; lastBm = t < 0.5 ? a : b;
-  } else ctx.drawImage(bm, 0, 0, bm.naturalWidth || bm.width, bm.naturalHeight || bm.height, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR);
-  if (MODE === 'm') bords(c);
-}
-/* téléphone : au-dessus et en dessous de l'image, un prolongement flou et sombre de la même image (plus de bandes noires) */
-const fc = document.createElement('canvas'), fx = fc.getContext('2d'); fc.width = 24; fc.height = 26;
-function fond(img, c){
-  try {
-    fx.drawImage(img, 0, 0, img.naturalWidth || img.width, img.naturalHeight || img.height, 0, 0, 24, 26);
-    const W = cv.width, H = cv.height, sc = Math.max(W / 24, H / 26);
-    ctx.drawImage(fc, 0, 0, 24, 26, (W - 24 * sc) / 2, (H - 26 * sc) / 2, 24 * sc, 26 * sc);
-    ctx.fillStyle = "rgba(11,10,18,.5)"; ctx.fillRect(0, 0, W, H);
-  } catch (e) {}
-}
-function bords(c){
-  const e = 70 * DPR, y0 = c.y * DPR, y1 = (c.y + c.h) * DPR, W = cv.width;
-  let g = ctx.createLinearGradient(0, y0, 0, y0 + e); g.addColorStop(0, "rgba(11,10,18,.55)"); g.addColorStop(1, "rgba(11,10,18,0)");
-  ctx.fillStyle = g; ctx.fillRect(0, y0, W, e);
-  g = ctx.createLinearGradient(0, y1 - e, 0, y1); g.addColorStop(0, "rgba(11,10,18,0)"); g.addColorStop(1, "rgba(11,10,18,.55)");
-  ctx.fillStyle = g; ctx.fillRect(0, y1 - e, W, e);
-}
-/* zone de la pluie : sur téléphone, seulement sur l'image */
-window.ntZone = () => (started && MODE === 'm') ? {y:cover().y, h:cover().h} : null;
-let started = false;
-const IDLE_ON = false;
-/* à l'arrêt, on se pose toujours sur une image réellement rendue (les images paires sont parfois des fondus) */
-const REEL = x => Math.max(0, Math.min(NF - 2, Math.round(x / 2) * 2));
-const DBG = {seek:0, bloc:0, err:'', fps:0};
-if (/[?&]debug=1/.test(location.search)){
-  const el = document.createElement('div');
-  el.style.cssText = 'position:fixed;z-index:99;right:8px;top:60px;font:12px/1.4 monospace;background:rgba(0,0,0,.75);color:#0f0;padding:8px 10px;pointer-events:none;white-space:pre';
-  document.addEventListener('DOMContentLoaded', () => document.body.appendChild(el));
-  let n = 0, t = performance.now();
-  const boucle = () => { n++; const now = performance.now(); if (now - t > 1000){ DBG.fps = n; n = 0; t = now; } requestAnimationFrame(boucle); };
-  requestAnimationFrame(boucle);
-  addEventListener('error', e => { DBG.err = e.message; });
-  setInterval(() => { el.textContent = 'mode ' + (typeof USE_VID !== 'undefined' && USE_VID ? 'video' : 'images') + ' ' + MODE + '\nfps ' + DBG.fps + '\nscrollY ' + Math.round(scrollY) + ' / ' + document.documentElement.scrollHeight + '\nimage ' + (window.NTF || 0) + '\ncur ' + (typeof cur !== 'undefined' ? cur.toFixed(1) : '') + '\nseek ' + DBG.seek + ' bloc ' + DBG.bloc + '\noverflow ' + (document.documentElement.style.overflow || '-') + '\nerr ' + DBG.err; }, 250);
-}
-
-/* ---------- Safari : la rue est lue comme une vidéo qu'on fait avancer image par image ----------
-   (le navigateur gère seul la mémoire et le décodage : plus de gel au bout de quelques défilements) */
-// ordinateur sous Safari (le téléphone, lui, défile bien avec les images)
-const H264 = document.createElement('video').canPlayType('video/mp4; codecs="avc1.640028"') !== '';
-const VTEST = /[?&]vid=webm/.test(location.search);   // essai sous Chromium (sans H.264)
-// tous les ordinateurs (Safari, Chrome, Edge, Firefox) : la vidéo est bien plus fluide et légère (80 Mo au lieu de 300) ;
-// le téléphone garde les images ; ?img=1 force les images, et en cas de souci la page y revient toute seule
-const USE_VID = VTEST || (H264 && !/[?&]img=1/.test(location.search) && (/[?&]vid=1/.test(location.search) || matchMedia("(hover: hover) and (pointer: fine)").matches));
-if (USE_VID){
-  // Safari sur Mac : version 1600 px, deux fois plus légère (41 Mo au lieu de 78) — sinon le Mac sature et la rue se fige
-  const SAFARI = /Apple/.test(navigator.vendor || '');
-  const VS = VTEST ? {d:'pk/rue_d.webm', m:'pk/rue_m.webm'} : {d:SAFARI ? 'pk/rue_s.mp4' : 'pk/rue_d.mp4', m:'pk/rue_m.mp4'}, VV = {};
-  const vget = () => {
-    if (VV[MODE]) return VV[MODE];
-    const v = VV[MODE] = {el:document.createElement('video'), prog:0, ready:false, want:0, at:-1, busy:false, tgt:0};
-    v.el.muted = true; v.el.playsInline = true; v.el.setAttribute('playsinline', ''); v.el.preload = 'auto';
-    Object.assign(v.el.style, {position:'absolute', left:0, top:0, visibility:'hidden', pointerEvents:'none', background:'#0b0a12'});
-    const stg = document.getElementById('stage'); stg.style.overflow = 'hidden'; stg.insertBefore(v.el, document.getElementById('idle')); cv.style.visibility = 'hidden';
-    // la vidéo ne passe pas : on revient au lecteur d'images
-    v.el.addEventListener('error', () => { if (!/img=1/.test(location.search)) location.replace(location.pathname + '?img=1'); });
-    v.el.addEventListener('seeked', () => { v.at = v.tgt; v.busy = false; peindre(v); viser(v); });
-    v.el.addEventListener('loadeddata', () => {
-      const fin = () => { v.ready = true; v.busy = false; v.at = -1; placer(v); viser(v); };
-      const p = v.el.play(); if (p && p.then) p.then(() => { v.el.pause(); fin(); }, fin); else fin();
-    });
-    (async () => {
-      try {
-        const r = await fetch(VS[MODE] + VER); const n = +r.headers.get('content-length') || 0;
-        let blob;
-        if (r.body && r.body.getReader && n){
-          const rd = r.body.getReader(), parts = []; let got = 0;
-          for (;;){ const {done, value} = await rd.read(); if (done) break; parts.push(value); got += value.length; v.prog = got / n; }
-          blob = new Blob(parts, {type:'video/mp4'}); parts.length = 0;   // les morceaux ne restent pas en double en mémoire
-        } else { blob = await r.blob(); }
-        v.prog = 1; v.el.src = URL.createObjectURL(blob); v.el.load();
-      } catch (e) { v.prog = 1; v.el.src = VS[MODE] + VER; v.el.load(); }
-    })();
-    return v;
-  };
-  /* Safari oublie parfois de signaler la fin d'un déplacement dans la vidéo : sans garde-fou, l'image resterait figée */
-  const viser = v => {
-    if (!v.ready) return;
-    if (v.busy){ if (performance.now() - v.tB > (SAFARI ? 900 : 300)){ v.busy = false; v.at = -1; DBG.bloc++; noterBloc(); if (secours) return; } else return; }
-    if (v.want === v.at){ placer(v); return; }
-    v.busy = true; v.tB = performance.now(); v.tgt = v.want; DBG.seek++;
-    try { v.el.currentTime = (v.want + 0.5) / 30; } catch (e) { v.busy = false; DBG.err = String(e); }
-  };
-  setInterval(() => { const v = VV[MODE]; if (v && started && !secours) viser(v); }, 120);
-  /* la vidéo est affichée telle quelle (pas de dessin dans le canvas) : c'est Safari qui l'affiche, sans effort */
-  const placer = v => {
-    const c = cover(), st_ = v.el.style;
-    st_.left = c.x + "px"; st_.top = c.y + "px"; st_.width = c.w + "px"; st_.height = c.h + "px";
-    for (const k in VV) VV[k].el.style.visibility = (VV[k] === v && v.ready) ? "visible" : "hidden";
-  };
-  const peindre = v => { if (v === VV[MODE]) placer(v); };
-  /* secours : si Safari bloque la vidéo plusieurs fois de suite, on repasse au lecteur d'images, sans recharger la page */
-  const ORIG = {loadAll, pump, updLoad, draw, pret: window.NTPRET};
-  let secours = false, blocs = [];
-  window.ntSecours = () => {
-    if (secours) return; secours = true;
-    for (const k in VV){ VV[k].el.pause(); VV[k].el.style.display = 'none'; }
-    cv.style.visibility = ''; loadAll = ORIG.loadAll; pump = ORIG.pump; updLoad = ORIG.updLoad; draw = ORIG.draw; window.NTPRET = ORIG.pret;
-    if (VV[MODE] && VV[MODE].ready && cb_dessin(VV[MODE])) {}
-    loadAll(); draw();
-  };
-  const cb_dessin = v => { try { const c = cover(); ctx.drawImage(v.el, 0, 0, v.el.videoWidth, v.el.videoHeight, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR); lastBm = null; return true; } catch (e) { return false; } };
-  // le lecteur d'images télécharge 300 Mo : sur Mac on ne s'y résout qu'en dernier recours (blocages vraiment répétés)
-  const noterBloc = () => { const t = performance.now(); blocs = blocs.filter(x => t - x < 8000); blocs.push(t); if (blocs.length >= (SAFARI ? 6 : 3)) window.ntSecours(); };
-  // libère la vidéo en mémoire quand on quitte la page (sinon Safari l'accumule d'une visite à l'autre)
-  addEventListener('pagehide', () => { for (const k in VV){ const u = VV[k].el.src; VV[k].el.removeAttribute('src'); VV[k].el.load(); if (u.startsWith('blob:')) URL.revokeObjectURL(u); } });
-  // Safari ressert parfois la page depuis sa mémoire (bouton retour, onglet rouvert) : la vidéo vient d'être libérée, on recharge proprement
-  addEventListener('pageshow', e => { if (e.persisted) location.reload(); });
-  loadAll = () => { if (!secours) vget(); };
-  pump = () => {};
-  updLoad = () => {};
-  window.NTPRET = () => { const v = vget(); return v.ready ? 1 : 0.97 * v.prog; };
-  draw = () => {
-    if (!started) return;
-    const v = vget(), f = Math.max(0, Math.min(NF - 1, net ? REEL(shown) : Math.round(shown)));
-    window.NTF = f + 1; v.want = f; viser(v);
-  };
-  loadEl.textContent = "";
-}
-
-/* ---------- pages d'affiche ---------- */
-const col = document.getElementById("col"), page = document.getElementById("page");
-function pageHTML(p){
-  const facts = p.facts.map(f => "<li>" + f + "</li>").join("");
-  const unTxt = t => '<div class="txt"><strong>' + t[0] + "</strong><p>" + t[1] + "</p></div>";
-  /* fiches projet (affiche 05) : photo, objectif, réalisé, résultat — entre le premier texte et les suivants */
-  const fiches = p.fiches ? '<div class="fiches">' + p.fiches.map(f => {
-    const tag = f.href ? 'a href="' + f.href + '"' + (/^https?:/.test(f.href) ? ' target="_blank" rel="noopener"' : '') : 'div';
-    return '<' + tag + ' class="fiche"><span class="fph"><img loading="lazy" alt="" src="' + f.img + '" style="object-position:' + f.pos + '"></span><span class="fco"><span class="fhd"><b>' + f.t + '</b><em>' + f.tag + '</em></span>' +
-      '<span class="frw"><i>Objectif</i><span>' + f.obj + '</span></span><span class="frw"><i>Réalisé</i><span>' + f.real + '</span></span><span class="frw"><i>Résultat</i><span>' + f.res + '</span></span>' +
-      (f.go ? '<span class="fgo">' + f.go + '</span>' : '') + '</span></' + (f.href ? 'a' : 'div') + '>';
-  }).join("") + '</div>' : "";
-  const todos = (p.txt.length ? unTxt(p.txt[0]) + fiches + p.txt.slice(1).map(unTxt).join("") : fiches) + (p.html || "");
-  const photos = p.ph.length ? '<div class="sec-title">Photos</div><div class="collage">' + p.ph.map(([u, c, k]) => '<figure class="pf ' + k + '"><img loading="lazy" alt="' + c + '" src="' + u + '">' + (c ? "<figcaption>" + c + "</figcaption>" : "") + "</figure>").join("") + "</div>" : "";
-  return '<div class="poster" style="background-image:url(img/a' + p.n + '_debut.webp)" role="img" aria-label="Affiche ' + p.n + '"></div>' +
-    '<div class="body" style="--c1:' + p.c1 + '"><div class="p-head"><span class="eyebrow">' + p.eyebrow + "</span><h2>" + p.title + '</h2></div>' + (facts ? '<ul class="facts">' + facts + "</ul>" : "") +
-    todos + photos + "</div>" +
-    '<div class="poster" style="background-image:url(img/a' + p.n + '_fin.webp)" role="img" aria-label="Fin du chapitre ' + p.n + '"></div>';
-}
-
-/* ---------- ligne de temps ---------- */
-let PXF = 30;                 // pixels de scroll par image Blender (recalculé selon l'écran)
-let segs = [], total = 0, colH = {}, geom = null;
-function rectPx(){ const c = cover(), RECT = RECTS[MODE]; return {x:c.x + RECT[0] * c.w, y:c.y + RECT[1] * c.h, w:(RECT[2] - RECT[0]) * c.w, h:(RECT[3] - RECT[1]) * c.h}; }
-function measure(){
-  const r = rectPx();
-  const w = Math.min(r.w, VW - 32), x = (r.w <= VW - 32) ? r.x : (VW - w) / 2;
-  const ph = w * 1189 / 1000;
-  geom = {x, y:r.y + (r.h - ph) / 2, w, ph};
-  P.forEach(p => {
-    col.innerHTML = pageHTML(p); col.style.width = w + "px";
-    colH[p.n] = col.offsetHeight;
-  });
-  col.innerHTML = "";
-}
-function build(){
-  segs = []; let a = 1, s = 0;
-  const add = (o, len) => { o.s = s; o.len = len; s += len; segs.push(o); };
-  P.forEach(p => {
-    add({t:"v", f0:a, f1:p.deb}, (p.deb - a) * PXF);
-    const fade = VH * 0.6, sc = Math.max(0, colH[p.n] - geom.ph);
-    add({t:"p", p, fade, scroll:sc}, fade * 2 + sc * SLOW);
-    a = p.fin;
-  });
-  add({t:"v", f0:a, f1:1204}, (1204 - a) * PXF);
-  add({t:"end"}, VH * 0.9);
-  total = s;
-  document.getElementById("track").style.height = (total + VH) + "px";
-  const nav = document.getElementById("chapters"); nav.innerHTML = "";
-  const NOMS = ["Synthèse", "Formation", "Expérience", "Esport", "Réalisations", "Recommandation"];
-  P.forEach(p => { const b = document.createElement("button"); b.type = "button"; b.innerHTML = "0" + p.n + "<span> · " + NOMS[p.n - 1] + "</span>"; b.setAttribute("aria-label", "Aller à l'affiche " + p.n);
-    b.onclick = () => { const sg = segs.find(x => x.p === p); window.scrollTo({top:sg.s + sg.fade * 0.999, behavior:"auto"}); }; nav.appendChild(b); });
-  const c = document.createElement("button"); c.type = "button"; c.textContent = "Contact"; c.onclick = () => window.scrollTo({top:total, behavior:"auto"}); nav.appendChild(c);
-}
-let shownPage = null;
-document.addEventListener("click", e => {
-  if (e.target.closest("[data-contact]")) { e.preventDefault(); window.scrollTo({top:total, behavior:"smooth"}); }
-});
-document.addEventListener("change", e => { if (e.target.matches("[data-visa]") && e.target.checked) setTimeout(() => window.scrollTo({top:total, behavior:"smooth"}), 600); });
-/* défilement des affiches : ralenti (SLOW) et lissé comme la vidéo */
-const SLOW = 4.5; let colT = 0, colY = null, lastPg = null, colAnim = false;
-function colTick(){ const d = colT - colY; if (Math.abs(d) < 0.3){ colY = colT; col.style.transform = "translateY(" + colY + "px)"; colAnim = false; return; } colY += d * 0.14; col.style.transform = "translateY(" + colY + "px)"; requestAnimationFrame(colTick); }
-function kickCol(){ if (!colAnim){ colAnim = true; requestAnimationFrame(colTick); } }
-function showPage(p){ if (shownPage === p) return; shownPage = p; if (!p){ col.innerHTML = ""; return; } col.innerHTML = pageHTML(p); if (window.stat) window.stat("rue/affiche-" + p.n, "Rue : affiche " + p.n); col.style.width = geom.w + "px"; col.style.left = geom.x + "px"; }
-function onScroll(){
-  if (!started) return;
-  const y = window.scrollY;
-  let sg = segs.find(o => y >= o.s && y < o.s + o.len) || segs[segs.length - 1];
-  const t = Math.max(0, Math.min(1, (y - sg.s) / sg.len));
-  let pageOp = 0, contactOp = 0;
-  if (sg.t === "v"){ cur = fi(sg.f0 + (sg.f1 - sg.f0) * t); showPage(null); }
-  else if (sg.t === "p"){
-    const p = sg.p, d = y - sg.s; showPage(p);
-    let off;
-    const sl = sg.scroll * SLOW;
-    if (d < sg.fade){ pageOp = d / sg.fade; off = 0; cur = fi(p.deb); }
-    else if (d < sg.fade + sl){ pageOp = 1; off = (d - sg.fade) / SLOW; cur = fi(p.deb); }
-    else { pageOp = 1 - (d - sg.fade - sl) / sg.fade; off = sg.scroll; cur = fi(p.fin); }
-    colT = geom.y - off; if (colY === null || shownPage !== lastPg){ colY = colT; lastPg = shownPage; } kickCol();
-    page.querySelector(".veil").style.opacity = Math.min(1, Math.min(d, sg.len - d) / sg.fade);
-  } else { cur = NF - 1; contactOp = Math.min(1, t * 2); showPage(null); if (window.stat) window.stat("rue/contact", "Rue : arrivé au ticket contact"); }
-  window.NTP = pageOp;
-  page.style.opacity = pageOp; page.style.pointerEvents = pageOp > 0.9 ? "auto" : "none";
-  const ct = document.getElementById("contact"); ct.style.opacity = contactOp; ct.style.pointerEvents = contactOp > 0.5 ? "auto" : "none";
-  document.getElementById("bar").style.width = (100 * y / total) + "%";
-  const idx = segs.indexOf(sg);
-  document.querySelectorAll("#chapters button").forEach((b, i) => {
-    const target = i < P.length ? segs.findIndex(x => x.p === P[i]) : segs.length - 1;
-    b.classList.toggle("on", target === idx);
-  });
-  kick(); idleUpd();
-}
-/* ---------- boucle d'attente : respiration + pluie, tant qu'on n'a pas scrollé ---------- */
-const idle = document.getElementById("idle"); let idleMode = null, idleReady = false;
-function idleSrc(){
-  if (!IDLE_ON) return;   // boucle de départ coupée : elle venait de l'ancienne version du rendu (la pluie animée suffit)
-  if (idleMode !== MODE){ idleMode = MODE; idleReady = false; idle.classList.remove("on"); idle.src = "img/idle_" + MODE + (idle.canPlayType('video/mp4; codecs="avc1.640020"') ? ".mp4" : ".webm") + VER; idle.load(); }
-  const c = cover(); Object.assign(idle.style, {left:c.x + "px", top:c.y + "px", width:c.w + "px", height:c.h + "px"});
-}
-idle.addEventListener("playing", () => { idleReady = true; idleUpd(); });
-function idleUpd(){
-  const atTop = started && !exp.hidden && window.scrollY < 8;
-  if (atTop){ if (idle.paused && idleMode) idle.play().catch(() => {}); }
-  idle.classList.toggle("on", atTop && idleReady);
-  if (!atTop && !idle.paused) setTimeout(() => { if (exp.hidden || window.scrollY >= 8) idle.pause(); }, 500);
-}
-function resize(){
-  DPR = Math.min(2, window.devicePixelRatio || 1, Math.max(1, 1920 / Math.max(1, window.innerWidth)));   // pas plus de pixels que l'image source (grands écrans : beaucoup moins de travail)
-  VW = window.innerWidth; VH = window.innerHeight;
-  MODE = VW / VH < 1 ? 'm' : 'd'; PXF = Math.max(20, VH * 0.045);
-  cv.width = VW * DPR; cv.height = VH * DPR; loadAll();
-  measure(); build(); shownPage = null; onScroll(); idleSrc(); idleUpd(); if (window.ntPluie) window.ntPluie();
-}
-function start(){
-  home.hidden = true; exp.hidden = false; started = true;
-  resize(); window.scrollTo(0, 0); shown = cur = 0; onScroll();
-}
-window.addEventListener("scroll", () => requestAnimationFrame(onScroll), {passive:true});
-window.addEventListener("resize", () => { if (started) resize(); });
-/* souris : si on tourne la molette dans le mauvais sens tout en haut de la rue, une petite bulle rappelle le bon sens */
-(() => {
-  let n = 0, tip = null, tm = 0;
-  addEventListener("wheel", e => {
-    if (!started || exp.hidden || e.deltaY >= 0 || window.scrollY > 4){ if (e.deltaY > 0) n = 0; return; }
-    if (++n < 3) return; n = 0;
-    if (!tip){
-      tip = document.createElement("div"); tip.innerHTML = "↓ Faites défiler <b>vers le bas</b> pour avancer";
-      Object.assign(tip.style, {position:"fixed", left:"50%", bottom:"14%", transform:"translateX(-50%)", zIndex:60, padding:"10px 16px", borderRadius:"999px",
-        background:"rgba(11,10,18,.85)", color:"#fff", font:"14px/1.2 var(--mono, monospace)", border:"1px solid rgba(255,255,255,.2)", transition:"opacity .4s", pointerEvents:"none", opacity:0});
-      document.body.appendChild(tip);
-    }
-    requestAnimationFrame(() => tip.style.opacity = 1); clearTimeout(tm); tm = setTimeout(() => tip.style.opacity = 0, 2600);
-  }, {passive:true});
-})();
-
-
-/* ---------- pluie animée par-dessus l'image : la rue reste vivante même quand on ne scrolle plus ---------- */
-(() => {
-  const pc = document.getElementById("pluie"), px = pc.getContext("2d");
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { pc.style.display = "none"; return; }
-  let W = 0, H = 0, R = 1, gouttes = [], last = 0;
-  function taille(){
-    const z = window.ntZone && window.ntZone();
-    R = Math.min(USE_VID ? 1 : 2, devicePixelRatio || 1); W = innerWidth; H = z ? Math.round(z.h) : innerHeight; pc.width = W * R; pc.height = H * R;
-    pc.style.top = (z ? z.y : 0) + "px"; pc.style.height = H + "px"; pc.style.bottom = "auto";
-    const n = Math.round(Math.min(320, W * H / 4200));
-    gouttes = Array.from({length:n}, () => neuve(true));
-  }
-  function neuve(partout){
-    const z = Math.random();                       // profondeur : les gouttes proches sont plus longues, rapides et visibles
-    return {x:Math.random() * (W + 260) - 260, y:partout ? Math.random() * H : -40 - Math.random() * 200,
-      l:10 + z * 26, v:900 + z * 1300, a:0.06 + z * 0.16, w:(0.6 + z * 0.8)};
-  }
-  const VENT = 0.16;                               // de haut-gauche vers bas-droite, comme dans le rendu
-  function anime(t){
-    requestAnimationFrame(anime);
-    const dt = Math.min(0.05, (t - last) / 1000 || 0); last = t;
-    if (exp.hidden || document.hidden) return;
-    const op = (1 - (window.NTP || 0)) * (idle.classList.contains("on") ? 0 : 1);
-    pc.style.opacity = op; if (op < 0.02) return;
-    px.setTransform(R, 0, 0, R, 0, 0); px.clearRect(0, 0, W, H); px.lineCap = "round";
-    for (const g of gouttes){
-      g.y += g.v * dt; g.x += g.v * VENT * dt;
-      if (g.y - g.l > H || g.x > W + 60) Object.assign(g, neuve(false));
-      px.strokeStyle = "rgba(205,220,255," + g.a + ")"; px.lineWidth = g.w;
-      px.beginPath(); px.moveTo(g.x, g.y); px.lineTo(g.x - g.l * VENT, g.y - g.l); px.stroke();
-    }
-  }
-  addEventListener("resize", taille); window.ntPluie = taille; taille(); requestAnimationFrame(anime);
-})();
-/* copier */
-document.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => {
-  const el = document.getElementById(b.dataset.copy), txt = el.textContent;
-  const done = () => { b.textContent = "Copié"; setTimeout(() => b.textContent = "Copier", 1600); };
-  try { navigator.clipboard.writeText(txt).then(done, () => sel(el)); } catch (e) { sel(el); }
-}));
-function sel(el){ const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
-/* préchargement des aperçus dès l'accueil */
-MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
-})();
-
 </script>
 
-<script src="son.js?v=11" defer></script>
-<script src="intro.js?v=5" defer></script>
 <script src="stats.js?v=2" defer></script>
 </body>
 </html>
