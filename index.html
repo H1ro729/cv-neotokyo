@@ -146,8 +146,8 @@ h1 span { color: var(--magenta); }
 </head>
 <body>
 <div class="fond" aria-hidden="true">
-  <video id="boucle" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="media/salon.jpg">
-    <source src="media/salon.mp4" type="video/mp4">
+  <video id="boucle" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="media/salon.jpg?v=2">
+    <source src="media/salon.mp4?v=2" type="video/mp4">
   </video>
 </div>
 
@@ -262,15 +262,15 @@ h1 span { color: var(--magenta); }
   // secours si le navigateur REFUSE la lecture automatique : la même boucle en images, dessinée à 24 i/s sur un canvas (fluide et nette)
   const secours = () => {
     if (!v.paused || anim) return;
-    const cv = document.createElement('canvas'); cv.width = 1280; cv.height = 720;
+    const cv = document.createElement('canvas'); cv.width = 1600; cv.height = 900;
     cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
     v.parentNode.insertBefore(cv, v.nextSibling); anim = cv;
     const ctx = cv.getContext('2d'), N = 96, imgs = new Array(N); let pretes = 0, t0 = 0;
-    for (let i = 0; i < N; i++){ const im = new Image(); im.decoding = 'async'; im.src = 'media/salon_seq/f_' + String(i + 1).padStart(2, '0') + '.webp';
-      im.onload = () => { imgs[i] = im; pretes++; if (i === 0) ctx.drawImage(im, 0, 0, 1280, 720); }; }
+    for (let i = 0; i < N; i++){ const im = new Image(); im.decoding = 'async'; im.src = 'media/salon_seq/f_' + String(i + 1).padStart(2, '0') + '.webp?v=2';
+      im.onload = () => { imgs[i] = im; pretes++; if (i === 0) ctx.drawImage(im, 0, 0, 1600, 900); }; }
     const boucle = (t) => {
       if (anim !== cv) return;
-      if (pretes === N){ if (!t0) t0 = t; const k = Math.floor((t - t0) / (1000 / 24)) % N; ctx.drawImage(imgs[k], 0, 0, 1280, 720); }
+      if (pretes === N){ if (!t0) t0 = t; const k = Math.floor((t - t0) / (1000 / 24)) % N; ctx.drawImage(imgs[k], 0, 0, 1600, 900); }
       requestAnimationFrame(boucle);
     };
     requestAnimationFrame(boucle);
