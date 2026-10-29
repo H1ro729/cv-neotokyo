@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610232200";
+(() => { const BUILD = "202610291400";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -590,7 +590,9 @@ const VTEST = /[?&]vid=webm/.test(location.search);   // essai sous Chromium (sa
 // le téléphone garde les images ; ?img=1 force les images, et en cas de souci la page y revient toute seule
 const USE_VID = VTEST || (H264 && !/[?&]img=1/.test(location.search) && (/[?&]vid=1/.test(location.search) || matchMedia("(hover: hover) and (pointer: fine)").matches));
 if (USE_VID){
-  const VS = VTEST ? {d:'pk/rue_d.webm', m:'pk/rue_m.webm'} : {d:'pk/rue_d.mp4', m:'pk/rue_m.mp4'}, VV = {};
+  // Safari sur Mac : version 1600 px, deux fois plus légère (41 Mo au lieu de 78) — sinon le Mac sature et la rue se fige
+  const SAFARI = /Apple/.test(navigator.vendor || '');
+  const VS = VTEST ? {d:'pk/rue_d.webm', m:'pk/rue_m.webm'} : {d:SAFARI ? 'pk/rue_s.mp4' : 'pk/rue_d.mp4', m:'pk/rue_m.mp4'}, VV = {};
   const vget = () => {
     if (VV[MODE]) return VV[MODE];
     const v = VV[MODE] = {el:document.createElement('video'), prog:0, ready:false, want:0, at:-1, busy:false, tgt:0};
@@ -611,7 +613,7 @@ if (USE_VID){
         if (r.body && r.body.getReader && n){
           const rd = r.body.getReader(), parts = []; let got = 0;
           for (;;){ const {done, value} = await rd.read(); if (done) break; parts.push(value); got += value.length; v.prog = got / n; }
-          blob = new Blob(parts, {type:'video/mp4'});
+          blob = new Blob(parts, {type:'video/mp4'}); parts.length = 0;   // les morceaux ne restent pas en double en mémoire
         } else { blob = await r.blob(); }
         v.prog = 1; v.el.src = URL.createObjectURL(blob); v.el.load();
       } catch (e) { v.prog = 1; v.el.src = VS[MODE] + VER; v.el.load(); }
@@ -621,7 +623,7 @@ if (USE_VID){
   /* Safari oublie parfois de signaler la fin d'un déplacement dans la vidéo : sans garde-fou, l'image resterait figée */
   const viser = v => {
     if (!v.ready) return;
-    if (v.busy){ if (performance.now() - v.tB > 300){ v.busy = false; v.at = -1; DBG.bloc++; noterBloc(); if (secours) return; } else return; }
+    if (v.busy){ if (performance.now() - v.tB > (SAFARI ? 900 : 300)){ v.busy = false; v.at = -1; DBG.bloc++; noterBloc(); if (secours) return; } else return; }
     if (v.want === v.at){ placer(v); return; }
     v.busy = true; v.tB = performance.now(); v.tgt = v.want; DBG.seek++;
     try { v.el.currentTime = (v.want + 0.5) / 30; } catch (e) { v.busy = false; DBG.err = String(e); }
@@ -645,9 +647,12 @@ if (USE_VID){
     loadAll(); draw();
   };
   const cb_dessin = v => { try { const c = cover(); ctx.drawImage(v.el, 0, 0, v.el.videoWidth, v.el.videoHeight, c.x * DPR, c.y * DPR, c.w * DPR, c.h * DPR); lastBm = null; return true; } catch (e) { return false; } };
-  const noterBloc = () => { const t = performance.now(); blocs = blocs.filter(x => t - x < 8000); blocs.push(t); if (blocs.length >= 3) window.ntSecours(); };
+  // le lecteur d'images télécharge 300 Mo : sur Mac on ne s'y résout qu'en dernier recours (blocages vraiment répétés)
+  const noterBloc = () => { const t = performance.now(); blocs = blocs.filter(x => t - x < 8000); blocs.push(t); if (blocs.length >= (SAFARI ? 6 : 3)) window.ntSecours(); };
   // libère la vidéo en mémoire quand on quitte la page (sinon Safari l'accumule d'une visite à l'autre)
   addEventListener('pagehide', () => { for (const k in VV){ const u = VV[k].el.src; VV[k].el.removeAttribute('src'); VV[k].el.load(); if (u.startsWith('blob:')) URL.revokeObjectURL(u); } });
+  // Safari ressert parfois la page depuis sa mémoire (bouton retour, onglet rouvert) : la vidéo vient d'être libérée, on recharge proprement
+  addEventListener('pageshow', e => { if (e.persisted) location.reload(); });
   loadAll = () => { if (!secours) vget(); };
   pump = () => {};
   updLoad = () => {};
