@@ -390,8 +390,8 @@ const home = document.getElementById("home"), exp = document.getElementById("exp
 })();
 ["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { if (window.stat) window.stat("rue/entree", "Entrée dans le CV immersif"); start(); if (window.lancerIntro) window.lancerIntro(); }));
 /* depuis le menu de l'accueil (tuile « CV immersif ») : on entre directement dans la rue */
-if (location.hash === "#jouer") addEventListener("load", () => document.getElementById("go-immersif").click());
-document.getElementById("back").addEventListener("click", () => { window.NTF = null; window.NTP = 0; exp.hidden = true; home.hidden = false; window.scrollTo(0, 0); idleUpd(); });
+addEventListener("load", () => document.getElementById("go-immersif").click());   // l'ancien accueil n'existe plus : on entre toujours directement dans la rue
+document.getElementById("back").addEventListener("click", () => { location.href = "./"; });   // retour au menu de l'accueil (nouvelle version)
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl3', h:'dh3'}, m:{l:'ml3', h:'mh3'}};

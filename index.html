@@ -129,7 +129,8 @@ h1 span { color: var(--magenta); }
 /* écran titre : une simple case grise translucide, rien d'autre */
 .panneau.seul { width: min(360px, 100%); padding: 0; gap: 0; clip-path: none; background: rgba(225, 228, 235, 0.06); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
 .panneau.seul .entete { display: none; }
-.panneau.seul .titre .appuie { border: 0; padding: 22px 26px; justify-content: center; text-align: center; font-size: 16px; letter-spacing: .32em; }
+.panneau.seul .titre .appuie { border: 0; padding: 0; font-size: 17px; letter-spacing: .34em; text-shadow: 0 1px 12px rgba(0, 0, 0, .65); }
+.appuie:focus, .appuie:focus-visible { outline: none; }
 </style>
 
 </head>
@@ -155,11 +156,19 @@ h1 span { color: var(--magenta); }
     <div class="vue" id="v-menu" hidden>
       <ul class="menu" id="menu">
         <li><a class="tuile" href="rue.html#jouer"><b>CV immersif</b><small>Une rue de Neo-Tokyo, mon parcours affiché sur le panneau</small><i>Vidéo</i></a></li>
-        <li><a class="tuile" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener"><b>CV 1 page</b><small>L'essentiel : formation, expériences, compétences</small><i>PDF</i></a></li>
-        <li><a class="tuile" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener"><b>Dossier complet</b><small>7 pages : esport, gendarmerie, projets, événements</small><i>PDF</i></a></li>
+        <li><button class="tuile" type="button" data-doc="cv"><b>CV 1 page</b><small>L'essentiel : formation, expériences, compétences</small><i>PDF</i></button></li>
+        <li><button class="tuile" type="button" data-doc="dossier"><b>Dossier complet</b><small>7 pages : esport, gendarmerie, projets, événements</small><i>PDF</i></button></li>
         <li><button class="tuile" type="button" id="ouvrir-contact"><b>Contact</b><small>Stage, alternance, CDD ou job étudiant</small><i>Ouvrir</i></button></li>
       </ul>
       <div class="pied" aria-hidden="true"><span><kbd>↑ ↓</kbd> choisir</span><span><kbd>Entrée</kbd> ouvrir</span><span><kbd>Échap</kbd> retour</span></div>
+    </div>
+
+    <div class="vue" id="v-doc" hidden>
+      <ul class="menu" id="menu-doc">
+        <li><a class="tuile" id="doc-ouvrir" href="#" target="_blank" rel="noopener"><b>Ouvrir</b><small id="doc-nom">CV 1 page</small><i>PDF</i></a></li>
+        <li><a class="tuile" id="doc-telecharger" href="#" download><b>Télécharger</b><small id="doc-fichier">CV_Guillaume_Belle-Croix_1page.pdf</small><i>PDF</i></a></li>
+      </ul>
+      <button class="retour" type="button" id="retour-doc">← Retour au menu</button>
     </div>
 
     <div class="vue" id="v-contact" hidden>
@@ -176,7 +185,19 @@ h1 span { color: var(--magenta); }
 
 <script>
 (() => {
-  const vues = { titre: document.getElementById('v-titre'), menu: document.getElementById('v-menu'), contact: document.getElementById('v-contact') };
+  const vues = { titre: document.getElementById('v-titre'), menu: document.getElementById('v-menu'), contact: document.getElementById('v-contact'), doc: document.getElementById('v-doc') };
+  const DOCS = {
+    cv: { nom: 'CV 1 page', url: 'cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4', fichier: 'CV_Guillaume_Belle-Croix_1page.pdf', i: 1 },
+    dossier: { nom: 'Dossier complet · 7 pages', url: 'cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2', fichier: 'CV_Guillaume_Belle-Croix_dossier.pdf', i: 2 },
+  };
+  document.querySelectorAll('[data-doc]').forEach((b) => b.addEventListener('click', () => {
+    const d = DOCS[b.dataset.doc];
+    document.getElementById('doc-ouvrir').href = d.url; document.getElementById('doc-telecharger').href = d.url;
+    document.getElementById('doc-telecharger').setAttribute('download', d.fichier);
+    document.getElementById('doc-nom').textContent = d.nom; document.getElementById('doc-fichier').textContent = d.fichier;
+    index = d.i; montrer('doc');
+  }));
+  document.getElementById('retour-doc').addEventListener('click', () => montrer('menu'));
   let courante = 'titre';
   const tuiles = () => Array.from(document.querySelectorAll('#menu .tuile'));
   let index = 0;
@@ -187,6 +208,7 @@ h1 span { color: var(--magenta); }
     courante = nom;
     if (nom === 'menu') choisir(index);
     if (nom === 'contact') document.querySelector('#v-contact .copier').focus();
+    if (nom === 'doc') document.getElementById('doc-ouvrir').focus();
     if (nom === 'titre') document.getElementById('demarrer').focus();
   }
   function choisir(i) {
@@ -203,7 +225,7 @@ h1 span { color: var(--magenta); }
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (courante === 'titre') { e.preventDefault(); montrer('menu'); return; }
-    if (e.key === 'Escape') { e.preventDefault(); montrer(courante === 'contact' ? 'menu' : 'titre'); return; }
+    if (e.key === 'Escape') { e.preventDefault(); montrer(courante === 'contact' || courante === 'doc' ? 'menu' : 'titre'); return; }
     if (courante === 'menu') {
       if (e.key === 'ArrowDown') { e.preventDefault(); choisir(index + 1); }
       if (e.key === 'ArrowUp') { e.preventDefault(); choisir(index - 1); }
