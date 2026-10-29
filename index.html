@@ -12,7 +12,10 @@
 <meta property="og:title" content="Guillaume Belle-Croix · CV interactif">
 <meta property="og:description" content="Esport, digital, événementiel : un CV à parcourir comme un jeu vidéo. Stage, alternance, CDD.">
 <meta property="og:url" content="https://guillaume-bellecroix.fr/">
-<meta property="og:image" content="https://guillaume-bellecroix.fr/img/og.jpg">
+<meta property="og:image" content="https://guillaume-bellecroix.fr/img/og.jpg?v=3">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://guillaume-bellecroix.fr/img/og.jpg?v=3">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#07080c">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -115,7 +118,15 @@ h1 span { color: var(--magenta); }
 }
 /* style unique : cases grises très translucides, contour fin, texte blanc — le titre, les tuiles et le contact */
 .panneau { background: none !important; border: 0 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; clip-path: none !important; padding: 0 !important; width: min(380px, 100%) !important; }
-.panneau .entete { display: none; }
+/* identité discrète au-dessus de la case et des tuiles (avis du panel : qui tu es, sans clic) */
+.panneau { gap: 26px !important; }
+.panneau .entete, .panneau.seul .entete { display: flex; gap: 6px; text-shadow: 0 1px 10px rgba(0, 0, 0, .75); }
+.panneau h1 { font-size: 22px; font-weight: 600; letter-spacing: .08em; line-height: 1.15; }
+.panneau .role { font-size: 11px; letter-spacing: .16em; color: rgba(240, 242, 246, .85); }
+.panneau .accroche { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: rgba(240, 242, 246, .72); max-width: 34em; }
+/* lisibilité des petits textes sur la vidéo */
+.tuile b, .tuile small, .tuile i, .pied, .ligne span, .ligne label, .retour { text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
+.tuile small { color: rgba(240, 242, 246, .85) !important; }
 .tuile, .ligne { background: rgba(225, 228, 235, 0.06); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); padding: 16px 20px; }
 .tuile b { font-size: 15px; letter-spacing: .22em; font-weight: 600; }
 .tuile small { font-size: 13px; color: rgba(240, 242, 246, .72); }
@@ -128,7 +139,6 @@ h1 span { color: var(--magenta); }
 @media (hover: none) { .pied { display: none; } }
 /* écran titre : une simple case grise translucide, rien d'autre */
 .panneau.seul { width: min(360px, 100%); padding: 0; gap: 0; clip-path: none; background: rgba(225, 228, 235, 0.06); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
-.panneau.seul .entete { display: none; }
 .panneau.seul .titre .appuie { border: 0; padding: 0; font-size: 17px; letter-spacing: .34em; text-shadow: 0 1px 12px rgba(0, 0, 0, .65); }
 .appuie:focus, .appuie:focus-visible { outline: none; }
 </style>
@@ -144,9 +154,9 @@ h1 span { color: var(--magenta); }
 <main class="scene">
   <section class="panneau" aria-live="polite">
     <header class="entete">
-      <div class="badge">CV interactif · v1</div>
-      <h1>Guillaume<br><span>Belle-Croix</span></h1>
-      <div class="role">Esport · Événementiel · Digital</div>
+      <h1>Guillaume Belle-Croix</h1>
+      <div class="role">Alternance · Esport · Événementiel · Bordeaux</div>
+      <p class="accroche">Vainqueur du tournoi communautaire Valorant EWC Champions · 2 ans Gendarme Adjoint Volontaire · INSEEC Marketing &amp; communication digitale</p>
     </header>
 
     <div class="vue titre" id="v-titre">
