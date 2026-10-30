@@ -146,8 +146,8 @@ h1 span { color: var(--magenta); }
 </head>
 <body>
 <div class="fond" aria-hidden="true">
-  <video id="boucle" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="media/salon.jpg?v=2">
-    <source src="media/salon.mp4?v=2" type="video/mp4">
+  <video id="boucle" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="media/salon.jpg?v=3">
+    <source src="media/salon.mp4?v=3" type="video/mp4">
   </video>
 </div>
 
@@ -168,7 +168,7 @@ h1 span { color: var(--magenta); }
         <li><a class="tuile" href="rue.html#jouer"><b>CV immersif</b><small>Une rue de Neo-Tokyo, mon parcours affiché sur le panneau</small><i>Vidéo</i></a></li>
         <li><button class="tuile" type="button" data-doc="cv"><b>CV 1 page</b><small>L'essentiel : formation, expériences, compétences</small><i>PDF</i></button></li>
         <li><button class="tuile" type="button" data-doc="dossier"><b>Dossier complet</b><small>7 pages : esport, gendarmerie, projets, événements</small><i>PDF</i></button></li>
-        <li><a class="tuile" href="projets/"><b>Mes projets</b><small>Clutch Esport · INSEEC Airlines</small><i>Voir</i></a></li>
+        <li><button class="tuile" type="button" id="ouvrir-projets"><b>Mes projets</b><small>Clutch Esport · INSEEC Airlines · CV immersif</small><i>Voir</i></button></li>
         <li><button class="tuile" type="button" id="ouvrir-contact"><b>Contact</b><small>Stage, alternance, CDD ou job étudiant</small><i>Ouvrir</i></button></li>
       </ul>
       <div class="pied" aria-hidden="true"><span><kbd>↑ ↓</kbd> choisir</span><span><kbd>Entrée</kbd> ouvrir</span><span><kbd>Échap</kbd> retour</span></div>
@@ -180,6 +180,15 @@ h1 span { color: var(--magenta); }
         <li><a class="tuile" id="doc-telecharger" href="#" download><b>Télécharger</b><small id="doc-fichier">CV_Guillaume_Belle-Croix_1page.pdf</small><i>PDF</i></a></li>
       </ul>
       <button class="retour" type="button" id="retour-doc">← Retour au menu</button>
+    </div>
+
+    <div class="vue" id="v-projets" hidden>
+      <ul class="menu" id="menu-projets">
+        <li><a class="tuile" href="https://www.clutch-esport.com" target="_blank" rel="noopener"><b>Clutch Esport</b><small>Site de pronostics esport gratuits sur 7 jeux, conçu et mis en ligne seul</small><i>Site ↗</i></a></li>
+        <li><a class="tuile" href="projets/airlines/"><b>INSEEC Airlines</b><small>Concept de soirée étudiante et son film 3D au scroll (Blender)</small><i>Film</i></a></li>
+        <li><a class="tuile" href="rue.html#jouer"><b>CV immersif</b><small>Ce site : une rue de Neo-Tokyo et un appartement modélisés sur Blender</small><i>Vidéo</i></a></li>
+      </ul>
+      <button class="retour" type="button" id="retour-projets">← Retour au menu</button>
     </div>
 
     <div class="vue" id="v-contact" hidden>
@@ -196,7 +205,7 @@ h1 span { color: var(--magenta); }
 
 <script>
 (() => {
-  const vues = { titre: document.getElementById('v-titre'), menu: document.getElementById('v-menu'), contact: document.getElementById('v-contact'), doc: document.getElementById('v-doc') };
+  const vues = { titre: document.getElementById('v-titre'), menu: document.getElementById('v-menu'), contact: document.getElementById('v-contact'), projets: document.getElementById('v-projets'), doc: document.getElementById('v-doc') };
   const DOCS = {
     cv: { nom: 'CV 1 page', url: 'cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4', fichier: 'CV_Guillaume_Belle-Croix_1page.pdf', i: 1 },
     dossier: { nom: 'Dossier complet · 7 pages', url: 'cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2', fichier: 'CV_Guillaume_Belle-Croix_dossier.pdf', i: 2 },
@@ -231,6 +240,7 @@ h1 span { color: var(--magenta); }
     if (nom === 'menu') choisir(index);
     if (nom === 'contact') document.querySelector('#v-contact .copier').focus();
     if (nom === 'doc') document.getElementById('doc-ouvrir').focus();
+    if (nom === 'projets') document.querySelector('#menu-projets .tuile').focus();
     if (nom === 'titre') document.getElementById('demarrer').focus();
   }
   function choisir(i) {
@@ -242,6 +252,8 @@ h1 span { color: var(--magenta); }
   document.getElementById('demarrer').addEventListener('click', () => aller('menu'));
   document.getElementById('ouvrir-contact').addEventListener('click', () => aller('contact'));
   document.getElementById('retour-contact').addEventListener('click', () => { index = 4; revenir(); });
+  document.getElementById('ouvrir-projets').addEventListener('click', () => aller('projets'));
+  document.getElementById('retour-projets').addEventListener('click', () => { index = 3; revenir(); });
   tuiles().forEach((el, k) => el.addEventListener('mouseenter', () => { index = k; tuiles().forEach((x, j) => x.classList.toggle('actif', j === k)); }));
 
   document.addEventListener('keydown', (e) => {
@@ -278,7 +290,7 @@ h1 span { color: var(--magenta); }
     cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
     v.parentNode.insertBefore(cv, v.nextSibling); anim = cv;
     const ctx = cv.getContext('2d'), N = 96, imgs = new Array(N); let pretes = 0, t0 = 0;
-    for (let i = 0; i < N; i++){ const im = new Image(); im.decoding = 'async'; im.src = 'media/salon_seq/f_' + String(i + 1).padStart(2, '0') + '.webp?v=2';
+    for (let i = 0; i < N; i++){ const im = new Image(); im.decoding = 'async'; im.src = 'media/salon_seq/f_' + String(i + 1).padStart(2, '0') + '.webp?v=3';
       im.onload = () => { imgs[i] = im; pretes++; if (i === 0) ctx.drawImage(im, 0, 0, 1600, 900); }; }
     const boucle = (t) => {
       if (anim !== cv) return;
@@ -297,11 +309,11 @@ h1 span { color: var(--magenta); }
   v.addEventListener('playing', () => { if (anim) { anim.remove(); anim = null; } });
   ['pointerdown', 'touchstart', 'keydown', 'click'].forEach((ev) => document.addEventListener(ev, lancer, { passive: true }));
   document.addEventListener('visibilitychange', () => { if (!document.hidden) lancer(); });
-  // au chargement : l'accueil, puis l'écran demandé par l'adresse (#menu, #contact, #cv, #dossier) s'il y en a un
+  // au chargement : l'accueil, puis l'écran demandé par l'adresse (#menu, #contact, #projets, #cv, #dossier) s'il y en a un
   const h = (location.hash || '').slice(1);
   history.replaceState({ v: 'titre' }, '', location.pathname);
   montrer('titre');
-  if (h === 'menu' || h === 'contact') aller(h); else if (h === 'cv' || h === 'dossier') { history.pushState({ v: 'menu' }, '', '#menu'); aller('doc', h); }
+  if (h === 'menu' || h === 'contact' || h === 'projets') { if (h !== 'menu') history.pushState({ v: 'menu' }, '', '#menu'); aller(h); } else if (h === 'cv' || h === 'dossier') { history.pushState({ v: 'menu' }, '', '#menu'); aller('doc', h); }
 })();
 </script>
 
