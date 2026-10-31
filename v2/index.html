@@ -185,7 +185,7 @@ body.gros .accroche { display: none; }
 
 <script>
 (() => {
-  const M = '../media/v2/';
+  const M = '../media/v2/', VER = '?v=60';
   /* les objets de la pièce : position dans l'image du salon (en % de la vidéo 1920×1080), vidéos et écran associé */
   const OBJETS = {
     pc:           { x: 4.6,  y: 58.5, cote: 'droite', titre: 'CV immersif',     sous: "Entre dans l'écran",            vue: 'pc' },
@@ -239,9 +239,10 @@ body.gros .accroche { display: none; }
   /* ---------- vidéos ---------- */
   const prets = new Set();
   function prechauffer(k) {             // charge à l'avance le travelling et le gros plan quand on survole la bulle
-    for (const f of [k + '_aller.mp4', k + '_boucle.mp4']) if (!prets.has(f)) { prets.add(f); fetch(M + f).catch(() => {}); }
+    for (const f of [k + '_aller.mp4', k + '_boucle.mp4']) if (!prets.has(f)) { prets.add(f); fetch(M + f + VER).catch(() => {}); }
   }
   function charger(v, src, poster) {
+    src += VER; if (poster) poster += VER;
     return new Promise((ok) => {
       if (v.dataset.src === src && v.readyState >= 2) return ok();
       v.dataset.src = src; if (poster) v.poster = poster; v.src = src; v.load();
