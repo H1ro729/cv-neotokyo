@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guillaume Belle-Croix · CV interactif</title>
+<meta name="description" content="Guillaume Belle-Croix : esport, événementiel, digital. CV immersif dans une rue de Neo-Tokyo, CV 1 page, dossier et contact. Stage, alternance, CDD.">
+<link rel="canonical" href="https://guillaume-bellecroix.fr/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Guillaume Belle-Croix">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Guillaume Belle-Croix · CV interactif">
+<meta property="og:description" content="Esport, digital, événementiel : un CV à parcourir comme un jeu vidéo. Stage, alternance, CDD.">
+<meta property="og:url" content="https://guillaume-bellecroix.fr/">
+<meta property="og:image" content="https://guillaume-bellecroix.fr/img/og.jpg?v=3">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://guillaume-bellecroix.fr/img/og.jpg?v=3">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#07080c">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Mise en page : la boucle du salon en plein écran, un panneau de verre fumé à gauche façon menu de jeu (écran titre → menu de tuiles) */
+:root {
+  --nuit: #07080c;          /* fond derrière la vidéo */
+  --verre: rgba(22, 24, 32, 0.46);
+  --verre-fort: rgba(30, 33, 44, 0.62);
+  --trait: rgba(222, 226, 240, 0.16);
+  --texte: #eef0f6;
+  --doux: rgba(226, 230, 242, 0.68);
+  --magenta: #f2f3f5;       /* accent neutre : blanc cassé */
+  --cyan: rgba(230, 232, 238, 0.6);
+  --f-titre: "Chakra Petch", "Rajdhani", "Segoe UI", system-ui, sans-serif;
+  --f-texte: "Barlow", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: var(--nuit); color: var(--texte); font-family: var(--f-texte); font-size: 16px;
+  overflow: hidden; -webkit-font-smoothing: antialiased;
+}
+.fond { position: fixed; inset: 0; z-index: 0; }
+.fond video, .fond img { width: 100%; height: 100%; object-fit: cover; display: block; max-width: none; }
+.fond::after {            /* assombrit très légèrement la gauche */
+  content: ""; position: absolute; inset: 0; opacity: .55;
+  background: linear-gradient(90deg, rgba(5,6,10,.72) 0%, rgba(5,6,10,.35) 38%, rgba(5,6,10,0) 62%),
+              linear-gradient(0deg, rgba(5,6,10,.55) 0%, rgba(5,6,10,0) 22%);
+}
+.scene {
+  position: relative; z-index: 1; height: 100%; display: flex; flex-direction: column; justify-content: center;
+  padding-block: clamp(20px, 5vh, 56px);
+  padding-left: max(16px, env(safe-area-inset-left, 0px), 5vw);
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.panneau {
+  width: min(440px, 100%); background: var(--verre); border: 1px solid var(--trait);
+  backdrop-filter: blur(16px) saturate(1.15); -webkit-backdrop-filter: blur(16px) saturate(1.15);
+  padding: 28px 28px 24px; display: flex; flex-direction: column; gap: 22px;
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+.entete { display: flex; flex-direction: column; gap: 6px; }
+.badge { font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+h1 { font-family: var(--f-titre); font-weight: 700; font-size: clamp(30px, 4.2vw, 44px); line-height: .98; letter-spacing: .01em; margin: 0; text-wrap: balance; }
+h1 span { color: var(--magenta); }
+.role { font-family: var(--f-titre); font-weight: 500; font-size: 14px; letter-spacing: .2em; text-transform: uppercase; color: var(--doux); }
+
+/* écran titre */
+.titre .appuie {
+  border-top: 1px solid var(--trait); padding-top: 18px; display: flex; align-items: center; gap: 12px;
+  font-family: var(--f-titre); font-weight: 600; font-size: 15px; letter-spacing: .22em; text-transform: uppercase;
+  animation: souffle 2.4s ease-in-out infinite; background: none; border-left: 0; border-right: 0; border-bottom: 0;
+  color: var(--texte); cursor: pointer; text-align: left; width: 100%;
+}
+.touche { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0; border: 1px solid var(--trait); padding: 3px 7px; color: var(--cyan); }
+@keyframes souffle { 0%,100% { opacity: 1 } 50% { opacity: .45 } }
+
+/* menu */
+.menu { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.tuile {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 14px;
+  padding: 14px 16px; background: var(--verre-fort); border: 1px solid var(--trait); color: var(--texte);
+  text-decoration: none; cursor: pointer; font: inherit; text-align: left; width: 100%;
+  transition: background .18s, border-color .18s, transform .18s;
+}
+.tuile b { font-family: var(--f-titre); font-weight: 600; font-size: 18px; letter-spacing: .06em; text-transform: uppercase; }
+.tuile small { grid-column: 1; font-size: 14px; color: var(--doux); min-width: 0; }
+.tuile i { grid-row: 1 / span 2; grid-column: 2; font-style: normal; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; color: var(--doux); text-transform: uppercase; }
+.tuile:hover, .tuile:focus-visible, .tuile.actif {
+  background: rgba(255, 255, 255, .12); border-color: var(--magenta); outline: none; transform: translateX(4px);
+}
+.tuile.actif i, .tuile:hover i { color: var(--magenta); }
+.pied { display: flex; flex-wrap: wrap; gap: 6px 16px; font-family: var(--f-mono); font-size: 11px; color: var(--doux); border-top: 1px solid var(--trait); padding-top: 14px; }
+.pied kbd { font-family: inherit; color: var(--texte); }
+
+/* contact */
+.contact { display: flex; flex-direction: column; gap: 10px; }
+.ligne { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; padding: 12px 14px; background: var(--verre-fort); border: 1px solid var(--trait); }
+.ligne span { font-family: var(--f-mono); font-size: 15px; user-select: all; min-width: 0; overflow-wrap: anywhere; }
+.ligne label { grid-column: 1 / -1; font-family: var(--f-titre); font-size: 11px; letter-spacing: .2em; text-transform: uppercase; color: var(--cyan); }
+.copier { text-decoration: none; font-family: var(--f-mono); font-size: 11px; background: none; color: var(--texte); border: 1px solid var(--trait); padding: 6px 10px; cursor: pointer; text-transform: uppercase; letter-spacing: .08em; }
+.copier:hover, .copier:focus-visible { border-color: var(--magenta); outline: none; }
+.retour { align-self: flex-start; font-family: var(--f-titre); font-size: 13px; letter-spacing: .18em; text-transform: uppercase; background: none; border: 0; color: var(--doux); cursor: pointer; padding: 4px 0; }
+.retour:hover, .retour:focus-visible { color: var(--magenta); outline: none; }
+
+.vue { display: flex; flex-direction: column; gap: 22px; animation: entre .35s ease-out both; }
+@keyframes entre { from { opacity: 0; transform: translateX(-10px) } to { opacity: 1; transform: none } }
+@media (prefers-reduced-motion: reduce) { .titre .appuie, .vue { animation: none; } .tuile { transition: none; } }
+@media (max-width: 520px) {
+  .scene { justify-content: flex-end; }
+  .panneau { padding: 22px 18px 18px; }
+  .fond::after { background: linear-gradient(0deg, rgba(5,6,10,.85) 0%, rgba(5,6,10,.35) 55%, rgba(5,6,10,0) 80%); }
+}
+/* style unique : cases grises très translucides, contour fin, texte blanc — le titre, les tuiles et le contact */
+.panneau { background: none !important; border: 0 !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; clip-path: none !important; padding: 0 !important; width: min(380px, 100%) !important; }
+/* identité discrète au-dessus de la case et des tuiles (avis du panel : qui tu es, sans clic) */
+.panneau { gap: 26px !important; }
+.panneau .entete, .panneau.seul .entete { display: flex; gap: 6px; text-shadow: 0 1px 10px rgba(0, 0, 0, .75); }
+.panneau h1 { font-size: 22px; font-weight: 600; letter-spacing: .08em; line-height: 1.15; }
+.panneau .role { font-size: 11px; letter-spacing: .16em; color: rgba(240, 242, 246, .85); }
+.panneau .accroche { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: rgba(240, 242, 246, .72); max-width: 34em; }
+/* lisibilité des petits textes sur la vidéo */
+.tuile b, .tuile small, .tuile i, .pied, .ligne span, .ligne label, .retour { text-shadow: 0 1px 8px rgba(0, 0, 0, .8); }
+.tuile small { color: rgba(240, 242, 246, .85) !important; }
+.tuile, .ligne { background: rgba(225, 228, 235, 0.025); border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); padding: 16px 20px; }
+.tuile b { font-size: 15px; letter-spacing: .22em; font-weight: 600; }
+.tuile small { font-size: 13px; color: rgba(240, 242, 246, .72); }
+.tuile i { color: rgba(240, 242, 246, .55); }
+.tuile:hover, .tuile:focus-visible, .tuile.actif { background: rgba(225, 228, 235, 0.08); border-color: rgba(255, 255, 255, 0.5); transform: translateX(4px); }
+.tuile.actif i, .tuile:hover i { color: #fff; }
+.pied { border-top: 0; padding-top: 4px; color: rgba(240, 242, 246, .55); }
+.copier { border-color: rgba(255, 255, 255, 0.3); }
+.copier:hover, .copier:focus-visible, .retour:hover, .retour:focus-visible { border-color: #fff; color: #fff; }
+@media (hover: none) { .pied { display: none; } }
+/* écran titre : une simple case grise translucide, rien d'autre */
+.panneau.seul { width: min(360px, 100%); padding: 0; gap: 0; clip-path: none; background: rgba(225, 228, 235, 0.06); border: 1px solid rgba(255, 255, 255, 0.22); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+.panneau.seul .titre .appuie { border: 0; padding: 0; font-size: 17px; letter-spacing: .34em; text-shadow: 0 1px 12px rgba(0, 0, 0, .65); }
+.appuie:focus, .appuie:focus-visible { outline: none; }
+</style>
+
+</head>
+<body>
+<div class="fond" aria-hidden="true">
+  <video id="boucle" autoplay muted loop playsinline webkit-playsinline preload="auto" poster="../media/salon.jpg?v=3">
+    <source src="../media/salon.mp4?v=3" type="video/mp4">
+  </video>
+</div>
+
+<main class="scene">
+  <section class="panneau" aria-live="polite">
+    <header class="entete">
+      <h1>Guillaume Belle-Croix</h1>
+      <div class="role">Alternance · Esport · Événementiel · Bordeaux</div>
+      <p class="accroche">Vainqueur du tournoi communautaire Valorant EWC Champions · 2 ans Gendarme Adjoint Volontaire · INSEEC Marketing &amp; communication digitale</p>
+    </header>
+
+    <div class="vue titre" id="v-titre">
+      <button class="appuie" id="demarrer" type="button">Press any button</button>
+    </div>
+
+    <div class="vue" id="v-menu" hidden>
+      <ul class="menu" id="menu">
+        <li><a class="tuile" href="../rue.html#jouer"><b>CV immersif</b><small>Une rue de Neo-Tokyo, mon parcours affiché sur le panneau</small><i>Vidéo</i></a></li>
+        <li><button class="tuile" type="button" data-doc="cv"><b>CV 1 page</b><small>L'essentiel : formation, expériences, compétences</small><i>PDF</i></button></li>
+        <li><button class="tuile" type="button" data-doc="dossier"><b>Dossier complet</b><small>7 pages : esport, gendarmerie, projets, événements</small><i>PDF</i></button></li>
+        <li><button class="tuile" type="button" id="ouvrir-projets"><b>Mes projets</b><small>Clutch Esport · INSEEC Airlines · CV immersif</small><i>Voir</i></button></li>
+        <li><button class="tuile" type="button" id="ouvrir-contact"><b>Contact</b><small>Stage, alternance, CDD ou job étudiant</small><i>Ouvrir</i></button></li>
+      </ul>
+      <div class="pied" aria-hidden="true"><span><kbd>↑ ↓</kbd> choisir</span><span><kbd>Entrée</kbd> ouvrir</span><span><kbd>Échap</kbd> retour</span></div>
+    </div>
+
+    <div class="vue" id="v-doc" hidden>
+      <ul class="menu" id="menu-doc">
+        <li><a class="tuile" id="doc-ouvrir" href="#" target="_blank" rel="noopener"><b>Ouvrir</b><small id="doc-nom">CV 1 page</small><i>PDF</i></a></li>
+        <li><a class="tuile" id="doc-telecharger" href="#" download><b>Télécharger</b><small id="doc-fichier">CV_Guillaume_Belle-Croix_1page.pdf</small><i>PDF</i></a></li>
+      </ul>
+      <button class="retour" type="button" id="retour-doc">← Retour au menu</button>
+    </div>
+
+    <div class="vue" id="v-projets" hidden>
+      <ul class="menu" id="menu-projets">
+        <li><a class="tuile" href="https://www.clutch-esport.com" target="_blank" rel="noopener"><b>Clutch Esport</b><small>Site de pronostics esport gratuits sur 7 jeux, conçu et mis en ligne seul</small><i>Site ↗</i></a></li>
+        <li><a class="tuile" href="../projets/airlines/"><b>INSEEC Airlines</b><small>Concept de soirée étudiante et son film 3D au scroll (Blender)</small><i>Film</i></a></li>
+        <li><a class="tuile" href="../rue.html#jouer"><b>CV immersif</b><small>Ce site : une rue de Neo-Tokyo et un appartement modélisés sur Blender</small><i>Vidéo</i></a></li>
+      </ul>
+      <button class="retour" type="button" id="retour-projets">← Retour au menu</button>
+    </div>
+
+    <div class="vue" id="v-contact" hidden>
+      <div class="contact">
+        <div class="ligne"><label>Téléphone</label><span id="c-tel">06 42 49 93 22</span><button class="copier" type="button" data-copie="06 42 49 93 22">Copier</button></div>
+        <div class="ligne"><label>E-mail</label><span id="c-mail">guillaume_blcx@icloud.com</span><button class="copier" type="button" data-copie="guillaume_blcx@icloud.com">Copier</button></div>
+        <div class="ligne"><label>Fiche contact</label><span>Ajouter à mes contacts</span><a class="copier" href="../contact/guillaume-belle-croix.vcf">Télécharger</a></div>
+        <div class="ligne"><label>Basé à</label><span id="c-ville">Bordeaux · INSEEC Marketing &amp; communication digitale</span></div>
+      </div>
+      <button class="retour" type="button" id="retour-contact">← Retour au menu</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const vues = { titre: document.getElementById('v-titre'), menu: document.getElementById('v-menu'), contact: document.getElementById('v-contact'), projets: document.getElementById('v-projets'), doc: document.getElementById('v-doc') };
+  const DOCS = {
+    cv: { nom: 'CV 1 page', url: '../cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4', fichier: 'CV_Guillaume_Belle-Croix_1page.pdf', i: 1 },
+    dossier: { nom: 'Dossier complet · 7 pages', url: '../cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2', fichier: 'CV_Guillaume_Belle-Croix_dossier.pdf', i: 2 },
+  };
+  function preparerDoc(cle) {
+    const d = DOCS[cle];
+    document.getElementById('doc-ouvrir').href = d.url; document.getElementById('doc-telecharger').href = d.url;
+    document.getElementById('doc-telecharger').setAttribute('download', d.fichier);
+    document.getElementById('doc-nom').textContent = d.nom; document.getElementById('doc-fichier').textContent = d.fichier;
+    index = d.i;
+  }
+  /* historique du navigateur : chaque écran (menu, contact, CV, dossier) a sa propre entrée,
+     la flèche retour ramène à l'écran précédent du site au lieu de le quitter */
+  function afficher(nom, cle) { if (nom === 'doc' && cle) preparerDoc(cle); montrer(nom); }
+  function aller(nom, cle) {
+    if (nom === courante && !cle) return;
+    afficher(nom, cle);
+    history.pushState({ v: nom, d: cle || null }, '', nom === 'titre' ? location.pathname : '#' + (cle || nom));
+  }
+  const revenir = () => { if (history.state && history.state.v && history.state.v !== 'titre') history.back(); else montrer('titre'); };
+  addEventListener('popstate', (e) => { const st = e.state || { v: 'titre' }; afficher(st.v, st.d); });
+  document.querySelectorAll('[data-doc]').forEach((b) => b.addEventListener('click', () => aller('doc', b.dataset.doc)));
+  document.getElementById('retour-doc').addEventListener('click', revenir);
+  let courante = 'titre';
+  const tuiles = () => Array.from(document.querySelectorAll('#menu .tuile'));
+  let index = 0;
+
+  function montrer(nom) {
+    for (const [k, el] of Object.entries(vues)) el.hidden = (k !== nom);
+    document.querySelector('.panneau').classList.toggle('seul', nom === 'titre');
+    courante = nom;
+    if (nom === 'menu') choisir(index);
+    if (nom === 'contact') document.querySelector('#v-contact .copier').focus();
+    if (nom === 'doc') document.getElementById('doc-ouvrir').focus();
+    if (nom === 'projets') document.querySelector('#menu-projets .tuile').focus();
+    if (nom === 'titre') document.getElementById('demarrer').focus();
+  }
+  function choisir(i) {
+    const t = tuiles(); index = (i + t.length) % t.length;
+    t.forEach((el, k) => el.classList.toggle('actif', k === index));
+    t[index].focus({ preventScroll: true });
+  }
+
+  document.getElementById('demarrer').addEventListener('click', () => aller('menu'));
+  document.getElementById('ouvrir-contact').addEventListener('click', () => aller('contact'));
+  document.getElementById('retour-contact').addEventListener('click', () => { index = 4; revenir(); });
+  document.getElementById('ouvrir-projets').addEventListener('click', () => aller('projets'));
+  document.getElementById('retour-projets').addEventListener('click', () => { index = 3; revenir(); });
+  tuiles().forEach((el, k) => el.addEventListener('mouseenter', () => { index = k; tuiles().forEach((x, j) => x.classList.toggle('actif', j === k)); }));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (courante === 'titre') { e.preventDefault(); aller('menu'); return; }
+    if (e.key === 'Escape') { e.preventDefault(); revenir(); return; }
+    if (courante === 'menu') {
+      if (e.key === 'ArrowDown') { e.preventDefault(); choisir(index + 1); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); choisir(index - 1); }
+    }
+  });
+  // n'importe quel clic ou toucher sur l'écran titre ouvre le menu
+  document.addEventListener('pointerdown', (e) => { if (courante === 'titre' && !e.target.closest('a')) { e.preventDefault(); aller('menu'); } });
+
+  document.querySelectorAll('.copier').forEach((b) => b.addEventListener('click', async () => {
+    const txt = b.dataset.copie;
+    try { await navigator.clipboard.writeText(txt); b.textContent = 'Copié'; }
+    catch (err) {
+      const s = b.previousElementSibling; const r = document.createRange(); r.selectNodeContents(s);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); b.textContent = 'Sélectionné';
+    }
+    setTimeout(() => { b.textContent = 'Copier'; }, 1600);
+  }));
+
+  // la vidéo de fond : si le navigateur bloque la lecture, l'image fixe reste affichée
+  const v = document.getElementById('boucle');
+  // iPhone en mode économie d'énergie : la lecture automatique est bloquée, on relance au premier geste
+  // la vidéo d'abord ; l'image animée seulement si le navigateur REFUSE la lecture (pas pendant le simple chargement)
+  let anim = null;
+  // secours si le navigateur REFUSE la lecture automatique : la même boucle en images, dessinée à 24 i/s sur un canvas (fluide et nette)
+  const secours = () => {
+    if (!v.paused || anim) return;
+    const cv = document.createElement('canvas'); cv.width = 1600; cv.height = 900;
+    cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+    v.parentNode.insertBefore(cv, v.nextSibling); anim = cv;
+    const ctx = cv.getContext('2d'), N = 96, imgs = new Array(N); let pretes = 0, t0 = 0;
+    for (let i = 0; i < N; i++){ const im = new Image(); im.decoding = 'async'; im.src = '../media/salon_seq/f_' + String(i + 1).padStart(2, '0') + '.webp?v=3';
+      im.onload = () => { imgs[i] = im; pretes++; if (i === 0) ctx.drawImage(im, 0, 0, 1600, 900); }; }
+    const boucle = (t) => {
+      if (anim !== cv) return;
+      if (pretes === N){ if (!t0) t0 = t; const k = Math.floor((t - t0) / (1000 / 24)) % N; ctx.drawImage(imgs[k], 0, 0, 1600, 900); }
+      requestAnimationFrame(boucle);
+    };
+    requestAnimationFrame(boucle);
+  };
+  const lancer = () => {
+    v.muted = true; if (!v.paused) return;
+    const p = v.play();
+    if (p && p.catch) p.catch((e) => { if (e && e.name === 'NotAllowedError') secours(); });
+  };
+  lancer();
+  ['loadedmetadata', 'canplay'].forEach((ev) => v.addEventListener(ev, lancer));
+  v.addEventListener('playing', () => { if (anim) { anim.remove(); anim = null; } });
+  ['pointerdown', 'touchstart', 'keydown', 'click'].forEach((ev) => document.addEventListener(ev, lancer, { passive: true }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) lancer(); });
+  // au chargement : l'accueil, puis l'écran demandé par l'adresse (#menu, #contact, #projets, #cv, #dossier) s'il y en a un
+  const h = (location.hash || '').slice(1);
+  history.replaceState({ v: 'titre' }, '', location.pathname);
+  montrer('titre');
+  if (h === 'menu' || h === 'contact' || h === 'projets') { if (h !== 'menu') history.pushState({ v: 'menu' }, '', '#menu'); aller(h); } else if (h === 'cv' || h === 'dossier') { history.pushState({ v: 'menu' }, '', '#menu'); aller('doc', h); }
+})();
+</script>
+
+<script src="../stats.js?v=2" defer></script>
+</body>
+</html>
