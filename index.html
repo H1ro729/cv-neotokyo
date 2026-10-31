@@ -40,6 +40,7 @@
 *, *::before, *::after { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
+body.salon { touch-action: none; }
 body { margin: 0; background: var(--nuit); color: var(--texte); font-family: var(--f-texte); font-size: 16px; overflow: hidden; -webkit-font-smoothing: antialiased; }
 
 /* ---------- vidéos : le salon en permanence, et deux plans par-dessus (travelling, gros plan) ---------- */
@@ -67,6 +68,13 @@ body { margin: 0; background: var(--nuit); color: var(--texte); font-family: var
 .bulle .et b { font-family: var(--f-titre); font-weight: 600; font-size: 13px; letter-spacing: .2em; text-transform: uppercase; }
 .bulle .et small { font-size: 12.5px; color: var(--doux); }
 .bulle.gauche { flex-direction: row-reverse; transform: translate(calc(-100% + 13px), -13px); }
+/* juste des points : l'étiquette n'apparaît qu'au survol */
+.bulle .et { opacity: 0; transform: translateX(-6px); pointer-events: none; transition: opacity .18s, transform .18s, background .18s; }
+.bulle.gauche .et { transform: translateX(6px); }
+.bulle:hover .et, .bulle:focus-visible .et { opacity: 1; transform: none; }
+body.salon .panneau { display: none; }
+.glisse { position: fixed; left: 50%; bottom: max(28px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 3; pointer-events: none;
+  font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: rgba(240,242,246,.75); text-shadow: 0 1px 8px rgba(0,0,0,.9); transition: opacity .4s; white-space: nowrap; }
 .bulle:hover .et, .bulle:focus-visible .et { background: rgba(225,228,235,.1); border-color: var(--trait-fort); }
 .bulle:hover .pt, .bulle:focus-visible .pt { background: rgba(255,255,255,.25); }
 .bulle:focus-visible { outline: none; }
@@ -125,7 +133,6 @@ body.gros .accroche { display: none; }
 @media (max-width: 620px) {
   .scene { justify-content: flex-end; }
   .fond::after { background: linear-gradient(0deg, rgba(5,6,10,.85) 0%, rgba(5,6,10,.35) 55%, rgba(5,6,10,0) 80%); }
-  .bulles { display: none; }   /* sur téléphone, la pièce est recadrée : on choisit dans la liste */
   body.salon .accroche { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .appuie, .vue, .bulle .pt::after, .descend { animation: none; } .tuile, .fond video { transition: none; } }
@@ -139,6 +146,7 @@ body.gros .accroche { display: none; }
 </div>
 
 <div class="bulles cache" id="bulles"></div>
+<div class="glisse" id="glisse" hidden>← Glisse pour regarder autour →</div>
 
 <main class="scene">
   <section class="panneau" aria-live="polite">
@@ -229,7 +237,9 @@ body.gros .accroche { display: none; }
   });
   // place les bulles sur l'image, en tenant compte du recadrage « cover » de la vidéo
   function placer() {
-    const W = innerWidth, H = innerHeight, s = Math.max(W / 1920, H / 1080), dw = 1920 * s, dh = 1080 * s, ox = (W - dw) / 2, oy = (H - dh) / 2;
+    const W = innerWidth, H = innerHeight, s = Math.max(W / 1920, H / 1080), dw = 1920 * s, dh = 1080 * s, ox = (W - dw) * pan, oy = (H - dh) / 2;
+    vSalon.style.objectPosition = (pan * 100) + '% 50%';
+    $('glisse').hidden = !(etat === 'salon' && dw > W + 4 && !aGlisse);
     let caches = 0;
     for (const k of ORDRE) {
       const o = OBJETS[k], x = ox + o.x / 100 * dw, y = oy + o.y / 100 * dh;
@@ -238,10 +248,16 @@ body.gros .accroche { display: none; }
       o.bulle.style.left = x + 'px'; o.bulle.style.top = y + 'px';
       o.bulle.classList.toggle('gauche', x > W * 0.72);
     }
-    const etroit = caches > 0;
-    $('astuce').textContent = etroit ? 'Choisis un objet' : 'Clique sur un objet de la pièce';
-    if (etroit && !listeForcee) ouvrirListe(true);
   }
+  /* téléphone : la pièce est plus large que l'écran, on la fait glisser du doigt pour atteindre tous les objets */
+  let pan = 0.5, aGlisse = false, gx = null, gpan = 0.5;
+  addEventListener('pointerdown', (e) => { if (etat === 'salon' && !(e.target.closest && e.target.closest('.bulle'))) { gx = e.clientX; gpan = pan; } });
+  addEventListener('pointermove', (e) => {
+    if (gx === null || etat !== 'salon') return;
+    const W = innerWidth, s = Math.max(W / 1920, innerHeight / 1080), marge = 1920 * s - W; if (marge < 4) return;
+    pan = Math.min(1, Math.max(0, gpan - (e.clientX - gx) / marge)); if (Math.abs(e.clientX - gx) > 12) aGlisse = true; placer();
+  });
+  addEventListener('pointerup', () => { gx = null; }); addEventListener('pointercancel', () => { gx = null; });
   let listeForcee = false;
   function ouvrirListe(v) { bulles.classList.toggle('liste', !!v); liste.hidden = !v; $('ouvrir-liste').setAttribute('aria-expanded', v); $('ouvrir-liste').textContent = v ? '✕ Masquer la liste' : '☰ Tout afficher'; }
   $('ouvrir-liste').addEventListener('click', () => { listeForcee = true; ouvrirListe(liste.hidden); });
@@ -273,16 +289,23 @@ body.gros .accroche { display: none; }
     const boucle = charger(vBoucle, M + k + '_boucle.mp4', M + k + '_boucle.jpg');
     if (debut) {
       await charger(vPlan, M + debut);
+      cadrer(vPlan, debut.endsWith('_aller.mp4') ? pan : 0.5, 0.5);
       montrer(vPlan, true); await jouerJusquauBout(vPlan);
     }
     await boucle; vBoucle.currentTime = 0; vBoucle.play().catch(() => {});
     montrer(vBoucle, true); setTimeout(() => montrer(vPlan, false), 60);
     occupe = false; document.body.classList.remove('occupe');
   }
+  // sur téléphone, le travelling part du cadrage où l'on a fait glisser la pièce et revient au centre (et l'inverse au retour)
+  function cadrer(v, de, a) {
+    v.style.transition = 'none'; v.style.objectPosition = (de * 100) + '% 50%'; void v.offsetWidth;
+    v.style.transition = ''; v.style.transition = 'opacity .22s linear, object-position 1.9s ease-in-out'; v.style.objectPosition = (a * 100) + '% 50%';
+  }
   // gros plan → travelling inverse → salon
   async function revenirSalon(k) {
     occupe = true; document.body.classList.add('occupe');
     await charger(vPlan, M + k + '_retour.mp4');
+    cadrer(vPlan, 0.5, pan);
     montrer(vPlan, true); setTimeout(() => { montrer(vBoucle, false); vBoucle.pause(); }, 60);
     await jouerJusquauBout(vPlan);
     vSalon.play().catch(() => {}); montrer(vPlan, false);
