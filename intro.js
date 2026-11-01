@@ -59,7 +59,7 @@
   const ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H2v6h4l5 4z"/><path class="w" d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/><path class="x" d="m22 9-6 6M16 9l6 6"/></svg>';
   const attendre = ms => new Promise(r => setTimeout(r, ms));
 
-  window.lancerIntro = function (fini) {
+  window.lancerIntro = function (fini, court) {
     const son = document.getElementById("son");
     const el = document.createElement("div"); el.id = "intro"; el.setAttribute("role", "dialog"); el.setAttribute("aria-label", "Comment utiliser le CV immersif");
     const geste = tactile
@@ -119,6 +119,17 @@
     addEventListener("keydown", clavier);
     el.querySelector(".passer").addEventListener("click", terminer);
 
+    // arrivée depuis l'écran du PC : pas d'explication, on attend seulement que la rue soit chargée (rien ne s'affiche si elle l'est déjà)
+    if (court) {
+      s1.remove(); s2.remove(); el.querySelector(".passer").remove();
+      (async () => {
+        if (majChg() >= 1) { el.style.transition = "none"; el.classList.add("fin"); }
+        else { chg.classList.add("attente"); while (majChg() < 1) await attendre(150); await attendre(200); el.classList.add("fin"); await attendre(700); }
+        clearInterval(tChg); el.remove(); html.style.overflow = ovAvant; if (son) son.style.visibility = "";
+        removeEventListener("keydown", clavier); if (fini) fini();
+      })();
+      return;
+    }
     (async () => {
       await attendre(350); if (fin) return;
       s1.classList.add("on");

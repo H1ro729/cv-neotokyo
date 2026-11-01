@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202610310300";
+(() => { const BUILD = "202611011500";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -388,10 +388,39 @@ const home = document.getElementById("home"), exp = document.getElementById("exp
   }));
   addEventListener("pageshow", e => { if (e.persisted) { document.getElementById("home").classList.remove("sortie"); pose(cur()); } });
 })();
-["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { if (window.stat) window.stat("rue/entree", "Entrée dans le CV immersif"); start(); if (window.lancerIntro) window.lancerIntro(); }));
+/* depuis l'écran du PC de l'accueil : on entre sans la vidéo explicative (la plongée dans l'écran tient lieu d'introduction) */
+let DEPUIS_PC = false; try { DEPUIS_PC = !!sessionStorage.getItem("retour_rue"); } catch (e) {}
+["go-immersif", "tile-cv"].forEach(id => document.getElementById(id).addEventListener("click", () => { if (window.stat) window.stat("rue/entree", "Entrée dans le CV immersif"); start(); if (window.lancerIntro) window.lancerIntro(null, DEPUIS_PC); }));
 /* depuis le menu de l'accueil (tuile « CV immersif ») : on entre directement dans la rue */
 addEventListener("load", () => document.getElementById("go-immersif").click());   // l'ancien accueil n'existe plus : on entre toujours directement dans la rue
-document.getElementById("back").addEventListener("click", () => { let r = null; try { r = sessionStorage.getItem("retour_rue"); sessionStorage.removeItem("retour_rue"); } catch (e) {} location.href = r || "./"; });   // retour vers l'accueil, ou vers le PC de la V2 (on ressort de l'écran)   // retour au menu de l'accueil (nouvelle version)
+function sortirEcran(){ let r = null; try { r = sessionStorage.getItem("retour_rue"); sessionStorage.removeItem("retour_rue"); } catch (e) {} location.href = r || "./#sortie"; }
+document.getElementById("back").addEventListener("click", sortirEcran);   // retour vers l'accueil : on ressort de l'écran du PC
+/* fin de la rue : continuer à faire défiler fait ressortir de l'écran (geste volontaire : il faut être arrivé en bas, attendre un instant, puis insister) */
+(() => {
+  let basDepuis = 0, cumul = 0, dernier = 0, parti = false, tip = null;
+  const enBas = () => started && !exp.hidden && window.scrollY >= total - 4;
+  const indice = (v) => {
+    if (!tip) { tip = document.createElement("div"); tip.textContent = "↓ Continue de défiler pour sortir de l'écran";
+      Object.assign(tip.style, {position:"fixed", left:"50%", bottom:"6%", transform:"translateX(-50%)", zIndex:60, padding:"10px 16px", borderRadius:"999px", background:"rgba(11,10,18,.7)",
+        color:"#fff", font:"13px/1.2 var(--mono, monospace)", border:"1px solid rgba(255,255,255,.2)", transition:"opacity .4s", pointerEvents:"none", opacity:0, whiteSpace:"nowrap"});
+      document.body.appendChild(tip); }
+    tip.style.opacity = v ? 1 : 0; };
+  const pousser = (d) => {
+    const t = performance.now();
+    if (!enBas()) { basDepuis = 0; cumul = 0; indice(false); return; }
+    if (!basDepuis) { basDepuis = t; cumul = 0; indice(true); return; }
+    if (t - basDepuis < 900) return;                 // laisser l'inertie du défilement s'arrêter
+    if (t - dernier > 1200) cumul = 0; dernier = t;
+    cumul += d; if (cumul > 260 && !parti) { parti = true; indice(false); sortirEcran(); }
+  };
+  addEventListener("scroll", () => { if (enBas()) { if (!basDepuis) { basDepuis = performance.now(); indice(true); } } else { basDepuis = 0; indice(false); } }, {passive:true});
+  addEventListener("wheel", e => { if (e.deltaY > 0) pousser(e.deltaY); }, {passive:true});
+  let ty = null;
+  addEventListener("touchstart", e => { ty = e.touches[0].clientY; }, {passive:true});
+  addEventListener("touchmove", e => { if (ty !== null) { const d = ty - e.touches[0].clientY; if (d > 0) { pousser(d * 2); ty = e.touches[0].clientY; } } }, {passive:true});
+  addEventListener("keydown", e => { if (e.key === "ArrowDown" || e.key === "PageDown" || e.key === " ") pousser(140); });
+  addEventListener("pageshow", e => { if (e.persisted) { parti = false; basDepuis = 0; cumul = 0; } });
+})();   // retour vers l'accueil, ou vers le PC de la V2 (on ressort de l'écran)   // retour au menu de l'accueil (nouvelle version)
 
 /* ---------- images : 2 niveaux (aperçu léger pour tout, HD chargée autour de la position) ---------- */
 const DIR = {d:{l:'dl3', h:'dh3'}, m:{l:'ml3', h:'mh3'}};
@@ -851,7 +880,7 @@ MODE = innerWidth / innerHeight < 1 ? "m" : "d"; loadAll();
 </script>
 
 <script src="son.js?v=11" defer></script>
-<script src="intro.js?v=5" defer></script>
+<script src="intro.js?v=6" defer></script>
 <script src="stats.js?v=2" defer></script>
 </body>
 </html>

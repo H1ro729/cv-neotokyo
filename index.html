@@ -319,7 +319,9 @@ body.gros .accroche { display: none; }
     $('doc-ouvrir').href = d.url; $('doc-telecharger').href = d.url; $('doc-telecharger').setAttribute('download', d.fichier);
     $('doc-nom').textContent = d.nom; $('doc-fichier').textContent = d.fichier;
   }
+  let arrivePc = 0;
   function vueObjet(k) {
+    if (k === 'pc') arrivePc = performance.now();
     const o = OBJETS[k]; if (o.doc) preparerDoc(o.doc);
     afficherVue('v-' + o.vue);
     const premier = $('v-' + o.vue).querySelector('.tuile, .copier'); if (premier) premier.focus({ preventScroll: true });
@@ -364,10 +366,19 @@ body.gros .accroche { display: none; }
     location.href = 'rue.html#jouer';
   }
   $('entrer').addEventListener('click', plonger);
-  addEventListener('wheel', (e) => { if (etat === 'pc' && e.deltaY > 8) plonger(); }, { passive: true });
+  /* protection : l'élan d'un défilement (en sortant de la rue, ou juste après le zoom) ne doit pas relancer la plongée.
+     Il faut être arrivé devant le PC depuis 1,5 s, puis commencer un NOUVEAU geste de défilement assez franc. */
+  let derniereRoue = 0, cumulRoue = 0;
+  const pret = () => etat === 'pc' && !occupe && performance.now() - arrivePc > 1500;
+  addEventListener('wheel', (e) => {
+    const t = performance.now(), nouveau = t - derniereRoue > 350; derniereRoue = t;
+    if (!pret()) { cumulRoue = 0; return; }
+    if (nouveau) cumulRoue = 0;
+    if (e.deltaY > 0) { cumulRoue += e.deltaY; if (cumulRoue > 120) plonger(); }
+  }, { passive: true });
   let y0 = null;
   addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; }, { passive: true });
-  addEventListener('touchmove', (e) => { if (etat === 'pc' && y0 !== null && y0 - e.touches[0].clientY > 40) { y0 = null; plonger(); } }, { passive: true });
+  addEventListener('touchmove', (e) => { if (pret() && y0 !== null && y0 - e.touches[0].clientY > 60) { y0 = null; plonger(); } }, { passive: true });
   addEventListener('pageshow', (e) => { if (e.persisted) { plonge = false; occupe = false; document.body.classList.remove('occupe'); } });
 
   /* ---------- clavier ---------- */
