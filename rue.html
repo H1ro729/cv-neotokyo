@@ -3,7 +3,7 @@
 <head>
 <script>
 /* Safari garde parfois une ancienne version de la page : on compare avec la version publiée et on recharge si besoin */
-(() => { const BUILD = "202611011500";
+(() => { const BUILD = "202611022300";
   fetch("version.json?t=" + Date.now(), {cache:"no-store"}).then(r => r.json()).then(j => {
     if (j.v && j.v !== BUILD && !/[?&]b=/.test(location.search)) location.replace(location.pathname + "?b=" + j.v + location.hash);
   }).catch(() => {}); })();
@@ -639,6 +639,11 @@ if (USE_VID){
     });
     (async () => {
       try {
+        // déjà téléchargée en fond pendant la visite de l'appartement (index.html) : on la prend directement
+        if ('caches' in window){
+          const h = await caches.match(VS[MODE] + VER).catch(() => null);
+          if (h){ const bl = await h.blob(); if (bl.size > 1e6){ v.prog = 1; v.el.src = URL.createObjectURL(bl); v.el.load(); return; } }
+        }
         const r = await fetch(VS[MODE] + VER); const n = +r.headers.get('content-length') || 0;
         let blob;
         if (r.body && r.body.getReader && n){

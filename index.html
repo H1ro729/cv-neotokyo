@@ -347,7 +347,26 @@ body.gros .accroche { display: none; }
     if (v === 'titre') { etat = 'titre'; afficherVue('v-titre'); bulles.classList.add('cache'); }
     else entrerSalon(false);
   });
+  /* la rue du CV immersif (vidéo de 40 à 80 Mo sur ordinateur) se télécharge en fond pendant la visite de l'appartement :
+     en plongeant dans l'écran, elle est déjà là et on peut défiler tout de suite. Mêmes règles que rue.html (VER compris). */
+  let rueLancee = false;
+  function prechargerRue() {
+    if (rueLancee) return; rueLancee = true;
+    try {
+      const h264 = document.createElement('video').canPlayType('video/mp4; codecs="avc1.640028"') !== '';
+      const ordi = matchMedia('(hover: hover) and (pointer: fine)').matches && innerWidth / innerHeight >= 1;
+      if (!h264 || !ordi || !('caches' in window)) return;
+      const url = 'pk/' + (/Apple/.test(navigator.vendor || '') ? 'rue_s.mp4' : 'rue_d.mp4') + '?v=19', NOM = 'rue-v19';
+      caches.keys().then((ks) => ks.forEach((k) => { if (k.startsWith('rue-') && k !== NOM) caches.delete(k); }));
+      caches.open(NOM).then(async (c) => {
+        if (await c.match(url)) return;
+        const r = await fetch(url, { priority: 'low' });
+        if (r.ok) await c.put(url, r);
+      }).catch(() => {});
+    } catch (e) {}
+  }
   function entrerSalon(pousser) {
+    setTimeout(prechargerRue, 2500);
     if (pousser) history.pushState({ v: 'salon' }, '', '#salon');
     etat = 'salon'; afficherVue('v-salon-ui'); placer(); bulles.classList.remove('cache');
     vSalon.play().catch(() => {});
