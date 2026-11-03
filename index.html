@@ -135,15 +135,26 @@ body.gros .accroche { display: none; }
   .fond::after { background: linear-gradient(0deg, rgba(5,6,10,.85) 0%, rgba(5,6,10,.35) 55%, rgba(5,6,10,0) 80%); }
   body.salon .accroche { display: none; }
 }
-/* ---------- accès direct aux CV, en haut à droite ---------- */
-.raccourcis { position: fixed; z-index: 4; top: max(18px, env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px), 3vw); display: flex; gap: 10px; transition: opacity .3s; }
+/* ---------- accès direct aux CV : indications de touches, comme en bas d'un menu de jeu (C et D marchent au clavier) ---------- */
+.raccourcis { position: fixed; z-index: 4; right: max(16px, env(safe-area-inset-right, 0px), 2.8vw); bottom: max(84px, calc(env(safe-area-inset-bottom, 0px) + 60px)); display: flex; gap: 30px; transition: opacity .3s; }
 .occupe .raccourcis { opacity: 0; pointer-events: none; }
-.raccourci { display: grid; gap: 2px; padding: 10px 16px 11px; background: var(--case); border: 1px solid var(--trait); backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
-  color: var(--texte); text-decoration: none; text-shadow: 0 1px 8px rgba(0,0,0,.8); transition: background .18s, border-color .18s; }
-.raccourci b { font-family: var(--f-titre); font-weight: 600; font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; }
-.raccourci small { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: rgba(240,242,246,.6); }
-.raccourci:hover, .raccourci:focus-visible { background: var(--case-fort); border-color: var(--trait-fort); outline: none; }
-@media (max-width: 620px) { .raccourcis { left: 16px; right: 16px; gap: 8px; } .raccourci { flex: 1; padding: 9px 12px 10px; } .raccourci b { font-size: 11.5px; letter-spacing: .14em; } }
+.raccourci { display: flex; align-items: center; gap: 11px; color: var(--texte); text-decoration: none; font-family: var(--f-titre); font-weight: 600; font-size: 12.5px; letter-spacing: .22em; text-transform: uppercase;
+  text-shadow: 0 1px 10px rgba(0,0,0,.95), 0 0 2px rgba(0,0,0,.5); transition: opacity .18s; }
+.raccourci kbd { display: grid; place-items: center; width: 28px; height: 28px; border: 1.5px solid rgba(255,255,255,.85); border-radius: 6px; font-family: var(--f-mono); font-size: 13px; font-weight: 600; letter-spacing: 0;
+  background: rgba(10,12,18,.25); box-shadow: 0 2px 0 rgba(255,255,255,.35), 0 2px 10px rgba(0,0,0,.6); transition: transform .12s, background .18s; }
+.raccourci:hover kbd, .raccourci:focus-visible kbd { background: rgba(255,255,255,.18); }
+.raccourci:active kbd, .raccourci.appuye kbd { transform: translateY(2px); box-shadow: 0 0 0 rgba(255,255,255,.35), 0 2px 10px rgba(0,0,0,.6); }
+.raccourci:focus-visible { outline: none; }
+/* téléphone : pas de clavier, deux mots soulignés en bas */
+@media (hover: none), (max-width: 620px) {
+  .raccourci kbd { display: none; }
+  .raccourci { padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,.45); font-size: 11.5px; letter-spacing: .18em; }
+}
+@media (max-width: 620px) {
+  /* en haut sur l'écran titre et les gros plans (le texte est en bas) ; en bas dans le salon, au-dessus de « Glisse » */
+  .raccourcis { left: 0; right: 0; justify-content: center; gap: 26px; top: max(20px, env(safe-area-inset-top, 0px)); bottom: auto; }
+  body.salon .raccourcis { top: auto; bottom: max(64px, calc(env(safe-area-inset-bottom, 0px) + 50px)); }
+}
 @media (prefers-reduced-motion: reduce) { .appuie, .vue, .bulle .pt::after, .descend { animation: none; } .tuile, .fond video { transition: none; } }
 </style>
 </head>
@@ -156,8 +167,8 @@ body.gros .accroche { display: none; }
 
 <div class="bulles cache" id="bulles"></div>
 <nav class="raccourcis" aria-label="Accès direct aux CV">
-  <a class="raccourci" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener"><b>CV 1 page</b><small>PDF</small></a>
-  <a class="raccourci" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener"><b>Dossier complet</b><small>7 pages · PDF</small></a>
+  <a class="raccourci" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener" aria-keyshortcuts="C"><kbd>C</kbd>CV 1 page</a>
+  <a class="raccourci" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener" aria-keyshortcuts="D"><kbd>D</kbd>Dossier 7 pages</a>
 </nav>
 <div class="glisse" id="glisse" hidden>← Glisse pour regarder autour →</div>
 
@@ -436,6 +447,12 @@ body.gros .accroche { display: none; }
   /* ---------- clavier ---------- */
   document.addEventListener('keydown', (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    // C et D : ouvrent le CV 1 page / le dossier 7 pages, comme les touches indiquées en bas à droite
+    const touche = (e.key || '').toLowerCase(), lien = touche === 'c' ? 0 : touche === 'd' ? 1 : -1;
+    if (lien >= 0 && !e.repeat) {
+      const a = document.querySelectorAll('.raccourci')[lien]; e.preventDefault();
+      a.classList.add('appuye'); setTimeout(() => a.classList.remove('appuye'), 160); window.open(a.href, '_blank', 'noopener'); return;
+    }
     if (etat === 'titre') { e.preventDefault(); entrerSalon(true); return; }
     if (e.key === 'Escape' && objet) { e.preventDefault(); retour(); return; }
     if (etat === 'pc' && (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ')) { e.preventDefault(); plonger(); }
