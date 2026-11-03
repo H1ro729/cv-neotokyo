@@ -264,15 +264,33 @@ body.gros .accroche { display: none; }
   addEventListener('resize', placer);
 
   /* ---------- vidéos ---------- */
-  const prets = new Set();
-  function prechauffer(k) {             // charge à l'avance le travelling et le gros plan quand on survole la bulle
-    for (const f of [k + '_aller.mp4', k + '_boucle.mp4']) if (!prets.has(f)) { prets.add(f); fetch(M + f + VER).catch(() => {}); }
+  /* les vidéos sont téléchargées en entier à l'avance (dès l'arrivée dans le salon) et gardées en mémoire :
+     au clic, le travelling démarre tout de suite et ne s'arrête jamais en route pour attendre le réseau */
+  const BLOBS = new Map(), EN_COURS = new Map();
+  function telecharger(f) {
+    if (BLOBS.has(f)) return Promise.resolve(BLOBS.get(f));
+    if (EN_COURS.has(f)) return EN_COURS.get(f);
+    const p = fetch(M + f + VER).then((r) => (r.ok ? r.blob() : null))
+      .then((b) => { if (!b || b.size < 1000) return null; const u = URL.createObjectURL(b); BLOBS.set(f, u); return u; })
+      .catch(() => null).finally(() => EN_COURS.delete(f));
+    EN_COURS.set(f, p); return p;
   }
-  function charger(v, src, poster) {
-    src += VER; if (poster) poster += VER;
+  function prechauffer(k) { telecharger(k + '_aller.mp4'); telecharger(k + '_boucle.mp4'); }
+  let zoomsLances = false;
+  async function prechargerZooms() {
+    if (zoomsLances) return; zoomsLances = true;
+    for (const k of ORDRE) { await telecharger(k + '_aller.mp4'); await telecharger(k + '_boucle.mp4'); }
+    prechargerRue();
+  }
+  async function charger(v, src, poster) {
+    const nom = src.startsWith(M) ? src.slice(M.length) : null;
+    let url = nom ? BLOBS.get(nom) : null;
+    if (!url && nom && EN_COURS.has(nom)) url = await EN_COURS.get(nom);
+    if (!url) url = src + VER;
+    if (poster) poster += VER;
     return new Promise((ok) => {
-      if (v.dataset.src === src && v.readyState >= 2) return ok();
-      v.dataset.src = src; if (poster) v.poster = poster; v.src = src; v.load();
+      if (v.dataset.src === url && v.readyState >= 2) return ok();
+      v.dataset.src = url; if (poster) v.poster = poster; v.src = url; v.load();
       const fin = () => { v.removeEventListener('loadeddata', fin); ok(); };
       v.addEventListener('loadeddata', fin); setTimeout(fin, 6000);
     });
@@ -321,7 +339,8 @@ body.gros .accroche { display: none; }
   }
   let arrivePc = 0;
   function vueObjet(k) {
-    if (k === 'pc') arrivePc = performance.now();
+    if (k === 'pc') { arrivePc = performance.now(); telecharger('plongee.mp4'); }
+    telecharger(k + '_retour.mp4');
     const o = OBJETS[k]; if (o.doc) preparerDoc(o.doc);
     afficherVue('v-' + o.vue);
     const premier = $('v-' + o.vue).querySelector('.tuile, .copier'); if (premier) premier.focus({ preventScroll: true });
@@ -366,7 +385,7 @@ body.gros .accroche { display: none; }
     } catch (e) {}
   }
   function entrerSalon(pousser) {
-    setTimeout(prechargerRue, 2500);
+    setTimeout(prechargerZooms, 600);
     if (pousser) history.pushState({ v: 'salon' }, '', '#salon');
     etat = 'salon'; afficherVue('v-salon-ui'); placer(); bulles.classList.remove('cache');
     vSalon.play().catch(() => {});
