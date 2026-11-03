@@ -45,7 +45,7 @@ body { margin: 0; background: var(--nuit); color: var(--texte); font-family: var
 
 /* ---------- vidéos : le salon en permanence, et deux plans par-dessus (travelling, gros plan) ---------- */
 .fond { position: fixed; inset: 0; z-index: 0; background: var(--nuit); }
-.fond video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .22s linear; }
+.fond video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; }
 .fond video.vu { opacity: 1; }
 #v-salon { opacity: 1; }
 .fond::after { content: ""; position: absolute; inset: 0; pointer-events: none;
@@ -135,7 +135,7 @@ body.gros .accroche { display: none; }
   .fond::after { background: linear-gradient(0deg, rgba(5,6,10,.85) 0%, rgba(5,6,10,.35) 55%, rgba(5,6,10,0) 80%); }
   body.salon .accroche { display: none; }
 }
-@media (prefers-reduced-motion: reduce) { .appuie, .vue, .bulle .pt::after, .descend { animation: none; } .tuile, .fond video { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .appuie, .vue, .bulle .pt::after, .descend { animation: none; } .tuile { transition: none; } }
 </style>
 </head>
 <body>
@@ -283,11 +283,12 @@ body.gros .accroche { display: none; }
   }
   function pomper() {
     if (actif) return;
-    if (!file.length) { if (fileLancee) prechargerRue(); return; }
+    if (!file.length) { if (fileLancee) prechargerRue(); return; }   // tout est en mémoire : la rue peut prendre la bande passante
     const f = file.shift(); actif = { f };
     fetch(M + f + verDe(f)).then((r) => (r.ok ? r.blob() : null)).then((b) => {
       if (!b || b.size < 1000) return;
       const u = URL.createObjectURL(b), w = ATTENTES.get(f); BLOBS.set(f, u); if (w) { w.r(u); ATTENTES.delete(f); }
+      if (f.endsWith('_aller.mp4') || (objet && f === objet + '_retour.mp4')) armer(f);
     }).catch(() => {}).finally(() => { actif = null; pomper(); });
   }
   function lancerFile() {
@@ -295,7 +296,27 @@ body.gros .accroche { display: none; }
     const c = navigator.connection; if (c && c.saveData) return;          // économie de données : rien d'avance
     ORDRE.forEach((k) => demander(k + '_aller.mp4'));                     // d'abord les 5 allers…
     ORDRE.forEach((k) => demander(k + '_boucle.mp4'));                    // …puis les boucles
+    ORDRE.forEach((k) => demander(k + '_retour.mp4'));                    // …puis les retours (plus d'attente pour revenir au salon)
   }
+  /* vidéos « armées » : chaque zoom a son propre lecteur, déjà chargé et arrêté sur sa 1re image.
+     Au clic on appuie juste sur lecture : pas de changement de source ni de décodeur à relancer (Safari surtout). */
+  const ARMES = new Map();
+  function armer(f) {
+    if (ARMES.has(f)) return ARMES.get(f);
+    const u = BLOBS.get(f); if (!u) return null;
+    const v = document.createElement('video');
+    v.muted = true; v.defaultMuted = true; v.playsInline = true; v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
+    v.preload = 'auto'; v.src = u; vBoucle.before(v); v.load();
+    ARMES.set(f, v); return v;
+  }
+  function desarmer(f) { const v = ARMES.get(f); if (!v) return; ARMES.delete(f); v.pause(); v.removeAttribute('src'); v.load(); v.remove(); }
+  // remet un lecteur armé sur sa 1re image une fois caché, pour le prochain clic
+  function rearmer(v) { setTimeout(() => { if (v.classList.contains('vu')) return; v.pause(); try { v.currentTime = 0; } catch (e) {} }, 400); }
+  const lecteurPret = (v, ms) => new Promise((ok) => {
+    if (v.readyState >= 2) return ok();
+    const fin = () => { v.removeEventListener('loadeddata', fin); v.removeEventListener('canplay', fin); ok(); };
+    v.addEventListener('loadeddata', fin); v.addEventListener('canplay', fin); setTimeout(fin, ms);
+  });
   // survol d'une bulle : son aller et sa boucle passent en tête de file (sans téléchargement en parallèle)
   function prechauffer(k) { demander(k + '_boucle.mp4', true); demander(k + '_aller.mp4', true); }
   const telecharger = (f) => demander(f, true);
@@ -309,42 +330,55 @@ body.gros .accroche { display: none; }
     return new Promise((ok) => {
       if (v.dataset.src === url && v.readyState >= 2) return ok();
       v.dataset.src = url; if (poster) v.poster = poster; v.src = url; v.load();
-      const fin = () => { v.removeEventListener('loadeddata', fin); ok(); };
-      v.addEventListener('loadeddata', fin); setTimeout(fin, 6000);
+      const fin = () => { v.removeEventListener('loadeddata', fin); v.removeEventListener('canplay', fin); ok(); };
+      v.addEventListener('loadeddata', fin); v.addEventListener('canplay', fin); setTimeout(fin, 2500);
     });
   }
+  // joue jusqu'à la fin ; jamais bloqué : si la vidéo cale, on continue au bout de sa durée + 3 s
   const jouerJusquauBout = (v) => new Promise((ok) => {
-    const fin = () => { v.removeEventListener('ended', fin); ok(); };
-    v.addEventListener('ended', fin); v.currentTime = 0; const p = v.play(); if (p && p.catch) p.catch(fin);
+    let lim = 0;
+    const fin = () => { clearTimeout(lim); v.removeEventListener('ended', fin); ok(); };
+    v.addEventListener('ended', fin);
+    if (v.currentTime > 0.001) { try { v.currentTime = 0; } catch (e) {} }
+    lim = setTimeout(fin, ((isFinite(v.duration) && v.duration > 0 ? v.duration : 5) + 3) * 1000);
+    const p = v.play(); if (p && p.catch) p.catch(fin);
   });
   const montrer = (v, oui) => v.classList.toggle('vu', oui);
+  // coupe franche entre deux couches : on ne retire celle du dessus qu'une fois celle du dessous affichée
+  // (avant, les deux fondus se croisaient et on apercevait le salon une fraction de seconde)
+  const apresImage = (fn) => requestAnimationFrame(() => requestAnimationFrame(fn));
 
   // salon → travelling → gros plan en boucle
   async function lancerPlan(k, debut) {
     occupe = true; document.body.classList.add('occupe'); bulles.classList.add('cache');
     const boucle = charger(vBoucle, M + k + '_boucle.mp4', M + k + '_boucle.jpg');
+    let el = vPlan;
     if (debut) {
-      await charger(vPlan, M + debut);
-      cadrer(vPlan, debut.endsWith('_aller.mp4') ? pan : 0.5, 0.5);
-      montrer(vPlan, true); await jouerJusquauBout(vPlan);
+      el = armer(debut) || vPlan;
+      if (el === vPlan) await charger(vPlan, M + debut); else await lecteurPret(el, 1500);
+      cadrer(el, debut.endsWith('_aller.mp4') ? pan : 0.5, 0.5);
+      montrer(el, true); await jouerJusquauBout(el);
     }
-    await boucle; vBoucle.currentTime = 0; vBoucle.play().catch(() => {});
-    montrer(vBoucle, true); setTimeout(() => montrer(vPlan, false), 60);
+    await boucle; if (vBoucle.currentTime > 0.001) vBoucle.currentTime = 0; vBoucle.play().catch(() => {});
+    montrer(vBoucle, true); apresImage(() => { montrer(el, false); if (el !== vPlan) rearmer(el); });
     occupe = false; document.body.classList.remove('occupe');
   }
   // sur téléphone, le travelling part du cadrage où l'on a fait glisser la pièce et revient au centre (et l'inverse au retour)
   function cadrer(v, de, a) {
     v.style.transition = 'none'; v.style.objectPosition = (de * 100) + '% 50%'; void v.offsetWidth;
-    v.style.transition = ''; v.style.transition = 'opacity .22s linear, object-position 1.9s ease-in-out'; v.style.objectPosition = (a * 100) + '% 50%';
+    v.style.transition = 'object-position 1.9s ease-in-out'; v.style.objectPosition = (a * 100) + '% 50%';
   }
   // gros plan → travelling inverse → salon
   async function revenirSalon(k) {
     occupe = true; document.body.classList.add('occupe');
-    await charger(vPlan, M + k + '_retour.mp4');
-    cadrer(vPlan, 0.5, pan);
-    montrer(vPlan, true); setTimeout(() => { montrer(vBoucle, false); vBoucle.pause(); }, 60);
-    await jouerJusquauBout(vPlan);
-    vSalon.play().catch(() => {}); montrer(vPlan, false);
+    const f = k + '_retour.mp4', el = armer(f) || vPlan;
+    mesurer('retour ' + k, el, BLOBS.has(f));
+    if (el === vPlan) await charger(vPlan, M + f); else await lecteurPret(el, 1500);
+    cadrer(el, 0.5, pan);
+    montrer(el, true); apresImage(() => { montrer(vBoucle, false); vBoucle.pause(); });
+    await jouerJusquauBout(el);
+    vSalon.play().catch(() => {}); apresImage(() => montrer(el, false));
+    if (el !== vPlan) setTimeout(() => desarmer(f), 400);
     occupe = false; document.body.classList.remove('occupe'); bulles.classList.remove('cache');
   }
 
@@ -357,8 +391,8 @@ body.gros .accroche { display: none; }
   }
   let arrivePc = 0;
   function vueObjet(k) {
-    if (k === 'pc') { arrivePc = performance.now(); telecharger('plongee.mp4'); }
-    telecharger(k + '_retour.mp4');
+    if (k === 'pc') { arrivePc = performance.now(); telecharger('plongee.mp4'); prechargerRue(); }
+    telecharger(k + '_retour.mp4'); armer(k + '_retour.mp4');
     const o = OBJETS[k]; if (o.doc) preparerDoc(o.doc);
     afficherVue('v-' + o.vue);
     const premier = $('v-' + o.vue).querySelector('.tuile, .copier'); if (premier) premier.focus({ preventScroll: true });
@@ -373,17 +407,17 @@ body.gros .accroche { display: none; }
     if (!dbgEl) { dbgEl = document.createElement('div'); dbgEl.style.cssText = 'position:fixed;z-index:99;left:8px;bottom:8px;font:13px/1.45 monospace;background:rgba(0,0,0,.85);color:#3f6;padding:9px 12px;white-space:pre;pointer-events:none'; document.body.appendChild(dbgEl); }
     dbgEl.textContent = t;
   }
-  function mesurer(k) {
+  function mesurer(nom, el, enMemoire) {
     if (!DEBUG) return;
-    const t0 = performance.now(), pret = BLOBS.has(k + '_aller.mp4'), c = navigator.connection;
-    const info = () => 'source : ' + (pret ? 'mémoire (déjà téléchargée)' : 'réseau (pas encore téléchargée)') + '\nvidéos prêtes : ' + BLOBS.size + '\nconnexion : ' + (c ? c.effectiveType + ' ~' + c.downlink + ' Mbit/s' : '?') + '\n' + navigator.userAgent.replace(/^Mozilla\/5.0 /, '').slice(0, 90);
-    dbg('clic sur ' + k + '…\n' + info());
-    const fin = () => dbg('clic → 1re image du zoom : ' + Math.round(performance.now() - t0) + ' ms\n' + info());
-    if (vPlan.requestVideoFrameCallback) vPlan.requestVideoFrameCallback(fin); else vPlan.addEventListener('playing', fin, { once: true });
+    const t0 = performance.now(), c = navigator.connection, arme = el !== vPlan;
+    const info = () => 'source : ' + (enMemoire ? 'mémoire' : 'réseau (pas encore téléchargée)') + (arme ? ' · lecteur armé' : ' · lecteur commun') + '\nvidéos prêtes : ' + BLOBS.size + ' · armées : ' + ARMES.size + '\nconnexion : ' + (c ? c.effectiveType + ' ~' + c.downlink + ' Mbit/s' : '?') + '\n' + navigator.userAgent.replace(/^Mozilla\/5.0 /, '').slice(0, 90);
+    dbg('clic : ' + nom + '…\n' + info());
+    const fin = () => dbg('clic → 1re image (' + nom + ') : ' + Math.round(performance.now() - t0) + ' ms\n' + info());
+    if (el.requestVideoFrameCallback) el.requestVideoFrameCallback(fin); else el.addEventListener('playing', fin, { once: true });
   }
   async function aller(k) {
     if (occupe || etat !== 'salon') return;
-    mesurer(k); if (window.stat) window.stat('accueil/' + k, 'Accueil : ' + OBJETS[k].titre);
+    mesurer('zoom ' + k, ARMES.get(k + '_aller.mp4') || vPlan, BLOBS.has(k + '_aller.mp4')); if (window.stat) window.stat('accueil/' + k, 'Accueil : ' + OBJETS[k].titre);
     history.pushState({ v: k }, '', '#' + k);
     etat = k; objet = k; await lancerPlan(k, k + '_aller.mp4'); vueObjet(k);
   }
@@ -435,7 +469,7 @@ body.gros .accroche { display: none; }
     if (window.stat) window.stat('accueil/plongee', 'Accueil : plongée dans l\'écran');
     occupe = true; document.body.classList.add('occupe');
     await charger(vPlan, M + 'plongee.mp4');
-    montrer(vPlan, true); setTimeout(() => montrer(vBoucle, false), 60);
+    montrer(vPlan, true); apresImage(() => montrer(vBoucle, false));
     try { sessionStorage.setItem('retour_rue', location.pathname + '#sortie'); } catch (e) {}
     await jouerJusquauBout(vPlan);
     location.href = 'rue.html#jouer';
