@@ -285,7 +285,8 @@ body.gros .accroche { display: none; }
   async function charger(v, src, poster) {
     const nom = src.startsWith(M) ? src.slice(M.length) : null;
     let url = nom ? BLOBS.get(nom) : null;
-    if (!url && nom && EN_COURS.has(nom)) url = await EN_COURS.get(nom);
+    // téléchargement en cours (réseau lent) : on l'attend au plus 300 ms, sinon la vidéo part en lecture directe
+    if (!url && nom && EN_COURS.has(nom)) url = await Promise.race([EN_COURS.get(nom), new Promise((r) => setTimeout(() => r(null), 300))]);
     if (!url) url = src + VER;
     if (poster) poster += VER;
     return new Promise((ok) => {
