@@ -135,6 +135,15 @@ body.gros .accroche { display: none; }
   .fond::after { background: linear-gradient(0deg, rgba(5,6,10,.85) 0%, rgba(5,6,10,.35) 55%, rgba(5,6,10,0) 80%); }
   body.salon .accroche { display: none; }
 }
+/* ---------- accès direct aux CV, en haut à droite ---------- */
+.raccourcis { position: fixed; z-index: 4; top: max(18px, env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px), 3vw); display: flex; gap: 10px; transition: opacity .3s; }
+.occupe .raccourcis { opacity: 0; pointer-events: none; }
+.raccourci { display: grid; gap: 2px; padding: 10px 16px 11px; background: var(--case); border: 1px solid var(--trait); backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
+  color: var(--texte); text-decoration: none; text-shadow: 0 1px 8px rgba(0,0,0,.8); transition: background .18s, border-color .18s; }
+.raccourci b { font-family: var(--f-titre); font-weight: 600; font-size: 12.5px; letter-spacing: .2em; text-transform: uppercase; }
+.raccourci small { font-family: var(--f-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: rgba(240,242,246,.6); }
+.raccourci:hover, .raccourci:focus-visible { background: var(--case-fort); border-color: var(--trait-fort); outline: none; }
+@media (max-width: 620px) { .raccourcis { left: 16px; right: 16px; gap: 8px; } .raccourci { flex: 1; padding: 9px 12px 10px; } .raccourci b { font-size: 11.5px; letter-spacing: .14em; } }
 @media (prefers-reduced-motion: reduce) { .appuie, .vue, .bulle .pt::after, .descend { animation: none; } .tuile, .fond video { transition: none; } }
 </style>
 </head>
@@ -146,6 +155,10 @@ body.gros .accroche { display: none; }
 </div>
 
 <div class="bulles cache" id="bulles"></div>
+<nav class="raccourcis" aria-label="Accès direct aux CV">
+  <a class="raccourci" href="cv/CV_Guillaume_Belle-Croix_1page.pdf?v=4" target="_blank" rel="noopener"><b>CV 1 page</b><small>PDF</small></a>
+  <a class="raccourci" href="cv/CV_Guillaume_Belle-Croix_dossier.pdf?v=2" target="_blank" rel="noopener"><b>Dossier complet</b><small>7 pages · PDF</small></a>
+</nav>
 <div class="glisse" id="glisse" hidden>← Glisse pour regarder autour →</div>
 
 <main class="scene">
