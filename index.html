@@ -264,31 +264,48 @@ body.gros .accroche { display: none; }
   addEventListener('resize', placer);
 
   /* ---------- vidéos ---------- */
-  /* les vidéos sont téléchargées en entier à l'avance (dès l'arrivée dans le salon) et gardées en mémoire :
-     au clic, le travelling démarre tout de suite et ne s'arrête jamais en route pour attendre le réseau */
-  const BLOBS = new Map(), EN_COURS = new Map();
-  function telecharger(f) {
+  /* les vidéos sont téléchargées en entier à l'avance, une par une et par ordre de priorité, dès l'ouverture de la page
+     (pendant l'écran « Press any button ») et gardées en mémoire : au clic, le travelling démarre tout de suite.
+     Chaque objet a sa propre version : une mise à jour d'un objet ne force pas à retélécharger les autres. */
+  const VF = { pc: 61, cv: 63, dossier: 62, vapeur: 64, portefeuille: 60, plongee: 60, sortie: 60 };
+  const verDe = (f) => '?v=' + (VF[f.replace(/(_aller|_retour|_boucle)?\.(mp4|jpg)$/, '')] || 60);
+  const BLOBS = new Map(), ATTENTES = new Map();
+  let file = [], actif = null, fileLancee = false;
+  function quand(f) {
     if (BLOBS.has(f)) return Promise.resolve(BLOBS.get(f));
-    if (EN_COURS.has(f)) return EN_COURS.get(f);
-    const p = fetch(M + f + VER).then((r) => (r.ok ? r.blob() : null))
-      .then((b) => { if (!b || b.size < 1000) return null; const u = URL.createObjectURL(b); BLOBS.set(f, u); return u; })
-      .catch(() => null).finally(() => EN_COURS.delete(f));
-    EN_COURS.set(f, p); return p;
+    if (!ATTENTES.has(f)) { let r; const p = new Promise((ok) => { r = ok; }); p.r = r; ATTENTES.set(f, p); }
+    return ATTENTES.get(f);
   }
-  function prechauffer(k) { telecharger(k + '_aller.mp4'); telecharger(k + '_boucle.mp4'); }
-  let zoomsLances = false;
-  async function prechargerZooms() {
-    if (zoomsLances) return; zoomsLances = true;
-    for (const k of ORDRE) { await telecharger(k + '_aller.mp4'); await telecharger(k + '_boucle.mp4'); }
-    prechargerRue();
+  function demander(f, devant) {
+    if (BLOBS.has(f) || (actif && actif.f === f)) return;
+    file = file.filter((x) => x !== f); if (devant) file.unshift(f); else file.push(f);
+    pomper();
   }
+  function pomper() {
+    if (actif) return;
+    if (!file.length) { if (fileLancee) prechargerRue(); return; }
+    const f = file.shift(); actif = { f };
+    fetch(M + f + verDe(f)).then((r) => (r.ok ? r.blob() : null)).then((b) => {
+      if (!b || b.size < 1000) return;
+      const u = URL.createObjectURL(b), w = ATTENTES.get(f); BLOBS.set(f, u); if (w) { w.r(u); ATTENTES.delete(f); }
+    }).catch(() => {}).finally(() => { actif = null; pomper(); });
+  }
+  function lancerFile() {
+    if (fileLancee) return; fileLancee = true;
+    const c = navigator.connection; if (c && c.saveData) return;          // économie de données : rien d'avance
+    ORDRE.forEach((k) => demander(k + '_aller.mp4'));                     // d'abord les 5 allers…
+    ORDRE.forEach((k) => demander(k + '_boucle.mp4'));                    // …puis les boucles
+  }
+  // survol d'une bulle : son aller et sa boucle passent en tête de file (sans téléchargement en parallèle)
+  function prechauffer(k) { demander(k + '_boucle.mp4', true); demander(k + '_aller.mp4', true); }
+  const telecharger = (f) => demander(f, true);
   async function charger(v, src, poster) {
     const nom = src.startsWith(M) ? src.slice(M.length) : null;
     let url = nom ? BLOBS.get(nom) : null;
-    // téléchargement en cours (réseau lent) : on l'attend au plus 300 ms, sinon la vidéo part en lecture directe
-    if (!url && nom && EN_COURS.has(nom)) url = await Promise.race([EN_COURS.get(nom), new Promise((r) => setTimeout(() => r(null), 300))]);
-    if (!url) url = src + VER;
-    if (poster) poster += VER;
+    // en cours de téléchargement : on l'attend au plus 300 ms, sinon la vidéo part en lecture directe
+    if (!url && nom && actif && actif.f === nom) url = await Promise.race([quand(nom), new Promise((r) => setTimeout(() => r(null), 300))]);
+    if (!url) url = src + (nom ? verDe(nom) : VER);
+    if (poster) poster += poster.startsWith(M) ? verDe(poster.slice(M.length)) : VER;
     return new Promise((ok) => {
       if (v.dataset.src === url && v.readyState >= 2) return ok();
       v.dataset.src = url; if (poster) v.poster = poster; v.src = url; v.load();
@@ -386,7 +403,7 @@ body.gros .accroche { display: none; }
     } catch (e) {}
   }
   function entrerSalon(pousser) {
-    setTimeout(prechargerZooms, 600);
+    lancerFile();
     if (pousser) history.pushState({ v: 'salon' }, '', '#salon');
     etat = 'salon'; afficherVue('v-salon-ui'); placer(); bulles.classList.remove('cache');
     vSalon.play().catch(() => {});
@@ -453,6 +470,8 @@ body.gros .accroche { display: none; }
     lancerPlan('pc', 'sortie.mp4').then(() => vueObjet('pc'));
   } else if (h === 'salon') entrerSalon(true);
   else if (OBJETS[h]) { entrerSalon(true); aller(h); }
+  // la file démarre dès l'écran titre : le temps passé sur « Press any button » sert à télécharger
+  if (document.readyState === 'complete') setTimeout(lancerFile, 300); else addEventListener('load', () => setTimeout(lancerFile, 300));
 })();
 </script>
 <script src="stats.js?v=2" defer></script>
