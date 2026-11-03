@@ -14,6 +14,7 @@
   document.head.appendChild(s);
   // lectures et téléchargements des PDF
   document.addEventListener("click", e => {
+    const v = e.target.closest('a[href$=".vcf"]'); if (v) { window.stat("contact/fiche-vcf", "Contact : fiche téléchargée"); return; }
     const a = e.target.closest('a[href*="cv/CV_"]'); if (!a) return;
     const f = a.getAttribute("href").split("/").pop().split("?")[0];
     window.stat((a.hasAttribute("download") ? "pdf-telecharge/" : "pdf-ouvert/") + f);

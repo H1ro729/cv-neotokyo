@@ -365,8 +365,25 @@ body.gros .accroche { display: none; }
   }
 
   /* ---------- navigation (chaque écran a son entrée d'historique : la flèche retour reste dans le site) ---------- */
+  /* ?debug=1 : affiche en bas à gauche le temps entre le clic et la première image du zoom */
+  const DEBUG = /[?&]debug=1/.test(location.search);
+  let dbgEl = null;
+  function dbg(t) {
+    if (!DEBUG) return;
+    if (!dbgEl) { dbgEl = document.createElement('div'); dbgEl.style.cssText = 'position:fixed;z-index:99;left:8px;bottom:8px;font:13px/1.45 monospace;background:rgba(0,0,0,.85);color:#3f6;padding:9px 12px;white-space:pre;pointer-events:none'; document.body.appendChild(dbgEl); }
+    dbgEl.textContent = t;
+  }
+  function mesurer(k) {
+    if (!DEBUG) return;
+    const t0 = performance.now(), pret = BLOBS.has(k + '_aller.mp4'), c = navigator.connection;
+    const info = () => 'source : ' + (pret ? 'mémoire (déjà téléchargée)' : 'réseau (pas encore téléchargée)') + '\nvidéos prêtes : ' + BLOBS.size + '\nconnexion : ' + (c ? c.effectiveType + ' ~' + c.downlink + ' Mbit/s' : '?') + '\n' + navigator.userAgent.replace(/^Mozilla\/5.0 /, '').slice(0, 90);
+    dbg('clic sur ' + k + '…\n' + info());
+    const fin = () => dbg('clic → 1re image du zoom : ' + Math.round(performance.now() - t0) + ' ms\n' + info());
+    if (vPlan.requestVideoFrameCallback) vPlan.requestVideoFrameCallback(fin); else vPlan.addEventListener('playing', fin, { once: true });
+  }
   async function aller(k) {
     if (occupe || etat !== 'salon') return;
+    mesurer(k); if (window.stat) window.stat('accueil/' + k, 'Accueil : ' + OBJETS[k].titre);
     history.pushState({ v: k }, '', '#' + k);
     etat = k; objet = k; await lancerPlan(k, k + '_aller.mp4'); vueObjet(k);
   }
@@ -403,6 +420,7 @@ body.gros .accroche { display: none; }
     } catch (e) {}
   }
   function entrerSalon(pousser) {
+    if (window.stat) window.stat('accueil/salon', 'Accueil : entrée dans le salon');
     lancerFile();
     if (pousser) history.pushState({ v: 'salon' }, '', '#salon');
     etat = 'salon'; afficherVue('v-salon-ui'); placer(); bulles.classList.remove('cache');
@@ -414,6 +432,7 @@ body.gros .accroche { display: none; }
   let plonge = false;
   async function plonger() {
     if (etat !== 'pc' || occupe || plonge) return; plonge = true;
+    if (window.stat) window.stat('accueil/plongee', 'Accueil : plongée dans l\'écran');
     occupe = true; document.body.classList.add('occupe');
     await charger(vPlan, M + 'plongee.mp4');
     montrer(vPlan, true); setTimeout(() => montrer(vBoucle, false), 60);
@@ -449,6 +468,7 @@ body.gros .accroche { display: none; }
 
   /* ---------- copier ---------- */
   document.querySelectorAll('.copier[data-copie]').forEach((b) => b.addEventListener('click', async () => {
+    if (window.stat) window.stat('contact/copie-' + (b.dataset.copie.includes('@') ? 'email' : 'telephone'), 'Contact : copie ' + (b.dataset.copie.includes('@') ? 'e-mail' : 'téléphone'));
     try { await navigator.clipboard.writeText(b.dataset.copie); b.textContent = 'Copié'; }
     catch (err) { const r = document.createRange(); r.selectNodeContents(b.previousElementSibling); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Sélectionné'; }
     setTimeout(() => { b.textContent = 'Copier'; }, 1600);
@@ -474,6 +494,6 @@ body.gros .accroche { display: none; }
   if (document.readyState === 'complete') setTimeout(lancerFile, 300); else addEventListener('load', () => setTimeout(lancerFile, 300));
 })();
 </script>
-<script src="stats.js?v=2" defer></script>
+<script src="stats.js?v=3" defer></script>
 </body>
 </html>
