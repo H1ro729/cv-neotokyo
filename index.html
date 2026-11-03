@@ -267,7 +267,7 @@ body.gros .accroche { display: none; }
   /* les vidéos sont téléchargées en entier à l'avance, une par une et par ordre de priorité, dès l'ouverture de la page
      (pendant l'écran « Press any button ») et gardées en mémoire : au clic, le travelling démarre tout de suite.
      Chaque objet a sa propre version : une mise à jour d'un objet ne force pas à retélécharger les autres. */
-  const VF = { pc: 61, cv: 63, dossier: 62, vapeur: 64, portefeuille: 65, plongee: 60, sortie: 60 };
+  const VF = { pc: 61, cv: 63, dossier: 62, vapeur: 64, portefeuille: 65, plongee: 65, sortie: 60 };
   const verDe = (f) => '?v=' + (VF[f.replace(/(_aller|_retour|_boucle)?\.(mp4|jpg)$/, '')] || 60);
   const BLOBS = new Map(), ATTENTES = new Map();
   let file = [], actif = null, fileLancee = false;
